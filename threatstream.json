@@ -3,10 +3,10 @@
   "name": "ThreatStream",
   "description": "Integrates a variety of <b>reputation</b> and <b>lookup</b> actions from the Anomali ThreatStream threat intelligence platform.",
   "publisher": "Phantom",
-  "type": "reputation", 
+  "type": "reputation",
   "main_module": "threatstream_connector.pyc",
-    "app_version": "1.0.17",
-    "utctime_updated": "2017-04-29T02:31:10.000000Z",
+  "app_version": "1.0.18",
+  "utctime_updated": "2017-12-19T23:45:40.000000Z",
   "package_name": "phantom_threatstream",
   "logo": "anomali-logo.png",
   "product_vendor": "Anomali",
@@ -37,7 +37,7 @@
       "read_only": true,
       "parameters": {},
       "output": [],
-      "versions":"EQ(*)"
+      "versions": "EQ(*)"
     },
     {
       "action": "file reputation",
@@ -51,7 +51,9 @@
           "description": "MD5 Hash of file",
           "data_type": "string",
           "order": 0,
-          "contains": [ "md5" ],
+          "contains": [
+            "md5"
+          ],
           "required": true,
           "primary": true
         }
@@ -66,7 +68,9 @@
         {
           "data_path": "action_result.data.*.value",
           "data_type": "string",
-          "contains": [ "md5" ],
+          "contains": [
+            "md5"
+          ],
           "column_name": "Value",
           "column_order": 0
         },
@@ -97,7 +101,9 @@
         {
           "data_path": "action_result.data.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ]
+          "contains": [
+            "ip"
+          ]
         },
         {
           "data_path": "action_result.id",
@@ -250,7 +256,9 @@
         {
           "data_path": "action_result.parameter.hash",
           "data_type": "string",
-          "contains": ["md5"]
+          "contains": [
+            "md5"
+          ]
         },
         {
           "data_path": "summary.total_objects",
@@ -275,7 +283,10 @@
           "description": "Domain to investigate",
           "data_type": "string",
           "order": 0,
-          "contains": [ "domain", "url" ],
+          "contains": [
+            "domain",
+            "url"
+          ],
           "required": true,
           "primary": true
         }
@@ -290,14 +301,18 @@
         {
           "data_path": "action_result.data.*.value",
           "data_type": "string",
-          "contains": [ "domain" ],
+          "contains": [
+            "domain"
+          ],
           "column_name": "Value",
           "column_order": 0
         },
         {
           "data_path": "action_result.data.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ],
+          "contains": [
+            "ip"
+          ],
           "column_name": "IP",
           "column_order": 1
         },
@@ -452,12 +467,16 @@
         {
           "data_path": "action_result.extra_data.*.pdns.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ]
+          "contains": [
+            "ip"
+          ]
         },
         {
           "data_path": "action_result.extra_data.*.pdns.*.domain",
           "data_type": "string",
-          "contains": [ "domain" ]
+          "contains": [
+            "domain"
+          ]
         },
         {
           "data_path": "action_result.extra_data.*.pdns.*.rrtype",
@@ -502,7 +521,10 @@
         {
           "data_path": "action_result.parameter.domain",
           "data_type": "string",
-          "contains": ["domain", "url"]
+          "contains": [
+            "domain",
+            "url"
+          ]
         },
         {
           "data_path": "summary.total_objects",
@@ -527,7 +549,9 @@
           "description": "IP to investigate",
           "data_type": "string",
           "order": 0,
-          "contains": [ "ip" ],
+          "contains": [
+            "ip"
+          ],
           "required": true,
           "primary": true
         }
@@ -546,7 +570,9 @@
         {
           "data_path": "action_result.data.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ],
+          "contains": [
+            "ip"
+          ],
           "column_name": "IP",
           "column_order": 0
         },
@@ -701,12 +727,16 @@
         {
           "data_path": "action_result.extra_data.*.pdns.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ]
+          "contains": [
+            "ip"
+          ]
         },
         {
           "data_path": "action_result.extra_data.*.pdns.*.domain",
           "data_type": "string",
-          "contains": [ "domain" ]
+          "contains": [
+            "domain"
+          ]
         },
         {
           "data_path": "action_result.extra_data.*.pdns.*.rrtype",
@@ -751,7 +781,9 @@
         {
           "data_path": "action_result.parameter.ip",
           "data_type": "string",
-          "contains": ["ip"]
+          "contains": [
+            "ip"
+          ]
         },
         {
           "data_path": "summary.total_objects",
@@ -776,7 +808,9 @@
           "description": "Email to investigate",
           "data_type": "string",
           "order": 0,
-          "contains": [ "email" ],
+          "contains": [
+            "email"
+          ],
           "required": true,
           "primary": true
         }
@@ -791,7 +825,9 @@
         {
           "data_path": "action_result.data.*.value",
           "data_type": "string",
-          "contains": [ "email" ],
+          "contains": [
+            "email"
+          ],
           "column_name": "Value",
           "column_order": 0
         },
@@ -822,7 +858,9 @@
         {
           "data_path": "action_result.data.*.ip",
           "data_type": "string",
-          "contains": [ "ip" ]
+          "contains": [
+            "ip"
+          ]
         },
         {
           "data_path": "action_result.id",
@@ -975,7 +1013,9 @@
         {
           "data_path": "action_result.parameter.email",
           "data_type": "string",
-          "contains": ["email"]
+          "contains": [
+            "email"
+          ]
         },
         {
           "data_path": "summary.total_objects",
@@ -993,7 +1033,6 @@
       "description": "Execute a whois lookup on the given domain",
       "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
       "type": "investigate",
-      "type": "investigate",
       "identifier": "whois_domain",
       "read_only": true,
       "parameters": {
@@ -1001,7 +1040,10 @@
           "description": "Domain",
           "data_type": "string",
           "order": 0,
-          "contains": [ "domain", "url" ],
+          "contains": [
+            "domain",
+            "url"
+          ],
           "required": true,
           "primary": true
         }
@@ -1037,7 +1079,9 @@
           "data_path": "action_result.data.*.contacts.admin.email",
           "data_type": "string",
           "column_name": "Admin Email",
-          "contains": [ "email" ],
+          "contains": [
+            "email"
+          ],
           "column_order": 3
         },
         {
@@ -1088,7 +1132,9 @@
           "data_path": "action_result.data.*.contacts.registrant.email",
           "data_type": "string",
           "column_name": "Registrant Email",
-          "contains": [ "email" ],
+          "contains": [
+            "email"
+          ],
           "column_order": 8
         },
         {
@@ -1204,7 +1250,10 @@
         {
           "data_path": "action_result.parameter.domain",
           "data_type": "string",
-          "contains": [ "domain" , "url" ],
+          "contains": [
+            "domain",
+            "url"
+          ],
           "column_name": "Domain",
           "column_order": 0
         },
