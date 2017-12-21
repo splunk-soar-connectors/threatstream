@@ -1,1227 +1,1277 @@
 {
-  "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-  "name": "ThreatStream",
-  "description": "Integrates a variety of <b>reputation</b> and <b>lookup</b> actions from the Anomali ThreatStream threat intelligence platform.",
-  "publisher": "Phantom",
-  "type": "reputation", 
-  "main_module": "threatstream_connector.pyc",
+    "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
+    "name": "ThreatStream",
+    "description": "Integrates a variety of <b>reputation</b> and <b>lookup</b> actions from the Anomali ThreatStream threat intelligence platform.",
+    "publisher": "Phantom",
+    "type": "reputation",
+    "main_module": "threatstream_connector.pyc",
     "app_version": "1.0.17",
     "utctime_updated": "2017-04-29T02:31:10.000000Z",
-  "package_name": "phantom_threatstream",
-  "logo": "anomali-logo.png",
-  "product_vendor": "Anomali",
-  "product_name": "ThreatStream",
-  "product_version_regex": ".*",
-  "min_phantom_version": "1.2.265",
-  "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
-  "configuration": {
-    "username": {
-      "data_type": "string",
-      "order": 0,
-      "description": "User name",
-      "required": true
+    "package_name": "phantom_threatstream",
+    "logo": "logo_anomali.svg",
+    "logo_dark": "logo_anomali_dark.svg",
+    "product_vendor": "Anomali",
+    "product_name": "ThreatStream",
+    "product_version_regex": ".*",
+    "min_phantom_version": "1.2.265",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
+    "configuration": {
+        "username": {
+            "data_type": "string",
+            "order": 0,
+            "description": "User name",
+            "required": true
+        },
+        "api_key": {
+            "data_type": "string",
+            "order": 0,
+            "description": "API Key",
+            "required": true
+        }
     },
-    "api_key": {
-      "data_type": "string",
-      "order": 0,
-      "description": "API Key",
-      "required": true
-    }
-  },
-  "actions": [
-    {
-      "action": "test connectivity",
-      "description": "Test connectivity to ThreatStream by querying the intelligence endpoint",
-      "type": "test",
-      "identifier": "test_asset_connectivity",
-      "read_only": true,
-      "parameters": {},
-      "output": [],
-      "versions":"EQ(*)"
-    },
-    {
-      "action": "file reputation",
-      "description": "Get information about a file",
-      "verbose": "If nothing is found, this is because ThreatStream has no information on that file.",
-      "type": "investigate",
-      "identifier": "file_reputation",
-      "read_only": true,
-      "parameters": {
-        "hash": {
-          "description": "MD5 Hash of file",
-          "data_type": "string",
-          "order": 0,
-          "contains": [ "md5" ],
-          "required": true,
-          "primary": true
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Test connectivity to ThreatStream by querying the intelligence endpoint",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file reputation",
+            "description": "Get information about a file",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that file.",
+            "type": "investigate",
+            "identifier": "file_reputation",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "MD5 Hash of file",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "File Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.extra_data.*..external_references.IPVoid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Shodan",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Get information about a given domain",
+            "type": "investigate",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "identifier": "domain_reputation",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to investigate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Shodan",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "Get information about a given IP",
+            "type": "investigate",
+            "identifier": "ip_reputation",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to investigate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Ip Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.pdns.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Shodan",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "email reputation",
+            "description": "Get information about a given email",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that email.",
+            "type": "investigate",
+            "identifier": "email_reputation",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "description": "Email to investigate",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Email Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Shodan",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois domain",
+            "description": "Execute a whois lookup on the given domain",
+            "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
+            "type": "investigate",
+            "identifier": "whois_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois details"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.city",
+                    "data_type": "string",
+                    "column_name": "Admin City",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.country",
+                    "data_type": "string",
+                    "column_name": "Admin Country",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.email",
+                    "data_type": "string",
+                    "column_name": "Admin Email",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.name",
+                    "data_type": "string",
+                    "column_name": "Admin Name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.organization",
+                    "data_type": "string",
+                    "column_name": "Admin Organization",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.phone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.postalcode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.fax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.city",
+                    "data_type": "string",
+                    "column_name": "Registrant City",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.country",
+                    "data_type": "string",
+                    "column_name": "Registrant Country",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.email",
+                    "data_type": "string",
+                    "column_name": "Registrant Email",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.name",
+                    "data_type": "string",
+                    "column_name": "Registrant Name",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.organization",
+                    "data_type": "string",
+                    "column_name": "Registrant Organization",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.phone",
+                    "data_type": "string",
+                    "column_name": "Registrant Phone",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.fax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.postalcode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.registrant.street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.fax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.phone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.postalcode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.tech.street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creation_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.emails",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.nameservers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.registrar",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updated_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.whois_server",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         }
-      },
-      "render": {
-        "width": 12,
-        "title": "File Reputation",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.value",
-          "data_type": "string",
-          "contains": [ "md5" ],
-          "column_name": "Value",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.confidence",
-          "data_type": "numeric",
-          "column_name": "Confidence",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.threatscore",
-          "data_type": "numeric",
-          "column_name": "Threatscore",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.itype",
-          "data_type": "string",
-          "column_name": "Indicator",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.created_ts",
-          "data_type": "string",
-          "column_name": "First Found",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ]
-        },
-        {
-          "data_path": "action_result.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.asn",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.org",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.detail2",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.severity",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdns",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.trusted_circle_ids",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.import_session_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.description",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.org_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.country",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.feed_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.latitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.is_public",
-          "data_type": "boolean"
-        },
-        {
-          "data_path": "action_result.data.*.longitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.update_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.modified_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.threat_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.resource_uri",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.expiration_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.extended_source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.retina_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.owner_organization_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.source_reported_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.extra_data.*..external_references.IPVoid",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Shodan",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.hash",
-          "data_type": "string",
-          "contains": ["md5"]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "domain reputation",
-      "description": "Get information about a given domain",
-      "type": "investigate",
-      "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
-      "identifier": "domain_reputation",
-      "read_only": true,
-      "parameters": {
-        "domain": {
-          "description": "Domain to investigate",
-          "data_type": "string",
-          "order": 0,
-          "contains": [ "domain", "url" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Domain Reputation",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.value",
-          "data_type": "string",
-          "contains": [ "domain" ],
-          "column_name": "Value",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ],
-          "column_name": "IP",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.confidence",
-          "data_type": "numeric",
-          "column_name": "Confidence",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.threatscore",
-          "data_type": "numeric",
-          "column_name": "Threatscore",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.itype",
-          "data_type": "string",
-          "column_name": "Indicator",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.created_ts",
-          "data_type": "string",
-          "column_name": "First Found",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.asn",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.org",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.detail2",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.severity",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdns",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.trusted_circle_ids",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.import_session_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.description",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.org_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.country",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.feed_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.latitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.is_public",
-          "data_type": "boolean"
-        },
-        {
-          "data_path": "action_result.data.*.longitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.update_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.modified_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.threat_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.resource_uri",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.expiration_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.extended_source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.retina_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.owner_organization_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.source_reported_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ]
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.domain",
-          "data_type": "string",
-          "contains": [ "domain" ]
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.rrtype",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.last_seen",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.first_seen",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.IPVoid",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Shodan",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.domain",
-          "data_type": "string",
-          "contains": ["domain", "url"]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "ip reputation",
-      "description": "Get information about a given IP",
-      "type": "investigate",
-      "identifier": "ip_reputation",
-      "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
-      "read_only": true,
-      "parameters": {
-        "ip": {
-          "description": "IP to investigate",
-          "data_type": "string",
-          "order": 0,
-          "contains": [ "ip" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Ip Reputation",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.value",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ],
-          "column_name": "IP",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.confidence",
-          "data_type": "numeric",
-          "column_name": "Confidence",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.threatscore",
-          "data_type": "numeric",
-          "column_name": "Threatscore",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.itype",
-          "data_type": "string",
-          "column_name": "Indicator",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.created_ts",
-          "data_type": "string",
-          "column_name": "First Found",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.asn",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.org",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.detail2",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.severity",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdns",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.trusted_circle_ids",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.import_session_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.description",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.org_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.country",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.feed_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.latitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.is_public",
-          "data_type": "boolean"
-        },
-        {
-          "data_path": "action_result.data.*.longitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.update_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.modified_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.threat_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.resource_uri",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.expiration_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.extended_source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.retina_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.owner_organization_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.source_reported_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ]
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.domain",
-          "data_type": "string",
-          "contains": [ "domain" ]
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.rrtype",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.last_seen",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.pdns.*.first_seen",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.IPVoid",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Shodan",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip",
-          "data_type": "string",
-          "contains": ["ip"]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "email reputation",
-      "description": "Get information about a given email",
-      "verbose": "If nothing is found, this is because ThreatStream has no information on that email.",
-      "type": "investigate",
-      "identifier": "email_reputation",
-      "read_only": true,
-      "parameters": {
-        "email": {
-          "description": "Email to investigate",
-          "data_type": "string",
-          "order": 0,
-          "contains": [ "email" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "width": 12,
-        "title": "Email Reputation",
-        "type": "table",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.value",
-          "data_type": "string",
-          "contains": [ "email" ],
-          "column_name": "Value",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.data.*.confidence",
-          "data_type": "numeric",
-          "column_name": "Confidence",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.threatscore",
-          "data_type": "numeric",
-          "column_name": "Threatscore",
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.itype",
-          "data_type": "string",
-          "column_name": "Indicator",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.created_ts",
-          "data_type": "string",
-          "column_name": "First Found",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.ip",
-          "data_type": "string",
-          "contains": [ "ip" ]
-        },
-        {
-          "data_path": "action_result.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.asn",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.org",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.detail2",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.meta.severity",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdns",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.trusted_circle_ids",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.import_session_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.description",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.org_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.tags.*.source_user_id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.country",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.feed_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.latitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.is_public",
-          "data_type": "boolean"
-        },
-        {
-          "data_path": "action_result.data.*.longitude",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.update_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.modified_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.threat_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.resource_uri",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.expiration_ts",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.extended_source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.retina_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.owner_organization_id",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.source_reported_confidence",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.IPVoid",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Shodan",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.email",
-          "data_type": "string",
-          "contains": ["email"]
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    },
-    {
-      "action": "whois domain",
-      "description": "Execute a whois lookup on the given domain",
-      "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
-      "type": "investigate",
-      "type": "investigate",
-      "identifier": "whois_domain",
-      "read_only": true,
-      "parameters": {
-        "domain": {
-          "description": "Domain",
-          "data_type": "string",
-          "order": 0,
-          "contains": [ "domain", "url" ],
-          "required": true,
-          "primary": true
-        }
-      },
-      "render": {
-        "type": "table",
-        "width": 12,
-        "height": 5,
-        "title": "Whois details"
-      },
-      "output": [
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.id",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.city",
-          "data_type": "string",
-          "column_name": "Admin City",
-          "column_order": 1
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.country",
-          "data_type": "string",
-          "column_name": "Admin Country",
-          "column_order": 2
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.email",
-          "data_type": "string",
-          "column_name": "Admin Email",
-          "contains": [ "email" ],
-          "column_order": 3
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.name",
-          "data_type": "string",
-          "column_name": "Admin Name",
-          "column_order": 4
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.organization",
-          "data_type": "string",
-          "column_name": "Admin Organization",
-          "column_order": 5
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.phone",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.postalcode",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.state",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.street",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.admin.fax",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.city",
-          "data_type": "string",
-          "column_name": "Registrant City",
-          "column_order": 6
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.country",
-          "data_type": "string",
-          "column_name": "Registrant Country",
-          "column_order": 7
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.email",
-          "data_type": "string",
-          "column_name": "Registrant Email",
-          "contains": [ "email" ],
-          "column_order": 8
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.name",
-          "data_type": "string",
-          "column_name": "Registrant Name",
-          "column_order": 9
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.organization",
-          "data_type": "string",
-          "column_name": "Registrant Organization",
-          "column_order": 10
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.phone",
-          "data_type": "string",
-          "column_name": "Registrant Phone",
-          "column_order": 11
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.fax",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.postalcode",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.state",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.registrant.street",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.city",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.country",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.email",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.fax",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.name",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.organization",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.phone",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.postalcode",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.state",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.contacts.tech.street",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.creation_date",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.emails",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.expiration_date",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.nameservers",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.raw",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.registrar",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.updated_date",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.whois_server",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.domain",
-          "data_type": "string",
-          "contains": [ "domain" , "url" ],
-          "column_name": "Domain",
-          "column_order": 0
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ],
-      "versions": "EQ(*)"
-    }
-  ]
+    ]
 }
