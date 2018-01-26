@@ -6,7 +6,7 @@
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
     "app_version": "1.0.19",
-    "utctime_updated": "2018-01-25T03:07:30.000000Z",
+    "utctime_updated": "2018-01-26T00:50:55.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
