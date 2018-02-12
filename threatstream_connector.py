@@ -514,15 +514,6 @@ class ThreatstreamConnector(BaseConnector):
         if (not ret_val):
             return action_result.get_status()
 
-        # self.save_progress("Completed import.  Now checking for value to validate and pull ID")
-        # payload = self._generate_payload(extend_source="true", limit="25", offset="0",
-        #                                 order_by="-created_ts", value=param["value"])
-        # ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
-        # if (phantom.is_fail(ret_val)):
-        #    return action_result.get_status()
-
-        # action_result.add_data(resp_json)
-
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Data should be available in ThreatStream soon.")
 
     def _handle_on_poll(self, param):
@@ -563,6 +554,36 @@ class ThreatstreamConnector(BaseConnector):
                 container['source_data_identifier'] = resp_json["id"]
                 container['name'] = resp_json["name"]
                 container['data'] = resp_json
+                container['artifacts'] = []
+
+                intelligence = resp_json.pop("intelligence")
+                if intelligence != []:
+                    for item in intelligence:
+                        artifact = {"label": "artifact",
+                                    "type": "network",
+                                    "name": "intelligence artifact",
+                                    "description": "Artifact added by ThreatStream App",
+                                    "source_data_identifier": item["id"]
+                                    }
+                        artifact['cef'] = item
+                        artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
+                                'owner_organization_id': [ "threatstream organization id" ],
+                                'ip': [ "ip" ],
+                                'value': [ "ip", "domain", "md5", "sha1", "hash" ]
+                                        }
+                        container['artifacts'].append(artifact)
+
+                artifact = {"label": "artifact",
+                            "type": "network",
+                            "name": "incident artifact",
+                            "description": "Artifact added by ThreatStream App",
+                            "source_data_identifier": resp_json["id"]
+                            }
+                artifact['cef'] = resp_json
+                artifact['cef_types'] = {'id': [ "threatstream incident id" ],
+                            'organization_id': [ "threatstream organization id" ]
+                                         }
+                container['artifacts'].append(artifact)
 
                 self.save_progress("Saving container and adding artifacts...")
                 ret_val, message, container_id = self.save_container(container)
@@ -579,43 +600,6 @@ class ThreatstreamConnector(BaseConnector):
                 # Add incident ID to tracking set for state saving later
                 set_of_inc_ids.add(int(resp_json["id"]))
                 added_containers += 1
-
-                intelligence = resp_json.pop("intelligence")
-                if intelligence != []:
-                    for item in intelligence:
-                        artifact = {"label": "artifact",
-                                    "type": "network",
-                                    "name": "intelligence artifact",
-                                    "description": "Artifact added by ThreatStream App",
-                                    "container_id": container_id,
-                                    "source_data_identifier": item["id"],
-                                    "run_automation": False  # Don't run any playbooks, when this artifact is added
-                                    }
-                        artifact['cef'] = item
-                        artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
-                                'owner_organization_id': [ "threatstream organization id" ],
-                                'ip': [ "ip" ],
-                                'value': [ "ip", "domain", "md5", "sha1", "hash" ]
-                                        }
-                        ret_val, status_string, artifact_id = self.save_artifact(artifact)
-                        if (phantom.is_fail(ret_val)):
-                            return action_result.set_status(phantom.APP_ERROR, "Failed to save intel artifact")
-
-                artifact = {"label": "artifact",
-                            "type": "network",
-                            "name": "incident artifact",
-                            "description": "Artifact added by ThreatStream App",
-                            "container_id": container_id,
-                            "source_data_identifier": resp_json["id"],
-                            "run_automation": False  # Don't run any playbooks, when this artifact is added
-                            }
-                artifact['cef'] = resp_json
-                artifact['cef_types'] = {'id': [ "threatstream incident id" ],
-                            'organization_id': [ "threatstream organization id" ]
-                                         }
-                ret_val, status_string, artifact_id = self.save_artifact(artifact)
-                if (phantom.is_fail(ret_val)):
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to save intel artifact")
 
         if (not self.is_poll_now()):
             self._state["last_incident_id"] = sorted(set_of_inc_ids)[-1]
@@ -658,10 +642,6 @@ class ThreatstreamConnector(BaseConnector):
 
 
 if __name__ == '__main__':
-    """ Code that is executed when run in standalone debug mode
-    for .e.g:
-    python2.7 ./my_connector.py /tmp/my_input_test.json
-        """
 
     # Imports
     import sys

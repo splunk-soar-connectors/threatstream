@@ -1,7 +1,7 @@
 {
     "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "name": "ThreatStream",
-    "description": "Integrates a variety of <b>reputation</b> and <b>lookup</b> actions from the Anomali ThreatStream threat intelligence platform.",
+    "description": "Integrates a variety of reputation and lookup actions from the Anomali ThreatStream threat intelligence platform.",
     "publisher": "Phantom",
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
@@ -2159,7 +2159,7 @@
             "verbose": "",
             "type": "generic",
             "identifier": "create_incident",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "name": {
                     "description": "Name to give the incident",
@@ -2182,7 +2182,7 @@
                     "required": false
                 },
                 "intelligence": {
-                    "description": "Comma separated list of intelligence IDs to assocate with the incident -  Note that this overwrites, not appends",
+                    "description": "Comma separated list of intelligence IDs to associate with the incident",
                     "data_type": "string",
                     "order": 3,
                     "contains": [
@@ -2454,7 +2454,7 @@
             "verbose": "",
             "type": "generic",
             "identifier": "update_incident",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "incident_id": {
                     "description": "ID number of incident to update",
@@ -3037,7 +3037,7 @@
             "verbose": "",
             "type": "generic",
             "identifier": "import_observables",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "observable_type": {
                     "description": "Type of observable to import",
