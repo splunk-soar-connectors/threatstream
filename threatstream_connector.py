@@ -534,7 +534,10 @@ class ThreatstreamConnector(BaseConnector):
         # save state for future polls
         set_of_inc_ids = set()
         start_incident_id = self._state.get("last_incident_id", 0)
-        max_containers = int(config.get("max_containers", 100))
+        if self.is_poll_now():
+            max_containers = int(param.get("container_count", 100))
+        else:
+            max_containers = int(config.get("max_containers", 100))
         added_containers = 0
 
         for incident in resp_json['objects']:
