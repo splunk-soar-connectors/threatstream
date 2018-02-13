@@ -1,7 +1,7 @@
 # --
 # File: threatstream_consts.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016
+# Copyright (c) Phantom Cyber Corporation, 2016-2018
 #
 # This unpublished material is proprietary to Phantom Cyber Corporation.
 # All rights reserved. The methods and
@@ -27,6 +27,10 @@ ENDPOINT_INISGHT = "/v1/inteldetails/insights/"
 ENDPOINT_REFERENCE = "/v1/inteldetails/references/{ioc_value}/"
 ENDPOINT_CONFIDENCE = "/v1/inteldetails/confidence_trend/"
 ENDPOINT_WHOIS = "/v1/inteldetails/whois/{ioc_value}/"
+ENDPOINT_INCIDENT = "/v1/incident/"
+ENDPOINT_INCIDENT_WITH_VALUE = "/v1/incident/associated_with_intelligence/"
+ENDPOINT_SINGLE_INCIDENT = "/v1/incident/{inc_id}/"
+ENDPOINT_IMPORT_IOC = "/v1/intelligence/"
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
