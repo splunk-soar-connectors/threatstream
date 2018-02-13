@@ -13,7 +13,7 @@
     "product_vendor": "Anomali",
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.2.265",
+    "min_phantom_version": "3.0.251",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "configuration": {
         "username": {
@@ -1888,7 +1888,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "tim.frazier@phantom.us"
+                        "joe@exampleserver.com"
                     ],
                     "contains": [
                         "email"
@@ -1905,7 +1905,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "Tim Frazier"
+                        "Herman Edwards"
                     ]
                 },
                 {
@@ -2211,7 +2211,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "tim.frazier@phantom.us"
+                        "joe@exampleserver.com"
                     ],
                     "contains": [
                         "email"
@@ -2228,7 +2228,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "Tim Frazier"
+                        "Herman Edwards"
                     ]
                 },
                 {
@@ -2773,7 +2773,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "tim.frazier@phantom.us"
+                        "joe@exampleserver.com"
                     ],
                     "contains": [
                         "email"
@@ -2790,7 +2790,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "Tim Frazier"
+                        "Herman Edwards"
                     ]
                 },
                 {
