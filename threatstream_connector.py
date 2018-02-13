@@ -25,6 +25,7 @@ import requests
 import datetime
 import pythonwhois
 import simplejson as json
+from bs4 import BeautifulSoup
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -423,7 +424,7 @@ class ThreatstreamConnector(BaseConnector):
         data = {
                 "name": param["name"], "is_public": param["is_public"], "status": 1
                }
-        data = self._build_data(param, data)
+        data = self._build_data(param, data, action_result)
         if data is None:
             return action_result.get_status()
 
@@ -440,7 +441,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = {}
-        data = self._build_data(param, data)
+        data = self._build_data(param, data, action_result)
         if data is None:
             return action_result.get_status()
 
@@ -453,7 +454,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
 
-    def _build_data(self, param, data):
+    def _build_data(self, param, data, action_result):
 
         if param.get("fields", None):
             try:
