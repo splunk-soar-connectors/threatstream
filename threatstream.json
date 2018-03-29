@@ -2345,7 +2345,7 @@
                     "required": false
                 },
                 "intelligence": {
-                    "description": "Comma separated list of intelligence IDs to assocate with the incident - Note that this overwrites, not appends",
+                    "description": "Comma separated list of intelligence IDs to associate with the incident - Note that this overwrites, not appends",
                     "data_type": "string",
                     "order": 2,
                     "allow_list": true,

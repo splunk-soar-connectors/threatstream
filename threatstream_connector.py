@@ -548,9 +548,7 @@ class ThreatstreamConnector(BaseConnector):
             if all([incident["organization_id"] == int(org_id),
                     int(incident["id"]) > start_incident_id,
                     added_containers < max_containers]):
-                container = {"description": "Container added by ThreatStream App",
-                            "run_automation": False
-                             }
+                container = {"description": "Container added by ThreatStream App"}
                 self.save_progress("Retrieving details for incident {0}...".format(incident["id"]))
                 ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload)
                 if (not ret_val):
