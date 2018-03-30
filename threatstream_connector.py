@@ -26,6 +26,7 @@ import datetime
 import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
+import time
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -515,7 +516,25 @@ class ThreatstreamConnector(BaseConnector):
         if (not ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Data should be available in ThreatStream soon.")
+        need_info = True
+        counter = 1
+        while need_info and counter <= 5:
+            self.save_progress("Retrieving intelligence details attempt {0} of 5".format(counter))
+            time.sleep(5)
+            payload = self._generate_payload(extend_source="true", limit="25", offset="0",
+                                         order_by="-created_ts", value=param["value"])
+
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
+            if (phantom.is_fail(ret_val)):
+                return action_result.get_status()
+
+            if resp_json['objects'] != []:
+                for detail in resp_json['objects']:
+                    action_result.add_data(detail)
+                need_info = False
+            counter += 1
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Perform a reputation action if details are not included in this action.")
 
     def _handle_on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -548,9 +567,7 @@ class ThreatstreamConnector(BaseConnector):
             if all([incident["organization_id"] == int(org_id),
                     int(incident["id"]) > start_incident_id,
                     added_containers < max_containers]):
-                container = {"description": "Container added by ThreatStream App",
-                            "run_automation": False
-                             }
+                container = {"description": "Container added by ThreatStream App"}
                 self.save_progress("Retrieving details for incident {0}...".format(incident["id"]))
                 ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload)
                 if (not ret_val):
