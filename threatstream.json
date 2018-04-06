@@ -1460,6 +1460,73 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "delete incident",
+            "description": "Delete incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "delete_incident",
+            "read_only": true,
+            "parameters": {
+                "incident_id": {
+                    "description": "ID number of incident to delete",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Delete Incident",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted incident"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        "15518"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get incident",
             "description": "Get incident in ThreatStream by ID number",
             "verbose": "",
