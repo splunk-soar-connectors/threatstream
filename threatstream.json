@@ -1,19 +1,19 @@
 {
     "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "name": "ThreatStream",
-    "description": "Integrates a variety of reputation and lookup actions from the Anomali ThreatStream threat intelligence platform.",
+    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
     "publisher": "Phantom",
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
-    "app_version": "1.0.20",
-    "utctime_updated": "2018-02-23T00:14:05.000000Z",
+    "app_version": "1.0.22",
+    "utctime_updated": "2018-04-04T16:43:06.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
     "product_vendor": "Anomali",
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.251",
+    "min_phantom_version": "3.0.284",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "configuration": {
         "username": {
@@ -3408,30 +3408,30 @@
                 "container_id": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Container IDs to limit the ingestion to.",
+                    "description": "Container IDs to limit the ingestion to",
                     "allow_list": true
                 },
                 "start_time": {
                     "data_type": "numeric",
                     "order": 1,
                     "description": "Start of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is past 10 days"
+                    "verbose": "If not specified, the default is past 10 days."
                 },
                 "end_time": {
                     "data_type": "numeric",
                     "order": 2,
                     "description": "End of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is now"
+                    "verbose": "If not specified, the default is now."
                 },
                 "container_count": {
                     "data_type": "numeric",
                     "order": 3,
-                    "description": "Maximum number of container records to query for."
+                    "description": "Maximum number of container records to query for"
                 },
                 "artifact_count": {
                     "data_type": "numeric",
                     "order": 4,
-                    "description": "Maximum number of artifact records to query for."
+                    "description": "Maximum number of artifact records to query for"
                 }
             },
             "output": [],
