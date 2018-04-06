@@ -638,7 +638,10 @@ class ThreatstreamConnector(BaseConnector):
                 added_containers += 1
 
         if (not self.is_poll_now()):
-            self._state["last_incident_id"] = sorted(set_of_inc_ids)[-1]
+            try:
+                self._state["last_incident_id"] = sorted(set_of_inc_ids)[-1]
+            except:
+                self._state["last_incident_id"] = 0
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved list of incidents")
 
