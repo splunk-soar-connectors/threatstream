@@ -62,6 +62,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_FILE_REPUTATION = "file_reputation"
     ACTION_ID_LIST_INCIDENTS = "list_incidents"
     ACTION_ID_GET_INCIDENT = "get_incident"
+    ACTION_ID_DELETE_INCIDENT = "delete_incident"
     ACTION_ID_CREATE_INCIDENT = "create_incident"
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
@@ -93,9 +94,12 @@ class ThreatstreamConnector(BaseConnector):
 
         # An html response, treat it like an error
         status_code = response.status_code
+        action = self.get_action_identifier()
 
         if status_code == 202:
             return RetVal(phantom.APP_SUCCESS, {})
+        elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
@@ -419,6 +423,17 @@ class ThreatstreamConnector(BaseConnector):
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved incident")
 
+    def _handle_delete_incident(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+
+        if (not ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident")
+
     def _handle_create_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -650,6 +665,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_list_incidents(param)
         elif (action == self.ACTION_ID_GET_INCIDENT):
             ret_val = self._handle_get_incident(param)
+        elif (action == self.ACTION_ID_DELETE_INCIDENT):
+            ret_val = self._handle_delete_incident(param)
         elif (action == self.ACTION_ID_CREATE_INCIDENT):
             ret_val = self._handle_create_incident(param)
         elif (action == self.ACTION_ID_UPDATE_INCIDENT):
