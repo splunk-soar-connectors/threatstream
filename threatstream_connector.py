@@ -583,7 +583,7 @@ class ThreatstreamConnector(BaseConnector):
         added_containers = 0
 
         for incident in resp_json['objects']:
-            if config["ingest_only_published_incidents"]:
+            if config.get("ingest_only_published_incidents", True):
                 if incident["publication_status"] != "published":
                     continue
             if all([incident["organization_id"] == int(org_id),

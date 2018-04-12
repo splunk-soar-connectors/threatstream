@@ -41,7 +41,7 @@
             "data_type": "boolean",
             "order": 3,
             "description": "Ingest only incidents marked published",
-            "required": true,
+            "required": false,
             "default": true
         },
         "max_containers": {
@@ -49,7 +49,7 @@
             "description": "Maximum incidents for scheduled polling",
             "order": 4,
             "default": 100,
-            "required": true
+            "required": false
         }
     },
     "actions": [
