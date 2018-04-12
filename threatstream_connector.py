@@ -109,8 +109,15 @@ class ThreatstreamConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        data_message = ""
+        # Error text can still be an empty string
+        if error_text:
+            data_message = " Data from server:\n{0}\n".format(error_text)
+
+        message = "Status Code: {0}.{1}".format(
+            status_code,
+            data_message
+        )
 
         message = message.replace('{', '{{').replace('}', '}}')
 
