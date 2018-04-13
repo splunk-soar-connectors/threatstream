@@ -3133,7 +3133,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         11
-                    ]
+                    ],
+                    "column_name": "Confidence",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.country",
@@ -3147,7 +3149,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2018-03-29T23:31:34.986Z"
-                    ]
+                    ],
+                    "column_name": "First Found",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.description",
@@ -3176,7 +3180,12 @@
                     "data_type": "numeric",
                     "example_values": [
                         50630233146
-                    ]
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "column_name": "Intel ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.import_session_id",
@@ -3205,7 +3214,9 @@
                     "data_type": "string",
                     "example_values": [
                         "actor_ip"
-                    ]
+                    ],
+                    "column_name": "Indicator",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.latitude",
@@ -3380,7 +3391,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         3
-                    ]
+                    ],
+                    "column_name": "Threatscore",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.trusted_circle_ids",
@@ -3414,8 +3427,16 @@
                         "24.148.217.110"
                     ],
                     "contains": [
-                        "ip"
-                    ]
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.summary",
