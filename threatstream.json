@@ -1,19 +1,19 @@
 {
     "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "name": "ThreatStream",
-    "description": "Integrates a variety of <b>reputation</b> and <b>lookup</b> actions from the Anomali ThreatStream threat intelligence platform.",
+    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
     "publisher": "Phantom",
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
-    "app_version": "1.0.19",
-    "utctime_updated": "2018-01-26T00:50:55.000000Z",
+    "app_version": "1.0.24",
+    "utctime_updated": "2018-04-13T01:06:14.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
     "product_vendor": "Anomali",
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
-    "min_phantom_version": "1.2.265",
+    "min_phantom_version": "3.0.284",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "configuration": {
         "username": {
@@ -23,10 +23,33 @@
             "required": true
         },
         "api_key": {
-            "data_type": "string",
-            "order": 0,
+            "data_type": "password",
+            "order": 1,
             "description": "API Key",
             "required": true
+        },
+        "organization_id": {
+            "data_type": "numeric",
+            "order": 2,
+            "contains": [
+                "threatstream organization id"
+            ],
+            "description": "Organization ID for filtering incidents when polling",
+            "required": false
+        },
+        "ingest_only_published_incidents": {
+            "data_type": "boolean",
+            "order": 3,
+            "description": "Ingest only incidents marked published",
+            "required": false,
+            "default": true
+        },
+        "max_containers": {
+            "data_type": "numeric",
+            "description": "Maximum incidents for scheduled polling",
+            "order": 4,
+            "default": 100,
+            "required": false
         }
     },
     "actions": [
@@ -67,13 +90,19 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.value",
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
                     "data_type": "string",
                     "contains": [
                         "md5"
-                    ],
-                    "column_name": "Value",
-                    "column_order": 0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.confidence",
@@ -82,22 +111,43 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.threatscore",
-                    "data_type": "numeric",
-                    "column_name": "Threatscore",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.itype",
-                    "data_type": "string",
-                    "column_name": "Indicator",
-                    "column_order": 4
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_ts",
                     "data_type": "string",
                     "column_name": "First Found",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Intel ID",
+                    "column_order": 1,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ip",
@@ -107,19 +157,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.id",
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.asn",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
+                    "data_path": "action_result.data.*.longitude",
                     "data_type": "string"
                 },
                 {
@@ -131,19 +183,42 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.rdns",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_path": "action_result.data.*.resource_uri",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.import_session_id",
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.description",
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string"
                 },
                 {
@@ -167,31 +242,17 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.threat_type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.feed_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.latitude",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_public",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.longitude",
+                    "data_path": "action_result.data.*.trusted_circle_ids",
                     "data_type": "string"
                 },
                 {
@@ -199,67 +260,21 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.modified_ts",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.threat_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.resource_uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.expiration_ts",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.extended_source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.retina_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.owner_organization_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.source_reported_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.extra_data.*..external_references.IPVoid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Shodan",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "md5"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -300,13 +315,65 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.value",
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "contains": [
-                        "domain"
-                    ],
-                    "column_name": "Value",
-                    "column_order": 0
+                        "domain",
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Intel ID",
+                    "column_order": 2,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ip",
@@ -318,43 +385,21 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.confidence",
-                    "data_type": "numeric",
-                    "column_name": "Confidence",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.threatscore",
-                    "data_type": "numeric",
-                    "column_name": "Threatscore",
-                    "column_order": 3
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.itype",
                     "data_type": "string",
                     "column_name": "Indicator",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.data.*.created_ts",
-                    "data_type": "string",
-                    "column_name": "First Found",
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.id",
+                    "data_path": "action_result.data.*.latitude",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.asn",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
+                    "data_path": "action_result.data.*.longitude",
                     "data_type": "string"
                 },
                 {
@@ -366,19 +411,42 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.rdns",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_path": "action_result.data.*.resource_uri",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.import_session_id",
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.description",
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string"
                 },
                 {
@@ -402,31 +470,17 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.threat_type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.feed_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.latitude",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_public",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.longitude",
+                    "data_path": "action_result.data.*.trusted_circle_ids",
                     "data_type": "string"
                 },
                 {
@@ -434,98 +488,21 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.modified_ts",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.threat_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.resource_uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.expiration_ts",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.extended_source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.retina_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.owner_organization_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.source_reported_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.domain",
+                    "data_path": "action_result.data.*.value",
                     "data_type": "string",
                     "contains": [
                         "domain"
-                    ]
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
                 },
                 {
-                    "data_path": "action_result.extra_data.*.pdns.*.rrtype",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.last_seen",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.first_seen",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Shodan",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain",
-                        "url"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -565,7 +542,63 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.value",
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Intel ID",
+                    "column_order": 1,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
                     "data_type": "string"
                 },
                 {
@@ -578,43 +611,21 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.confidence",
-                    "data_type": "numeric",
-                    "column_name": "Confidence",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.threatscore",
-                    "data_type": "numeric",
-                    "column_name": "Threatscore",
-                    "column_order": 2
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.itype",
                     "data_type": "string",
                     "column_name": "Indicator",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.created_ts",
-                    "data_type": "string",
-                    "column_name": "First Found",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.id",
+                    "data_path": "action_result.data.*.latitude",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.asn",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
+                    "data_path": "action_result.data.*.longitude",
                     "data_type": "string"
                 },
                 {
@@ -626,19 +637,42 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.rdns",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_path": "action_result.data.*.resource_uri",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.import_session_id",
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.description",
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string"
                 },
                 {
@@ -662,31 +696,17 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.threat_type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.feed_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.latitude",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_public",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.longitude",
+                    "data_path": "action_result.data.*.trusted_circle_ids",
                     "data_type": "string"
                 },
                 {
@@ -694,97 +714,16 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.modified_ts",
+                    "data_path": "action_result.data.*.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.threat_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.resource_uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.expiration_ts",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.extended_source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.retina_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.owner_organization_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.source_reported_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.rrtype",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.last_seen",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.pdns.*.first_seen",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Shodan",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -824,13 +763,19 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.value",
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.email",
                     "data_type": "string",
                     "contains": [
                         "email"
-                    ],
-                    "column_name": "Value",
-                    "column_order": 0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.confidence",
@@ -839,22 +784,43 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.threatscore",
-                    "data_type": "numeric",
-                    "column_name": "Threatscore",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.itype",
-                    "data_type": "string",
-                    "column_name": "Indicator",
-                    "column_order": 4
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_ts",
                     "data_type": "string",
                     "column_name": "First Found",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Intel ID",
+                    "column_order": 1,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ip",
@@ -864,19 +830,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.id",
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.asn",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
+                    "data_path": "action_result.data.*.longitude",
                     "data_type": "string"
                 },
                 {
@@ -888,19 +856,42 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.rdns",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_path": "action_result.data.*.resource_uri",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.import_session_id",
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.description",
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string"
                 },
                 {
@@ -924,31 +915,17 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.threat_type",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.feed_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.latitude",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_public",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.longitude",
+                    "data_path": "action_result.data.*.trusted_circle_ids",
                     "data_type": "string"
                 },
                 {
@@ -956,67 +933,21 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.modified_ts",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.threat_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.resource_uri",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.expiration_ts",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.extended_source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.retina_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.owner_organization_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.source_reported_confidence",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.IPVoid",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Shodan",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.VirusTotal",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.extra_data.*.external_references.Google Safe Browsing",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.email",
-                    "data_type": "string",
-                    "contains": [
-                        "email"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1057,12 +988,18 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.contacts.admin.city",
@@ -1084,6 +1021,10 @@
                         "email"
                     ],
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.contacts.admin.fax",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.admin.name",
@@ -1114,10 +1055,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.contacts.admin.fax",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.contacts.registrant.city",
                     "data_type": "string",
                     "column_name": "Registrant City",
@@ -1139,6 +1076,10 @@
                     "column_order": 8
                 },
                 {
+                    "data_path": "action_result.data.*.contacts.registrant.fax",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.contacts.registrant.name",
                     "data_type": "string",
                     "column_name": "Registrant Name",
@@ -1155,10 +1096,6 @@
                     "data_type": "string",
                     "column_name": "Registrant Phone",
                     "column_order": 11
-                },
-                {
-                    "data_path": "action_result.data.*.contacts.registrant.fax",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.registrant.postalcode",
@@ -1225,6 +1162,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.nameservers",
                     "data_type": "string"
                 },
@@ -1249,17 +1190,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain",
-                        "url"
-                    ],
-                    "column_name": "Domain",
-                    "column_order": 0
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -1271,6 +1206,2304 @@
                     "data_type": "numeric"
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list incidents",
+            "description": "List incidents in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "list_incidents",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "description": "Number of incidents to return",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": false
+                },
+                "intel_value": {
+                    "description": "Intelligence value to filter incidents (ie. google.com)",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Incidents",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intel_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "string",
+                    "example_values": [
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "145"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Anomali Labs Premium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/trustedcircle/145/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-08-11T19:39:13.604417"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.end_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-04-08T04:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 1,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes_private_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "column_name": "Is Public",
+                    "column_order": 2,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "column_name": "Last Modification Date",
+                    "column_order": 4,
+                    "example_values": [
+                        "2015-09-25T16:51:45.730982"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Incident Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Bit9 Compromise"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "column_name": "Organization ID",
+                    "column_order": 3,
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        1223
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "published"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.published_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-09-25T16:51:45.730982"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incident/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.start_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-08-11T19:18:53.160000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incidentstatustype/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "Breach"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "white"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved list of incidents"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete incident",
+            "description": "Delete incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "delete_incident",
+            "read_only": true,
+            "parameters": {
+                "incident_id": {
+                    "description": "ID number of incident to delete",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Delete Incident",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        "15518"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted incident"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incident",
+            "description": "Get incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "get_incident",
+            "read_only": true,
+            "parameters": {
+                "incident_id": {
+                    "description": "ID number of incident to return",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Incident",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        "13502"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.body_content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "markdown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:30:55.108132"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Incident ID",
+                    "column_order": 1,
+                    "example_values": [
+                        13502
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "18881"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        53
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "BR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-25T14:32:13.160497"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-25T14:32:13.154896"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.id",
+                    "data_type": "string",
+                    "column_name": "Intelligence ID",
+                    "column_order": 4,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "example_values": [
+                        "50511430902"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "177.132.23.100"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.is_public",
+                    "data_type": "boolean",
+                    "column_name": "Is Public",
+                    "column_order": 6,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "bot_ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-25.426000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-49.266700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "dionea,smbd,port-445,Windows-XP,DSL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-25T14:32:13.160497"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vivo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.rdns",
+                    "data_type": "string",
+                    "example_values": [
+                        "177.132.23.100.dynamic.adsl.gvt.net.br"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        65
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "rk9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "dionea"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.org_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.source_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Customer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.source_user_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        13487
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "bot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.trusted_circles_ids",
+                    "data_type": "numeric",
+                    "example_values": [
+                        145
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.type",
+                    "data_type": "string",
+                    "column_name": "Intelligence Type",
+                    "column_order": 3,
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.update_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1484029683"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "c13679d2-f01d-4b7a-a230-75b30fdb8486"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.value",
+                    "data_type": "string",
+                    "column_name": "Intelligence Value",
+                    "column_order": 5,
+                    "example_values": [
+                        "177.132.23.100"
+                    ],
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logo_s3_url",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:43:59.378579"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Incident Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Created through Phantom Action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "string",
+                    "column_name": "Organization ID",
+                    "column_order": 2,
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        "2342"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "joe@exampleserver.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/user/13487/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "new"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incident/13502/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incidentstatustype/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "amber"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved incident"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create incident",
+            "description": "Create incident in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "create_incident",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Name to give the incident",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": false
+                },
+                "is_public": {
+                    "description": "Classification designation",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1,
+                    "required": true
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the incident",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                },
+                "intelligence": {
+                    "description": "Comma separated list of intelligence IDs to associate with the incident",
+                    "data_type": "string",
+                    "order": 3,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "allow_list": true,
+                    "primary": true,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Create Incident",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"tlp\": \"red\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intelligence",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created through Phantom Action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.body_content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "markdown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:30:55.139341"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Incident ID",
+                    "column_order": 1,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        13502
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "column_name": "Is Public",
+                    "column_order": 6,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logo_s3_url",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:30:55.139363"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Incident Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Created through Phantom Action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2342"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "column_name": "Organization ID",
+                    "column_order": 2,
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "joe@exampleserver.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/user/13487/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "new"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incident/13502/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created incident"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update incident",
+            "description": "Update incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "update_incident",
+            "read_only": false,
+            "parameters": {
+                "incident_id": {
+                    "description": "ID number of incident to update",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to update on the incident",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                },
+                "intelligence": {
+                    "description": "Comma separated list of intelligence IDs to associate with the incident - Note that this overwrites, not appends",
+                    "data_type": "string",
+                    "order": 2,
+                    "allow_list": true,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Update Incident",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"status\": 1}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        "13502"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intelligence",
+                    "data_type": "string",
+                    "example_values": [
+                        "50511430902, 20550030"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.body_content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "markdown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:30:55.108132"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Incident ID",
+                    "column_order": 1,
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "example_values": [
+                        13502
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "18881"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        53
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "BR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-25T14:32:13.160497"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-04-25T14:32:13.154896"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.id",
+                    "data_type": "string",
+                    "column_name": "Intelligence ID",
+                    "column_order": 4,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "example_values": [
+                        "50511430902"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "177.132.23.100"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.is_public",
+                    "data_type": "boolean",
+                    "column_name": "Is Public",
+                    "column_order": 6,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "bot_ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-25.426000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-49.266700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "dionea,smbd,port-445,Windows-XP,DSL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-25T14:32:13.160497"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vivo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "column_name": "Intelligence Owner Organization ID",
+                    "column_order": 7,
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.rdns",
+                    "data_type": "string",
+                    "example_values": [
+                        "177.132.23.100.dynamic.adsl.gvt.net.br"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/intelligence/50511430902/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        65
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "rk9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "dionea"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.org_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.source_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Customer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.source_user_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        13487
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "bot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.trusted_circles_ids",
+                    "data_type": "numeric",
+                    "example_values": [
+                        145
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.type",
+                    "data_type": "string",
+                    "column_name": "Intelligence Type",
+                    "column_order": 3,
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.update_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1484029683"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "c13679d2-f01d-4b7a-a230-75b30fdb8486"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.intelligence.*.value",
+                    "data_type": "string",
+                    "column_name": "Intelligence Value",
+                    "column_order": 5,
+                    "example_values": [
+                        "177.132.23.100"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logo_s3_url",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-26T18:43:59.375227"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Incident Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "Created through Phantom Action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2342"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "column_name": "Organization ID",
+                    "column_order": 2,
+                    "contains": [
+                        "threatstream organization id"
+                    ],
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "joe@exampleserver.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman Edwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/user/13487/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "new"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incident/13502/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/incidentstatustype/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "amber"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated incident"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "import observables",
+            "description": "Import observables into ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "import_observables",
+            "read_only": false,
+            "parameters": {
+                "observable_type": {
+                    "description": "Type of observable to import",
+                    "data_type": "string",
+                    "order": 0,
+                    "value_list": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "hash"
+                    ],
+                    "required": true
+                },
+                "value": {
+                    "description": "Observable value",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "classification": {
+                    "description": "Designate classification for observable",
+                    "data_type": "string",
+                    "order": 2,
+                    "value_list": [
+                        "public",
+                        "private"
+                    ],
+                    "default": "private",
+                    "required": true
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Import Observables",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "private"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"itype\": \"actor_ip\", \"detail\": \"smbd\", \"confidence\": 50, \"severity\": \"low\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.observable_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "example_values": [
+                        "177.132.23.103",
+                        "24.148.217.110"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "11426"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11
+                    ],
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-03-29T23:31:34.986Z"
+                    ],
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-06-27T23:31:35.004Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50630233146
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "column_name": "Intel ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "24.148.217.110"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "actor_ip"
+                    ],
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "35.293600"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-80.735000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "smbd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 13487 Confirmed as false positive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.took",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-03-29T23:31:34.986Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "EarthLink"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string",
+                    "example_values": [
+                        "user-0c99mbe.cable.mindspring.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/intelligence/50630233146/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "falsepos"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "tpp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "smbd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2342"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Customer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13487"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "p2p"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1736852157
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "a1fbf7f8-cc70-48e9-8ca9-112af586ede5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "24.148.217.110"
+                    ],
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully imported observable",
+                        "Successfully imported observable. Perform a reputation action if details are not included in this action."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Container IDs to limit the ingestion to",
+                    "allow_list": true
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is past 10 days."
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is now."
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Maximum number of container records to query for"
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "order": 4,
+                    "description": "Maximum number of artifact records to query for"
+                }
+            },
+            "output": [],
             "versions": "EQ(*)"
         }
     ]
