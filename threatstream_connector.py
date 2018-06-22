@@ -27,6 +27,7 @@ import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
 import time
+import urllib
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -66,6 +67,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_CREATE_INCIDENT = "create_incident"
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
+    ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_ON_POLL = "on_poll"
 
     def __init__(self):
@@ -507,6 +509,56 @@ class ThreatstreamConnector(BaseConnector):
 
         return data
 
+    def _handle_run_query(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        payload = self._generate_payload()
+
+        search_string = param["search_string"]
+        limit = param.get("limit", 1000)
+
+        if limit > 10000:
+            action_result.set_status(
+                phantom.APP_ERROR, 
+                "Invalid limit selected - 10000 is the max number of records "
+                "allowed."
+            )
+        
+        order_by = param.get("order_by", None)
+
+        if order_by:
+            payload['order_by'] = order_by
+        payload['limit'] = str(limit)
+        payload['q'] = str(search_string)
+        payload['offset'] = str(param.get('offset', 0))
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+        
+        if resp_json.get('objects') is None:
+            return action_result.set_status(phantom.APP_ERROR, 'Expected item "objects" not returned in query results.')
+
+        for detail in resp_json['objects']:
+            action_result.add_data(detail)
+
+        if resp_json.get('meta') is None:
+            return action_result.set_status(phantom.APP_ERROR, 'Expected item "meta" not returned in query results.')
+        
+        summary = {
+            'records_avaiable': resp_json['meta']['total_count'],
+            'records_returned': min(int(resp_json['meta']['total_count']), int(resp_json['meta']['limit'])),
+            'next_offset': (
+                int(resp_json['meta']['limit']) + int(resp_json['meta']['offset']) 
+                if int(resp_json['meta']['total_count']) < int(resp_json['meta']['limit'])
+                else 0
+            )
+        }
+
+        action_result.update_summary(summary)
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully queried anomali threatstream.')
+
     def _handle_import_ioc(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -683,6 +735,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_update_incident(param)
         elif (action == self.ACTION_ID_IMPORT_IOC):
             ret_val = self._handle_import_ioc(param)
+        elif (action == self.ACTION_ID_RUN_QUERY):
+            ret_val = self._handle_run_query(param)
         elif (action == self.ACTION_ID_ON_POLL):
             ret_val = self._handle_on_poll(param)
 
