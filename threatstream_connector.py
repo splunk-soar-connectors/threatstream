@@ -505,7 +505,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
 
-        search_string = param["search_string"]
+        search_string = param["query"]
         limit = param.get("limit", 1000)
 
         if limit > 10000:

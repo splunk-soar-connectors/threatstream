@@ -3514,7 +3514,7 @@
             "identifier": "run_query",
             "read_only": false,
             "parameters": {
-                "search_string": {
+                "query": {
                     "description": "Search string using anomali filter language (seen on adv. search page)",
                     "data_type": "string",
                     "order": 0,
@@ -3835,15 +3835,6 @@
                     "data_type": "string",
                     "example_values": [
                         "24.148.217.110"
-                    ],
-                    "contains": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "md5",
-                        "sha1",
-                        "hash"
                     ],
                     "column_name": "Value",
                     "column_order": 0
