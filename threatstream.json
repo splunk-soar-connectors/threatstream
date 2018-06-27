@@ -14,7 +14,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "min_phantom_version": "3.0.284",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
+    "license": "Copyright (c) Splunk Inc., 2016-2018",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -3533,7 +3533,7 @@
                     "order": 2,
                     "required": false
                 },
-                "Offset": {
+                "offset": {
                     "description": "Record offset (used with paging, when returning many results)",
                     "data_type": "numeric",
                     "order": 3,
