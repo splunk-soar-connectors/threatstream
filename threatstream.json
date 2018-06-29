@@ -16,21 +16,32 @@
     "min_phantom_version": "3.0.284",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "configuration": {
-        "username": {
+        "hostname": {
             "data_type": "string",
             "order": 0,
+            "description": "Host Name",
+            "required": true,
+            "default": "api.threatstream.com"
+        },
+        "ph_0": {
+            "data_type": "ph",
+            "order": 1
+        },
+        "username": {
+            "data_type": "string",
+            "order": 2,
             "description": "User name",
             "required": true
         },
         "api_key": {
             "data_type": "password",
-            "order": 1,
+            "order": 3,
             "description": "API Key",
             "required": true
         },
         "organization_id": {
             "data_type": "numeric",
-            "order": 2,
+            "order": 4,
             "contains": [
                 "threatstream organization id"
             ],
@@ -39,7 +50,7 @@
         },
         "ingest_only_published_incidents": {
             "data_type": "boolean",
-            "order": 3,
+            "order": 5,
             "description": "Ingest only incidents marked published",
             "required": false,
             "default": true
@@ -47,7 +58,7 @@
         "max_containers": {
             "data_type": "numeric",
             "description": "Maximum incidents for scheduled polling",
-            "order": 4,
+            "order": 6,
             "default": 100,
             "required": false
         }

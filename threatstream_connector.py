@@ -75,7 +75,9 @@ class ThreatstreamConnector(BaseConnector):
         return
 
     def initialize(self):
-        self._base_url = "https://api.threatstream.com/api"
+        config = self.get_config()
+
+        self._base_url = "https://{0}/api".format(config.get('hostname', 'api.threatstream.com'))
         self._state = self.load_state()
         return phantom.APP_SUCCESS
 
