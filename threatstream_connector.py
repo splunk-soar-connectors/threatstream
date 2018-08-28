@@ -16,6 +16,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from phantom.vault import Vault
 
 # Local imports
 from threatstream_consts import *
@@ -67,6 +68,10 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
     ACTION_ID_ON_POLL = "on_poll"
+    ACTION_ID_DETONATE_FILE = "detonate_file"
+    ACTION_ID_GET_STATUS = "get_status"
+    ACTION_ID_GET_REPORT = "get_report"
+    ACTION_ID_DETONATE_URL = "detonate_url"
 
     def __init__(self):
 
@@ -173,7 +178,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get"):
+    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
 
         config = self.get_config()
         resp_json = None
@@ -185,16 +190,29 @@ class ThreatstreamConnector(BaseConnector):
 
         # Create a URL to connect to
         url = self._base_url + endpoint
+        if use_json:
+            try:
+                r = request_func(
+                                url,
+                                json=data,
+                                headers=headers,
+                                verify=config.get('verify_server_cert', False),
+                                params=payload,
+                                files=files)
+            except Exception as e:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
 
-        try:
-            r = request_func(
-                            url,
-                            json=data,
-                            headers=headers,
-                            verify=config.get('verify_server_cert', False),
-                            params=payload)
-        except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
+        else:
+            try:
+                r = request_func(
+                                url,
+                                data=data,
+                                headers=headers,
+                                verify=config.get('verify_server_cert', False),
+                                params=payload,
+                                files=files)
+            except Exception as e:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -558,6 +576,83 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Perform a reputation action if details are not included in this action.")
 
+    def _handle_get_status(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+        endpoint = param.get("endpoint")
+        endpoint = endpoint.replace("/api/", "/")
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved detonation status")
+
+    def _handle_get_report(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+        endpoint = param.get("endpoint")
+        if "report" not in endpoint:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide correct report endpoint")
+
+        endpoint = endpoint.replace("/api/", "/")
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved detonation report")
+
+    def _handle_detonate_file(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        # return action_result.set_status(phantom.APP_SUCCESS, param.get('classification'))
+        vault_info = Vault.get_file_info(vault_id=param.get('vault_id'))
+
+        for item in vault_info:
+            vault_path = item.get('path')
+            if vault_path is None:
+
+                return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
+            try:
+                vault_file = open(vault_path)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: " + str(e))
+
+            payload = self._generate_payload()
+
+            files = {
+                "file": vault_file
+            }
+            data = {
+                "report_radio-platform": param.get('platform'),
+                "report_radio-file": vault_path,
+                "report_radio-classification": param.get('classification')
+            }
+
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_FILE_DETONATION, payload, data=data, method="post", files=files, use_json=False)
+            if (phantom.is_fail(ret_val)):
+                return action_result.get_status()
+            action_result.add_data(resp_json)
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file.")
+
+    def _handle_detonate_url(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        payload = self._generate_payload()
+        data = {
+            "report_radio-platform": param.get('platform'),
+            "report_radio-url": param.get('url'),
+            "report_radio-classification": param.get('classification')
+        }
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_URL_DETONATION, payload, data=data, method="post", use_json=False)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated URL.")
+
     def _handle_on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
@@ -685,6 +780,14 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_import_ioc(param)
         elif (action == self.ACTION_ID_ON_POLL):
             ret_val = self._handle_on_poll(param)
+        elif (action == self.ACTION_ID_DETONATE_FILE):
+            ret_val = self._handle_detonate_file(param)
+        elif (action == self.ACTION_ID_GET_STATUS):
+            ret_val = self._handle_get_status(param)
+        elif (action == self.ACTION_ID_GET_REPORT):
+            ret_val = self._handle_get_report(param)
+        elif (action == self.ACTION_ID_DETONATE_URL):
+            ret_val = self._handle_detonate_url(param)
 
         return ret_val
 

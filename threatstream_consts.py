@@ -31,6 +31,8 @@ ENDPOINT_INCIDENT = "/v1/incident/"
 ENDPOINT_INCIDENT_WITH_VALUE = "/v1/incident/associated_with_intelligence/"
 ENDPOINT_SINGLE_INCIDENT = "/v1/incident/{inc_id}/"
 ENDPOINT_IMPORT_IOC = "/v1/intelligence/"
+ENDPOINT_FILE_DETONATION = "/v1/submit/new/"
+ENDPOINT_URL_DETONATION = "/v1/submit/new/"
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
