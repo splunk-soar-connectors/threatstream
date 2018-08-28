@@ -1,7 +1,63 @@
 {
+    "product_vendor": "Anomali",
+    "publisher": "Phantom",
+    "name": "ThreatStream",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
+    "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
+    "directory": "threatstream_5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
+    "min_phantom_version": "3.0.284",
+    "main_module": "threatstream_connector.pyc",
     "product_version_regex": ".*",
     "python_version": "2.7",
     "package_name": "phantom_threatstream",
+    "disabled": false,
+    "logo": "logo_anomali.svg",
+    "logo_dark": "logo_anomali_dark.svg",
+    "executable": "spawn",
+    "appname": "-",
+    "version": 1,
+    "app_version": "1.0.24",
+    "type": "reputation",
+    "product_name": "ThreatStream",
+    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
+    "utctime_updated": "2018-04-13T01:06:14.000000Z",
+    "configuration": {
+        "username": {
+            "required": true,
+            "order": 0,
+            "data_type": "string",
+            "description": "User name"
+        },
+        "organization_id": {
+            "contains": [
+                "threatstream organization id"
+            ],
+            "required": false,
+            "order": 2,
+            "data_type": "numeric",
+            "description": "Organization ID for filtering incidents when polling"
+        },
+        "api_key": {
+            "required": true,
+            "order": 1,
+            "data_type": "password",
+            "description": "API Key"
+        },
+        "max_containers": {
+            "default": 100,
+            "required": false,
+            "description": "Maximum incidents for scheduled polling",
+            "data_type": "numeric",
+            "order": 4
+        },
+        "ingest_only_published_incidents": {
+            "default": true,
+            "required": false,
+            "order": 3,
+            "data_type": "boolean",
+            "description": "Ingest only incidents marked published"
+        }
+      },
     "actions": [
         {
             "read_only": true,
@@ -4654,61 +4710,5 @@
             "identifier": "on_poll",
             "type": "ingest"
         }
-    ],
-    "disabled": false,
-    "logo": "logo_anomali.svg",
-    "logo_dark": "logo_anomali_dark.svg",
-    "executable": "spawn",
-    "appname": "-",
-    "version": 1,
-    "app_version": "1.0.24",
-    "type": "reputation",
-    "product_name": "ThreatStream",
-    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
-    "utctime_updated": "2018-04-13T01:06:14.000000Z",
-    "configuration": {
-        "username": {
-            "required": true,
-            "order": 0,
-            "data_type": "string",
-            "description": "User name"
-        },
-        "organization_id": {
-            "contains": [
-                "threatstream organization id"
-            ],
-            "required": false,
-            "order": 2,
-            "data_type": "numeric",
-            "description": "Organization ID for filtering incidents when polling"
-        },
-        "api_key": {
-            "required": true,
-            "order": 1,
-            "data_type": "password",
-            "description": "API Key"
-        },
-        "max_containers": {
-            "default": 100,
-            "required": false,
-            "description": "Maximum incidents for scheduled polling",
-            "data_type": "numeric",
-            "order": 4
-        },
-        "ingest_only_published_incidents": {
-            "default": true,
-            "required": false,
-            "order": 3,
-            "data_type": "boolean",
-            "description": "Ingest only incidents marked published"
-        }
-    },
-    "product_vendor": "Anomali",
-    "publisher": "Phantom",
-    "name": "ThreatStream",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
-    "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-    "directory": "threatstream_5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-    "min_phantom_version": "3.0.284",
-    "main_module": "threatstream_connector.pyc"
+    ]
 }
