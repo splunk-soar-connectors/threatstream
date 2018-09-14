@@ -5,7 +5,7 @@
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "directory": "threatstream_5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-    "min_phantom_version": "3.0.284",
+    "min_phantom_version": "3.5.180",
     "main_module": "threatstream_connector.pyc",
     "product_version_regex": ".*",
     "python_version": "2.7",
