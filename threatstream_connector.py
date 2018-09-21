@@ -174,7 +174,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
+    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get"):
 
         config = self.get_config()
         resp_json = None
@@ -186,29 +186,16 @@ class ThreatstreamConnector(BaseConnector):
 
         # Create a URL to connect to
         url = self._base_url + endpoint
-        if use_json:
-            try:
-                r = request_func(
-                                url,
-                                json=data,
-                                headers=headers,
-                                verify=config.get('verify_server_cert', False),
-                                params=payload,
-                                files=files)
-            except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
-
-        else:
-            try:
-                r = request_func(
-                                url,
-                                data=data,
-                                headers=headers,
-                                verify=config.get('verify_server_cert', False),
-                                params=payload,
-                                files=files)
-            except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
+        
+        try:
+            r = request_func(
+                            url,
+                            json=data,
+                            headers=headers,
+                            verify=config.get('verify_server_cert', False),
+                            params=payload)
+        except Exception as e:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
