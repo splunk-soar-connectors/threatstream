@@ -1,37 +1,56 @@
 {
-    "product_vendor": "Anomali",
-    "publisher": "Phantom",
-    "name": "ThreatStream",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
-    "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-    "directory": "threatstream_5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
-    "min_phantom_version": "3.5.180",
-    "main_module": "threatstream_connector.pyc",
-    "product_version_regex": ".*",
-    "python_version": "2.7",
-    "package_name": "phantom_threatstream",
-    "disabled": false,
-    "logo": "logo_anomali.svg",
-    "logo_dark": "logo_anomali_dark.svg",
-    "executable": "spawn",
-    "appname": "-",
-    "version": 1,
-    "app_version": "1.0.24",
-    "type": "reputation",
-    "product_name": "ThreatStream",
-    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
-    "utctime_updated": "2018-04-13T01:06:14.000000Z",
+  "name": "ThreatStream",
+  "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
+  "publisher": "Phantom",
+  "type": "reputation",
+  "main_module": "threatstream_connector.pyc",
+  "app_version": "1.0.24",
+  "utctime_updated": "2018-04-13T01:06:14.000000Z",
+  "package_name": "phantom_threatstream",
+  "logo": "logo_anomali.svg",
+  "logo_dark": "logo_anomali_dark.svg",
+  "product_vendor": "Anomali",
+  "product_name": "ThreatStream",
+  "product_version_regex": ".*",
+  "min_phantom_version": "3.0.284",
+  "license": "Copyright (c) 2016-2018 Splunk Inc.",
     "configuration": {
-        "username": {
-            "required": true,
-            "order": 0,
+        "hostname": {
             "data_type": "string",
-            "description": "User name"
+            "order": 0,
+            "description": "Host Name",
+            "required": true,
+            "default": "api.threatstream.com"
+        },
+        "ph_0": {
+            "data_type": "ph",
+            "order": 1
+        },
+        "username": {
+            "data_type": "string",
+            "order": 2,
+            "description": "User name",
+            "required": true
+        },
+        "api_key": {
+            "data_type": "password",
+            "order": 3,
+            "description": "API Key",
+            "required": true
         },
         "organization_id": {
+            "data_type": "numeric",
+            "order": 4,
             "contains": [
                 "threatstream organization id"
             ],
+            "description": "Organization ID for filtering incidents when polling",
+            "required": false
+        },
+        "ingest_only_published_incidents": {
+            "data_type": "boolean",
+            "order": 5,
+            "description": "Ingest only incidents marked published",
             "required": false,
             "order": 2,
             "data_type": "numeric",
@@ -951,6 +970,239 @@
                     "data_type": "numeric"
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url reputation",
+            "identifier": "url_reputation",
+            "description": "Get information about a URL",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to investigate",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "column_name": "First Found",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "column_name": "Intel ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "column_name": "Indicator",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream organization id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "URL Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois domain",
+            "description": "Execute a whois lookup on the given domain",
+            "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
+            "type": "investigate",
+            "identifier": "whois_domain",
+            "read_only": true,
             "parameters": {
                 "email": {
                     "required": true,
@@ -3422,6 +3674,88 @@
                     "data_type": "numeric"
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get pcap",
+            "identifier": "get_pcap",
+            "description": "Download pcap file of sample submitted to sandbox and add it to vault",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "ID of report associated with the pcap to download",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "Report File Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Get PCAP",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
             "parameters": {
                 "observable_type": {
                     "value_list": [

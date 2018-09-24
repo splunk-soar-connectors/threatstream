@@ -1,22 +1,15 @@
-# --
 # File: threatstream_consts.py
+# Copyright (c) 2016-2018 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
-#
-# This unpublished material is proprietary to Phantom Cyber Corporation.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber Corporation.
-#
-# --
+# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 THREATSTREAM_JSON_USERNAME = "username"
 THREATSTREAM_JSON_API_KEY = "api_key"
 THREATSTREAM_JSON_HASH = "hash"
 THREATSTREAM_JSON_DOMAIN = "domain"
 THREATSTREAM_JSON_IP = "ip"
+THREATSTREAM_JSON_URL = "url"
 THREATSTREAM_JSON_EMAIL = "email"
 # THREATSTREAM_JSON_IOC_VALUE = "ioc_value"
 # THREATSTREAM_JSON_IOC_TYPE = "ioc_type"
@@ -33,6 +26,7 @@ ENDPOINT_SINGLE_INCIDENT = "/v1/incident/{inc_id}/"
 ENDPOINT_IMPORT_IOC = "/v1/intelligence/"
 ENDPOINT_FILE_DETONATION = "/v1/submit/new/"
 ENDPOINT_URL_DETONATION = "/v1/submit/new/"
+ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
