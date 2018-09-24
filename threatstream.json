@@ -51,16 +51,7 @@
             "data_type": "boolean",
             "order": 5,
             "description": "Ingest only incidents marked published",
-            "required": false,
-            "order": 2,
-            "data_type": "numeric",
-            "description": "Organization ID for filtering incidents when polling"
-        },
-        "api_key": {
-            "required": true,
-            "order": 1,
-            "data_type": "password",
-            "description": "API Key"
+            "required": false
         },
         "max_containers": {
             "default": 100,
@@ -68,13 +59,6 @@
             "description": "Maximum incidents for scheduled polling",
             "data_type": "numeric",
             "order": 4
-        },
-        "ingest_only_published_incidents": {
-            "default": true,
-            "required": false,
-            "order": 3,
-            "data_type": "boolean",
-            "description": "Ingest only incidents marked published"
         }
       },
     "actions": [
@@ -1742,7 +1726,7 @@
             "verbose": ""
         },
         {
-            "read_only": true,
+            "read_only": false,
             "identifier": "delete_incident",
             "description": "Delete incident in ThreatStream by ID number",
             "render": {
@@ -3968,7 +3952,7 @@
                     "required": true,
                     "description": "classification of the sandbox submission - private or public",
                     "data_type": "string",
-                    "order": 1
+                    "order": 2
                 }
             },
             "type": "generic",
@@ -4404,7 +4388,7 @@
             "parameters": {
                 "endpoint": {
                     "required": true,
-                    "description": "Endpoint given by Detonate File/URL - /api/v1/submit/12345/",
+                    "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
                     "order": 0
                 }
@@ -4997,7 +4981,7 @@
             "parameters": {
                 "endpoint": {
                     "required": true,
-                    "description": "Endpoint given by Detonate File/URL - /api/v1/submit/12345/",
+                    "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
                     "order": 0
                 }
