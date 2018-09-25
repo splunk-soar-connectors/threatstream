@@ -24,6 +24,8 @@ ENDPOINT_INCIDENT = "/v1/incident/"
 ENDPOINT_INCIDENT_WITH_VALUE = "/v1/incident/associated_with_intelligence/"
 ENDPOINT_SINGLE_INCIDENT = "/v1/incident/{inc_id}/"
 ENDPOINT_IMPORT_IOC = "/v1/intelligence/"
+ENDPOINT_FILE_DETONATION = "/v1/submit/new/"
+ENDPOINT_URL_DETONATION = "/v1/submit/new/"
 ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
