@@ -1,19 +1,19 @@
 {
-  "name": "ThreatStream",
-  "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
-  "publisher": "Phantom",
-  "type": "reputation",
-  "main_module": "threatstream_connector.pyc",
-  "app_version": "1.0.24",
-  "utctime_updated": "2018-04-13T01:06:14.000000Z",
-  "package_name": "phantom_threatstream",
-  "logo": "logo_anomali.svg",
-  "logo_dark": "logo_anomali_dark.svg",
-  "product_vendor": "Anomali",
-  "product_name": "ThreatStream",
-  "product_version_regex": ".*",
-  "min_phantom_version": "3.0.284",
-  "license": "Copyright (c) 2016-2018 Splunk Inc.",
+    "name": "ThreatStream",
+    "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
+    "publisher": "Phantom",
+    "type": "reputation",
+    "main_module": "threatstream_connector.pyc",
+    "app_version": "1.0.24",
+    "utctime_updated": "2018-04-13T01:06:14.000000Z",
+    "package_name": "phantom_threatstream",
+    "logo": "logo_anomali.svg",
+    "logo_dark": "logo_anomali_dark.svg",
+    "product_vendor": "Anomali",
+    "product_name": "ThreatStream",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.284",
+    "license": "Copyright (c) 2016-2018 Splunk Inc.",
     "configuration": {
         "hostname": {
             "data_type": "string",
@@ -60,30 +60,37 @@
             "data_type": "numeric",
             "order": 4
         }
-      },
+    },
     "actions": [
         {
-            "read_only": true,
-            "description": "Test connectivity to ThreatStream by querying the intelligence endpoint",
-            "parameters": {},
-            "versions": "EQ(*)",
             "action": "test connectivity",
-            "output": [],
+            "description": "Test connectivity to ThreatStream by querying the intelligence endpoint",
+            "type": "test",
             "identifier": "test_asset_connectivity",
-            "type": "test"
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
         {
-            "read_only": true,
-            "identifier": "file_reputation",
-            "description": "Get information about a file",
-            "render": {
-                "width": 12,
-                "title": "File Reputation",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
             "action": "file reputation",
+            "description": "Get information about a file",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that file.",
+            "type": "investigate",
+            "identifier": "file_reputation",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "required": true,
+                    "description": "MD5 Hash of file",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -281,33 +288,34 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "File Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Get information about a given domain",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "type": "investigate",
+            "identifier": "domain_reputation",
+            "read_only": true,
             "parameters": {
-                "hash": {
+                "domain": {
                     "required": true,
-                    "description": "MD5 Hash of file",
+                    "description": "Domain to investigate",
                     "data_type": "string",
                     "contains": [
-                        "md5"
+                        "domain",
+                        "url"
                     ],
                     "primary": true,
                     "order": 0
                 }
             },
-            "type": "investigate",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that file."
-        },
-        {
-            "read_only": true,
-            "identifier": "domain_reputation",
-            "description": "Get information about a given domain",
-            "render": {
-                "width": 12,
-                "title": "Domain Reputation",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "domain reputation",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -508,34 +516,33 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "Get information about a given IP",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "type": "investigate",
+            "identifier": "ip_reputation",
+            "read_only": true,
             "parameters": {
-                "domain": {
+                "ip": {
                     "required": true,
-                    "description": "Domain to investigate",
+                    "description": "IP to investigate",
                     "data_type": "string",
                     "contains": [
-                        "domain",
-                        "url"
+                        "ip"
                     ],
                     "primary": true,
                     "order": 0
                 }
             },
-            "type": "investigate",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data."
-        },
-        {
-            "read_only": true,
-            "identifier": "ip_reputation",
-            "description": "Get information about a given IP",
-            "render": {
-                "width": 12,
-                "title": "Ip Reputation",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "ip reputation",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -730,33 +737,21 @@
                     "data_type": "numeric"
                 }
             ],
-            "parameters": {
-                "ip": {
-                    "required": true,
-                    "description": "IP to investigate",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ],
-                    "primary": true,
-                    "order": 0
-                }
-            },
-            "type": "investigate",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data."
-        },
-        {
-            "read_only": true,
-            "identifier": "email_reputation",
-            "description": "Get information about a given email",
             "render": {
                 "width": 12,
-                "title": "Email Reputation",
+                "title": "Ip Reputation",
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "email reputation",
+            "description": "Get information about a given email",
+            "type": "investigate",
+            "identifier": "email_reputation",
+            "read_only": true,
+            "parameters": {},
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -954,14 +949,20 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Email Reputation",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "url reputation",
-            "identifier": "url_reputation",
             "description": "Get information about a URL",
             "verbose": "If nothing is found, this is because ThreatStream has no information on that URL.",
             "type": "investigate",
+            "identifier": "url_reputation",
             "read_only": true,
             "parameters": {
                 "url": {
@@ -1188,32 +1189,18 @@
             "identifier": "whois_domain",
             "read_only": true,
             "parameters": {
-                "email": {
+                "domain": {
                     "required": true,
-                    "description": "Email to investigate",
+                    "description": "Domain",
                     "data_type": "string",
                     "contains": [
-                        "email"
+                        "domain",
+                        "url"
                     ],
                     "primary": true,
                     "order": 0
                 }
             },
-            "type": "investigate",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that email."
-        },
-        {
-            "read_only": true,
-            "identifier": "whois_domain",
-            "description": "Execute a whois lookup on the given domain",
-            "render": {
-                "width": 12,
-                "height": 5,
-                "type": "table",
-                "title": "Whois details"
-            },
-            "versions": "EQ(*)",
-            "action": "whois domain",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1434,34 +1421,35 @@
                     "data_type": "numeric"
                 }
             ],
-            "parameters": {
-                "domain": {
-                    "required": true,
-                    "description": "Domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain",
-                        "url"
-                    ],
-                    "primary": true,
-                    "order": 0
-                }
-            },
-            "type": "investigate",
-            "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields."
-        },
-        {
-            "read_only": true,
-            "identifier": "list_incidents",
-            "description": "List incidents in ThreatStream",
             "render": {
                 "width": 12,
-                "title": "List Incidents",
+                "height": 5,
                 "type": "table",
-                "height": 5
+                "title": "Whois details"
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "list incidents",
+            "description": "List incidents in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "list_incidents",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "required": false,
+                    "description": "Number of incidents to return",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "intel_value": {
+                    "required": false,
+                    "description": "Intelligence value to filter incidents (ie. google.com)",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1708,35 +1696,33 @@
                     "data_type": "numeric"
                 }
             ],
-            "parameters": {
-                "limit": {
-                    "required": false,
-                    "description": "Number of incidents to return",
-                    "data_type": "string",
-                    "order": 0
-                },
-                "intel_value": {
-                    "required": false,
-                    "description": "Intelligence value to filter incidents (ie. google.com)",
-                    "data_type": "string",
-                    "order": 1
-                }
-            },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "delete_incident",
-            "description": "Delete incident in ThreatStream by ID number",
             "render": {
                 "width": 12,
-                "title": "Delete Incident",
+                "title": "List Incidents",
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "delete incident",
+            "description": "Delete incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "delete_incident",
+            "read_only": false,
+            "parameters": {
+                "incident_id": {
+                    "required": true,
+                    "description": "ID number of incident to delete",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1785,10 +1771,25 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Delete Incident",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incident",
+            "description": "Get incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "get_incident",
+            "read_only": true,
             "parameters": {
                 "incident_id": {
                     "required": true,
-                    "description": "ID number of incident to delete",
+                    "description": "ID number of incident to return",
                     "data_type": "string",
                     "contains": [
                         "threatstream incident id"
@@ -1797,21 +1798,6 @@
                     "order": 0
                 }
             },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": true,
-            "identifier": "get_incident",
-            "description": "Get incident in ThreatStream by ID number",
-            "render": {
-                "width": 12,
-                "title": "Get Incident",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "get incident",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -2348,33 +2334,54 @@
                     "data_type": "numeric"
                 }
             ],
-            "parameters": {
-                "incident_id": {
-                    "required": true,
-                    "description": "ID number of incident to return",
-                    "data_type": "string",
-                    "contains": [
-                        "threatstream incident id"
-                    ],
-                    "primary": true,
-                    "order": 0
-                }
-            },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "create_incident",
-            "description": "Create incident in ThreatStream",
             "render": {
                 "width": 12,
-                "title": "Create Incident",
+                "title": "Get Incident",
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "create incident",
+            "description": "Create incident in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "create_incident",
+            "read_only": false,
+            "parameters": {
+                "intelligence": {
+                    "allow_list": true,
+                    "required": false,
+                    "description": "Comma separated list of intelligence IDs to associate with the incident",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "primary": true,
+                    "order": 3
+                },
+                "name": {
+                    "order": 0,
+                    "required": true,
+                    "primary": false,
+                    "data_type": "string",
+                    "description": "Name to give the incident"
+                },
+                "fields": {
+                    "required": false,
+                    "description": "JSON formatted string of fields to include with the incident",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "is_public": {
+                    "default": false,
+                    "required": true,
+                    "description": "Classification designation",
+                    "data_type": "boolean",
+                    "order": 1
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -2633,54 +2640,46 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Create Incident",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update incident",
+            "description": "Update incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "update_incident",
+            "read_only": false,
             "parameters": {
                 "intelligence": {
                     "allow_list": true,
                     "required": false,
-                    "description": "Comma separated list of intelligence IDs to associate with the incident",
-                    "data_type": "string",
-                    "contains": [
-                        "threatstream intelligence id"
-                    ],
-                    "primary": true,
-                    "order": 3
-                },
-                "name": {
-                    "order": 0,
-                    "required": true,
-                    "primary": false,
-                    "data_type": "string",
-                    "description": "Name to give the incident"
-                },
-                "fields": {
-                    "required": false,
-                    "description": "JSON formatted string of fields to include with the incident",
+                    "description": "Comma separated list of intelligence IDs to associate with the incident - Note that this overwrites, not appends",
                     "data_type": "string",
                     "order": 2
                 },
-                "is_public": {
-                    "default": false,
-                    "required": true,
-                    "description": "Classification designation",
-                    "data_type": "boolean",
+                "fields": {
+                    "required": false,
+                    "description": "JSON formatted string of fields to update on the incident",
+                    "data_type": "string",
                     "order": 1
+                },
+                "incident_id": {
+                    "required": true,
+                    "description": "ID number of incident to update",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
                 }
             },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "update_incident",
-            "description": "Update incident in ThreatStream by ID number",
-            "render": {
-                "width": 12,
-                "title": "Update Incident",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "update incident",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -3228,46 +3227,21 @@
                     "data_type": "numeric"
                 }
             ],
-            "parameters": {
-                "intelligence": {
-                    "allow_list": true,
-                    "required": false,
-                    "description": "Comma separated list of intelligence IDs to associate with the incident - Note that this overwrites, not appends",
-                    "data_type": "string",
-                    "order": 2
-                },
-                "fields": {
-                    "required": false,
-                    "description": "JSON formatted string of fields to update on the incident",
-                    "data_type": "string",
-                    "order": 1
-                },
-                "incident_id": {
-                    "required": true,
-                    "description": "ID number of incident to update",
-                    "data_type": "string",
-                    "contains": [
-                        "threatstream incident id"
-                    ],
-                    "primary": true,
-                    "order": 0
-                }
-            },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "import_observables",
-            "description": "Import observables into ThreatStream",
             "render": {
                 "width": 12,
-                "title": "Import Observables",
+                "title": "Update Incident",
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "import observables",
+            "description": "Import observables into ThreatStream",
+            "type": "generic",
+            "identifier": "import_observables",
+            "read_only": false,
+            "parameters": {},
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -3658,13 +3632,19 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Import Observables",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "get pcap",
-            "identifier": "get_pcap",
             "description": "Download pcap file of sample submitted to sandbox and add it to vault",
             "type": "investigate",
+            "identifier": "get_pcap",
             "read_only": true,
             "parameters": {
                 "id": {
@@ -3737,7 +3717,8 @@
         {
             "action": "on poll",
             "description": "Callback action for the on_poll ingest functionality",
-            "type": "ingest",
+            "verbose": "",
+            "type": "generic",
             "identifier": "on_poll",
             "read_only": true,
             "parameters": {
@@ -3787,22 +3768,36 @@
                     "data_type": "string",
                     "order": 3
                 }
-            },
-            "type": "generic",
-            "verbose": ""
+            }
         },
         {
-            "read_only": false,
-            "identifier": "detonate_file",
-            "description": "Detonate file in ThreatStream",
-            "render": {
-                "width": 12,
-                "title": "Detonate File",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
             "action": "detonate file",
+            "description": "Detonate file in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "detonate_file",
+            "read_only": false,
+            "parameters": {
+                "platform": {
+                    "default": "ALL",
+                    "required": false,
+                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "vault_id": {
+                    "required": true,
+                    "description": "Vault id of file to be detonated",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "classification": {
+                    "required": true,
+                    "description": "classification of the sandbox submission - private or public",
+                    "data_type": "string",
+                    "order": 2
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -3934,6 +3929,21 @@
                     "data_type": "string"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Detonate File",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "description": "Detonate url in ThreatStream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "detonate_url",
+            "read_only": false,
             "parameters": {
                 "platform": {
                     "default": "ALL",
@@ -3942,9 +3952,9 @@
                     "data_type": "string",
                     "order": 1
                 },
-                "vault_id": {
+                "url": {
                     "required": true,
-                    "description": "Vault id of file to be detonated",
+                    "description": "URL to be detonated",
                     "data_type": "string",
                     "order": 0
                 },
@@ -3952,24 +3962,9 @@
                     "required": true,
                     "description": "classification of the sandbox submission - private or public",
                     "data_type": "string",
-                    "order": 2
+                    "order": 1
                 }
             },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "detonate_url",
-            "description": "Detonate url in ThreatStream",
-            "render": {
-                "width": 12,
-                "title": "Detonate Url",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "detonate url",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4101,42 +4096,29 @@
                     "data_type": "string"
                 }
             ],
-            "parameters": {
-                "platform": {
-                    "default": "ALL",
-                    "required": false,
-                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
-                    "data_type": "string",
-                    "order": 1
-                },
-                "url": {
-                    "required": true,
-                    "description": "URL to be detonated",
-                    "data_type": "string",
-                    "order": 0
-                },
-                "classification": {
-                    "required": true,
-                    "description": "classification of the sandbox submission - private or public",
-                    "data_type": "string",
-                    "order": 1
-                }
-            },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": false,
-            "identifier": "get_status",
-            "description": "Retrieve detonation status in Threatstream",
             "render": {
                 "width": 12,
-                "title": "Get Status",
+                "title": "Detonate Url",
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)",
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get status",
+            "description": "Retrieve detonation status in Threatstream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "get_status",
+            "read_only": false,
+            "parameters": {
+                "endpoint": {
+                    "required": true,
+                    "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
+                    "data_type": "string",
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4385,6 +4367,21 @@
                     "data_type": "numeric"
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Get Status",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Retrieve detonation report in Threatstream",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "get_report",
+            "read_only": true,
             "parameters": {
                 "endpoint": {
                     "required": true,
@@ -4393,21 +4390,6 @@
                     "order": 0
                 }
             },
-            "type": "generic",
-            "verbose": ""
-        },
-        {
-            "read_only": true,
-            "identifier": "get_report",
-            "description": "Retrieve detonation report in Threatstream",
-            "render": {
-                "width": 12,
-                "title": "Get Report",
-                "type": "table",
-                "height": 5
-            },
-            "versions": "EQ(*)",
-            "action": "get report",
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -4978,20 +4960,20 @@
                     ]
                 }
             ],
-            "parameters": {
-                "endpoint": {
-                    "required": true,
-                    "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
-                    "data_type": "string",
-                    "order": 0
-                }
+            "render": {
+                "width": 12,
+                "title": "Get Report",
+                "type": "table",
+                "height": 5
             },
-            "type": "generic",
-            "verbose": ""
+            "versions": "EQ(*)"
         },
         {
-            "read_only": true,
+            "action": "on poll",
             "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
             "parameters": {
                 "container_count": {
                     "order": 3,
@@ -5022,11 +5004,8 @@
                     "order": 2
                 }
             },
-            "versions": "EQ(*)",
-            "action": "on poll",
             "output": [],
-            "identifier": "on_poll",
-            "type": "ingest"
+            "versions": "EQ(*)"
         }
     ]
 }
