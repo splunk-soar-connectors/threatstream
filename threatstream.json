@@ -3689,6 +3689,142 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "tag observable",
+            "identifier": "tag_observable",
+            "description": "Tag an observable",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Indicator ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "threatstream indicator id"
+                    ],
+                    "order": 0
+                },
+                "source_user_id": {
+                    "description": "ID of user to associate with tag",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 1
+                },
+                "tags": {
+                    "description": "Comma-separated list of tags to associate with this Observable",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "order": 2
+                }
+                
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream indicator id"
+                    ],
+                    "example_values": [
+                        "51590754288"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "16783"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tag",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        "true",
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "16783"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9x2",
+                        "nyj"
+                    ],
+                    "column_name": "Tag ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag_test"
+                    ],
+                    "column_name": "Tag",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "",
+                        "Successfully tagged Observable"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get pcap",
             "description": "Download pcap file of sample submitted to sandbox and add it to vault",
             "type": "investigate",
