@@ -1,7 +1,8 @@
-# Copyright (c) 2018 Splunk Inc.
+# File: threatstream_connector.py
+# Copyright (c) 2016-2018 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.# Phantom App imports
+# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom imports
 import phantom.app as phantom
@@ -18,7 +19,9 @@ import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
 import time
-import urllib
+import os
+import tempfile
+import shutil
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the

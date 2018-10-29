@@ -14,7 +14,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "min_phantom_version": "3.0.284",
-    "license": "Copyright (c) Splunk Inc., 2016-2018",
+    "license": "Copyright (c) 2016-2018 Splunk Inc.",
     "configuration": {
         "username": {
             "data_type": "string",
@@ -3510,7 +3510,7 @@
             "action": "run query",
             "description": "Run observables query in ThreatStream",
             "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "run_query",
             "read_only": false,
             "parameters": {
@@ -3555,11 +3555,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.search_string",
-                    "data_type": "string",
-                    "example_values": [
-                        "(status=\"active\") and (created_ts>=2018-05-23T06:58:45)"
-                    ]
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.order_by",
@@ -3570,24 +3571,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.limit",
-                    "data_type": "numeric"
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.offset",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.records_available",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.records_returned",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.next_offset",
-                    "data_type": "numeric"
+                    "data_path": "action_result.parameter.search_string",
+                    "data_type": "string",
+                    "example_values": [
+                        "(status=\"active\") and (created_ts>=2018-05-23T06:58:45)"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -3838,6 +3830,18 @@
                     ],
                     "column_name": "Value",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.next_offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.records_available",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.records_returned",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.message",
