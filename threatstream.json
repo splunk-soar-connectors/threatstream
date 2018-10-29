@@ -1,4 +1,5 @@
 {
+    "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "name": "ThreatStream",
     "description": "Integrates a variety of reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
     "publisher": "Phantom",
@@ -3241,7 +3242,54 @@
             "type": "generic",
             "identifier": "import_observables",
             "read_only": false,
-            "parameters": {},
+            "parameters": {
+                "observable_type": {
+                    "description": "Type of observable to import",
+                    "data_type": "string",
+                    "order": 0,
+                    "value_list": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "hash"
+                    ],
+                    "required": true
+                },
+                "value": {
+                    "description": "Observable value",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "classification": {
+                    "description": "Designate classification for observable",
+                    "data_type": "string",
+                    "order": 2,
+                    "value_list": [
+                        "public",
+                        "private"
+                    ],
+                    "default": "private",
+                    "required": true
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -3768,7 +3816,9 @@
                     "data_type": "string",
                     "order": 3
                 }
-            }
+            },
+            "output": [],
+            "versions": "EQ(*)"
         },
         {
             "action": "detonate file",
