@@ -603,20 +603,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please set the organization ID config value prior to tagging an observable")
 
         payload = self._generate_payload()
-    #    """  
-    #     {
-    #         "tags":[
-    #             {
-    #                 "name":"Malicious Link",
-    #                 "tlp":"red",
-    #                 "org_id":"55",
-    #                 "category":"user",
-    #                 "source_user":"",
-    #                 "source_user_id":"16783",
-    #                 "tagger":"user"
-    #             }
-    #         ]
-    #     } """
+        
         # tags should be a comma-separated list
         tags = param[THREATSTREAM_JSON_TAGS].split(',')
         data = {THREATSTREAM_JSON_TAGS : []}
