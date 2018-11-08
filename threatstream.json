@@ -5016,14 +5016,14 @@
             "read_only": false,
             "parameters": {
                 "query": {
-                    "description": "Search string using anomali filter language (seen on adv. search page)",
+                    "description": "Search string using Anomali filter language (seen on advanced search page)",
                     "data_type": "string",
                     "order": 0,
                     "required": true,
                     "primary": true
                 },
                 "order_by": {
-                    "description": "order by field",
+                    "description": "Field by which the query results will be ordered",
                     "data_type": "string",
                     "order": 1,
                     "required": false
