@@ -65,6 +65,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
     ACTION_ID_RUN_QUERY = "run_query"
+    ACTION_ID_TAG_IOC = "tag_observable"
     ACTION_ID_ON_POLL = "on_poll"
     ACTION_ID_DETONATE_FILE = "detonate_file"
     ACTION_ID_GET_STATUS = "get_status"
@@ -644,6 +645,38 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Perform a reputation action if details are not included in this action.")
 
+    def _handle_tag_ioc(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        config = self.get_config()
+
+        org_id = config.get("organization_id", None)
+        if org_id is None:
+            return action_result.set_status(phantom.APP_ERROR, "Please set the organization ID config value prior to tagging an observable")
+
+        payload = self._generate_payload()
+        
+        # tags should be a comma-separated list
+        tags = param[THREATSTREAM_JSON_TAGS].split(',')
+        data = {THREATSTREAM_JSON_TAGS : []}
+        
+        for tag in tags:
+            data[THREATSTREAM_JSON_TAGS].append({
+                "name": tag,
+                "org_id": org_id,
+                THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]
+            })
+
+        endpoint = ENDPOINT_TAG_IOC.format(indicator_id=param["id"])
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method="post")
+
+        if (not ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully tagged observable")
+ 
+
     def _handle_get_status(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
@@ -931,6 +964,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_detonate_url(param)
         elif (action == self.ACTION_ID_GET_PCAP):
             ret_val = self._handle_get_pcap(param)
+        elif (action == self.ACTION_ID_TAG_IOC):
+            ret_val = self._handle_tag_ioc(param)
 
         return ret_val
 
