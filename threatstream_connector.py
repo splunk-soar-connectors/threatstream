@@ -663,7 +663,8 @@ class ThreatstreamConnector(BaseConnector):
             data[THREATSTREAM_JSON_TAGS].append({
                 "name": tag,
                 "org_id": org_id,
-                THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]
+                "tlp": param.get('tlp', 'red').lower(),
+                THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]                
             })
 
         endpoint = ENDPOINT_TAG_IOC.format(indicator_id=param["id"])

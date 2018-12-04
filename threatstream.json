@@ -3719,8 +3719,22 @@
                     "required": true,
                     "primary": false,
                     "order": 2
-                }
-                
+                },
+                "tlp": {
+                    "description": "TLP to assign to each tag",
+                    "verbose:": "A TLP of red will make the tag private for the user's organization",
+                    "data_type": "string",
+                    "values_list": [
+                        "white",
+                        "green",
+                        "amber",
+                        "red"
+                    ],
+                    "default": "red",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                }                
             },
             "output": [
                 {
@@ -3748,10 +3762,19 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.tag",
+                    "data_path": "action_result.parameter.tags",
                     "data_type": "string",
                     "example_values": [
-                        "test_tag"
+                        "test_tag",
+                        "phantom_tag, test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red",
+                        "white"
                     ]
                 },
                 {
