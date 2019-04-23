@@ -274,7 +274,7 @@ class ThreatstreamConnector(BaseConnector):
     def _insight(self, value, ioc_type, action_result):
 
         # Validate input
-        if ioc_type not in [ "ip", "domain", "email", "md5" ]:
+        if ioc_type not in [ "ip", "domain", "email", "md5", "sha1", "sha256" ]:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
 
         payload = self._generate_payload(type=ioc_type, value=value)
@@ -379,7 +379,14 @@ class ThreatstreamConnector(BaseConnector):
     def _file_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_HASH]
-        ioc_type = "md5"
+
+        if phantom.is_md5(value):
+            ioc_type = "md5"
+        if phantom.is_sha1(value):
+            ioc_type = "sha1"
+        if phantom.is_sha256(value):
+            ioc_type = "sha256"
+
         ret_val = self._retrieve_email_md5(value, ioc_type, action_result)
         if (not ret_val):
             return action_result.get_status()
