@@ -83,10 +83,10 @@
             "parameters": {
                 "hash": {
                     "required": true,
-                    "description": "MD5 Hash of file",
+                    "description": "Hash of file",
                     "data_type": "string",
                     "contains": [
-                        "md5"
+                        "hash"
                     ],
                     "primary": true,
                     "order": 0
