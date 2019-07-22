@@ -752,7 +752,19 @@
             "type": "investigate",
             "identifier": "email_reputation",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "email": {
+                    "required": true,
+                    "description": "Email to investigate",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
