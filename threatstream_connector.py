@@ -847,7 +847,6 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
         # This set will be used to track all incidents added on this poll and
         # save state for future polls
-        set_of_inc_ids = set()
         start_incident_id = self._state.get("last_incident_id", 0)
         if self.is_poll_now():
             max_containers = int(param.get("container_count", 100))
@@ -914,14 +913,10 @@ class ThreatstreamConnector(BaseConnector):
                     self.debug_print(message)
                     return action_result.set_status(phantom.APP_ERROR, "Failed Creating container")
                 # Add incident ID to tracking set for state saving later
-                set_of_inc_ids.add(int(resp_json["id"]))
                 added_containers += 1
 
-        if (not self.is_poll_now()):
-            try:
-                self._state["last_incident_id"] = sorted(set_of_inc_ids)[-1]
-            except:
-                self._state["last_incident_id"] = 0
+                if (not self.is_poll_now()):
+                    self._state["last_incident_id"] = int(resp_json["id"])
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved list of incidents")
 
