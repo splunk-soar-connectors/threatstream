@@ -1752,7 +1752,9 @@
                     "example_values": [
                         "15518"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Incident ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
