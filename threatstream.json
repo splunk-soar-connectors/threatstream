@@ -2349,10 +2349,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Get Incident",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Group Info",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
