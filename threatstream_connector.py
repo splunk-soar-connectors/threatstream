@@ -56,7 +56,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_EMAIL_REPUTATION = "email_reputation"
     ACTION_ID_IP_REPUTATION = "ip_reputation"
     ACTION_ID_DOMAIN_REPUTATION = "domain_reputation"
-    ACTION_ID_URL_REPUTATION= "url_reputation"
+    ACTION_ID_URL_REPUTATION = "url_reputation"
     ACTION_ID_FILE_REPUTATION = "file_reputation"
     ACTION_ID_LIST_INCIDENTS = "list_incidents"
     ACTION_ID_GET_INCIDENT = "get_incident"
@@ -119,14 +119,14 @@ class ThreatstreamConnector(BaseConnector):
         data_message = ""
         # Error text can still be an empty string
         if error_text:
-            data_message = " Data from server:\n{0}\n".format(error_text)
+            data_message = " Data from server:\n{0}\n".format(error_text.encode('utf-8'))
 
-        message = "Status Code: {0}.{1}".format(
-            status_code,
-            data_message
-        )
+        message = "Status Code: {0}. {1}".format(status_code, data_message)
 
         message = message.replace('{', '{{').replace('}', '}}')
+
+        if len(message) > 500:
+            message = "Status Code: {0}. Error while connecting to the server. Please check the asset and the action's input parameters.".format(status_code)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -182,7 +182,6 @@ class ThreatstreamConnector(BaseConnector):
 
     def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
 
-        config = self.get_config()
         resp_json = None
 
         try:
@@ -198,7 +197,6 @@ class ThreatstreamConnector(BaseConnector):
                                 url,
                                 json=data,
                                 headers=headers,
-                                verify=config.get('verify_server_cert', False),
                                 params=payload,
                                 files=files)
             except Exception as e:
@@ -210,7 +208,6 @@ class ThreatstreamConnector(BaseConnector):
                                 url,
                                 data=data,
                                 headers=headers,
-                                verify=config.get('verify_server_cert', False),
                                 params=payload,
                                 files=files)
             except Exception as e:
@@ -237,20 +234,18 @@ class ThreatstreamConnector(BaseConnector):
         # intel with it included
         if phantom.is_url(value):
             value_regexp = '.*{0}.*'.format(urlsplit(value).netloc)
-            payload = self._generate_payload(extend_source="true", limit="25", offset="0", type="url",
-                                            order_by="-created_ts", value__regexp=value_regexp)
+            payload = self._generate_payload(extend_source="true", type="url", order_by="-created_ts", value__regexp=value_regexp)
         else:
-            payload = self._generate_payload(extend_source="true", limit="25", offset="0",
-                                            order_by="-created_ts", value=value)
+            payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value)
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
-        if (phantom.is_fail(ret_val)):
+        intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload)
+
+        if intel_details is None:
             return action_result.get_status()
 
-        # action_result.add_data({'intel_details': resp_json['objects']})
-        # self._data_dict['intel_details'] = resp_json['objects']
-        for detail in resp_json['objects']:
+        for detail in intel_details:
             action_result.add_data(detail)
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved intel details")
 
     def _pdns(self, value, ioc_type, action_result):
@@ -283,8 +278,6 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.set_status(phantom.APP_ERROR, "Error retrieving insights")
 
-        # action_result.add_data({'insights': resp_json['insights']})
-        # self._data_dict['insights'] = resp_json['insights']
         action_result.add_extra_data({'insights': resp_json['insights']})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
@@ -297,8 +290,6 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.set_status(phantom.APP_SUCCESS, "Error retrieving external references")
 
-        # action_result.add_data({'external_references': resp_json})
-        # self._data_dict['external_references'] = resp_json
         action_result.add_extra_data({'external_references': resp_json})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
@@ -351,6 +342,9 @@ class ThreatstreamConnector(BaseConnector):
 
     def _retrieve_email_md5(self, value, ioc_type, action_result):
         """ Retrieve all the information needed for email or md5 hashes """
+
+        action_result.add_data({'Hello': 'ABC'})
+
         ret_val = self._intel_details(value, action_result)
         if (not ret_val):
             return action_result.get_status()
@@ -446,26 +440,63 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
         return action_result.get_status()
 
+    def _paginator(self, endpoint, action_result, payload=None, offset=0, limit=None):
+
+        items_list = list()
+
+        if payload:
+            payload['limit'] = DEFAULT_MAX_RESULTS
+        else:
+            payload = self._generate_payload(limit=DEFAULT_MAX_RESULTS)
+
+        while True:
+            ret_val, items = self._make_rest_call(action_result, endpoint, payload)
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            items_list.extend(items.get("objects"))
+
+            if limit and len(items_list) >= limit:
+                return items_list[:limit]
+
+            if len(items.get("objects")) < DEFAULT_MAX_RESULTS:
+                break
+
+            offset = offset + DEFAULT_MAX_RESULTS
+            payload['offset'] = offset
+
+        return items_list
+
     def _handle_list_incidents(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if param.get("intel_value", None):
-            payload = self._generate_payload(limit=param.get("limit", "20"), value=param["intel_value"])
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT_WITH_VALUE, payload)
-        else:
-            payload = self._generate_payload(limit=param.get("limit", "20"))
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload)
+        limit = param.get("limit")
 
-        if (not ret_val):
+        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        if param.get("intel_value", None):
+            payload = self._generate_payload(value=param["intel_value"])
+            incidents = self._paginator(ENDPOINT_INCIDENT_WITH_VALUE, action_result, payload=payload, limit=limit)
+        else:
+            incidents = self._paginator(ENDPOINT_INCIDENT, action_result, limit=limit)
+
+        if incidents is None:
             return action_result.get_status()
 
-        for incident in resp_json['objects']:
+        for incident in incidents:
             action_result.add_data(incident)
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved list of incidents")
+
+        summary = action_result.update_summary({})
+        summary['incidents_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
+
         ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload)
 
         if (not ret_val):
@@ -556,50 +587,37 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
 
-        search_string = param["query"]
-        limit = param.get("limit", 1000)
+        try:
+            search_string = param["query"]
+            search_dict = json.loads(search_string)
+            payload.update(search_dict)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {0}".format(str(e)))
 
-        if limit > 10000:
-            action_result.set_status(
-                phantom.APP_ERROR, 
-                "Invalid limit selected - 10000 is the max number of records "
-                "allowed."
-            )
-        
-        order_by = param.get("order_by", None)
-
+        order_by = param.get("order_by")
         if order_by:
             payload['order_by'] = order_by
-        payload['limit'] = str(limit)
-        payload['q'] = str(search_string)
-        payload['offset'] = str(param.get('offset', 0))
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
-        if (phantom.is_fail(ret_val)):
+        offset = param.get('offset', 0)
+        if offset and (not str(offset).isdigit() or offset <= 0):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="offset"))
+
+        limit = param.get("limit")
+        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        records = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, offset=offset, limit=limit)
+
+        if records is None:
             return action_result.get_status()
-        
-        if resp_json.get('objects') is None:
-            return action_result.set_status(phantom.APP_ERROR, 'Expected item "objects" not returned in query results.')
 
-        for detail in resp_json['objects']:
-            action_result.add_data(detail)
+        for record in records:
+            action_result.add_data(record)
 
-        if resp_json.get('meta') is None:
-            return action_result.set_status(phantom.APP_ERROR, 'Expected item "meta" not returned in query results.')
-        
-        summary = {
-            'records_avaiable': resp_json['meta']['total_count'],
-            'records_returned': min(int(resp_json['meta']['total_count']), int(resp_json['meta']['limit'])),
-            'next_offset': (
-                int(resp_json['meta']['limit']) + int(resp_json['meta']['offset']) 
-                if int(resp_json['meta']['total_count']) < int(resp_json['meta']['limit'])
-                else 0
-            )
-        }
+        summary = action_result.update_summary({})
+        summary['records_returned'] = action_result.get_data_size()
 
-        action_result.update_summary(summary)
-
-        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully queried anomali threatstream.')
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_import_ioc(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -661,17 +679,17 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please set the organization ID config value prior to tagging an observable")
 
         payload = self._generate_payload()
-        
+
         # tags should be a comma-separated list
         tags = param[THREATSTREAM_JSON_TAGS].split(',')
-        data = {THREATSTREAM_JSON_TAGS : []}
-        
+        data = {THREATSTREAM_JSON_TAGS: []}
+
         for tag in tags:
             data[THREATSTREAM_JSON_TAGS].append({
                 "name": tag,
                 "org_id": org_id,
                 "tlp": param.get('tlp', 'red'),
-                THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]                
+                THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]
             })
 
         endpoint = ENDPOINT_TAG_IOC.format(indicator_id=param["id"])
@@ -683,7 +701,6 @@ class ThreatstreamConnector(BaseConnector):
         action_result.add_data(resp_json)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully tagged observable")
- 
 
     def _handle_get_status(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))

@@ -4,6 +4,7 @@
 # SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
 
+DEFAULT_MAX_RESULTS = 19
 THREATSTREAM_JSON_USERNAME = "username"
 THREATSTREAM_JSON_API_KEY = "api_key"
 THREATSTREAM_JSON_HASH = "hash"
@@ -34,5 +35,6 @@ ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
 THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response"
+THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"
