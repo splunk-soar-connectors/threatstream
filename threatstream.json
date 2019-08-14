@@ -325,12 +325,12 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
                     "contains": [
                         "domain",
                         "url"
-                    ],
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -540,7 +540,8 @@
                     "description": "IP to investigate",
                     "data_type": "string",
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "primary": true,
                     "order": 0
@@ -552,11 +553,12 @@
                     "data_type": "string"
                 },
                 {
-                    "contains": [
-                        "ip"
-                    ],
                     "data_path": "action_result.parameter.ip",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -760,6 +762,9 @@
                     "description": "Email to investigate",
                     "data_type": "string",
                     "primary": true,
+                    "contains": [
+                        "email"
+                    ],
                     "order": 0
                 }
             },
@@ -770,7 +775,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.email",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.asn",

@@ -14,16 +14,17 @@ from phantom.vault import Vault
 from threatstream_consts import *
 
 import ast
-import requests
-import datetime
-import pythonwhois
-import simplejson as json
-from bs4 import BeautifulSoup
-from urlparse import urlsplit
 import time
 import os
 import tempfile
 import shutil
+import requests
+import datetime
+import ipaddress
+import pythonwhois
+import simplejson as json
+from bs4 import BeautifulSoup
+from urlparse import urlsplit
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -84,6 +85,9 @@ class ThreatstreamConnector(BaseConnector):
 
         self._base_url = "https://{0}/api".format(config.get('hostname', 'api.threatstream.com'))
         self._state = self.load_state()
+
+        self.set_validator('ipv6', self._is_ip)
+
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -215,6 +219,22 @@ class ThreatstreamConnector(BaseConnector):
 
         return self._process_response(r, action_result)
 
+    def _is_ip(self, input_ip_address):
+        """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        ip_address_input = input_ip_address
+
+        try:
+            ipaddress.ip_address(unicode(ip_address_input))
+        except:
+            return False
+
+        return True
+
     def _generate_payload(self, **kwargs):
         """Create dict with username and password URL parameters
            Can also add in any further URL parameters
@@ -263,7 +283,10 @@ class ThreatstreamConnector(BaseConnector):
 
         # action_result.add_data({'pdns': resp_json['results']})
         # self._data_dict['pdns'] = resp_json['results']
-        action_result.add_extra_data({'pdns': resp_json['results']})
+        if action_result.get_data():
+            action_result.add_data(action_result.get_data()[0].update({'pdns': resp_json['results']}))
+        else:
+            action_result.add_data({'pdns': resp_json['results']})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _insight(self, value, ioc_type, action_result):
@@ -278,7 +301,10 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.set_status(phantom.APP_ERROR, "Error retrieving insights")
 
-        action_result.add_extra_data({'insights': resp_json['insights']})
+        if action_result.get_data():
+            action_result.add_data(action_result.get_data()[0].update({'insights': resp_json['insights']}))
+        else:
+            action_result.add_data({'insights': resp_json['insights']})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _external_references(self, value, action_result):
@@ -290,7 +316,10 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.set_status(phantom.APP_SUCCESS, "Error retrieving external references")
 
-        action_result.add_extra_data({'external_references': resp_json})
+        if action_result.get_data():
+            action_result.add_data(action_result.get_data()[0].update({'external_references': resp_json}))
+        else:
+            action_result.add_data({'external_references': resp_json})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _whois(self, value, action_result, tipe=""):
@@ -342,8 +371,6 @@ class ThreatstreamConnector(BaseConnector):
 
     def _retrieve_email_md5(self, value, ioc_type, action_result):
         """ Retrieve all the information needed for email or md5 hashes """
-
-        action_result.add_data({'Hello': 'ABC'})
 
         ret_val = self._intel_details(value, action_result)
         if (not ret_val):
