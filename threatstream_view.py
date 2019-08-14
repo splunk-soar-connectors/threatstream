@@ -40,4 +40,7 @@ def display_view(provides, all_app_runs, context):
     if provides == "get incident":
         ret_val = 'threatstream_get_incident.html'
 
+    if provides == "update incident":
+        ret_val = 'threatstream_update_incident.html'
+
     return ret_val
