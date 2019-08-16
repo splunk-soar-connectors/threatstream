@@ -23,9 +23,11 @@
             "required": true,
             "default": "api.threatstream.com"
         },
-        "ph_0": {
-            "data_type": "ph",
-            "order": 1
+        "organization_id": {
+            "data_type": "numeric",
+            "order": 1,
+            "description": "Organization ID for filtering incidents when polling",
+            "required": false
         },
         "username": {
             "data_type": "string",
@@ -39,27 +41,18 @@
             "description": "API Key",
             "required": true
         },
-        "organization_id": {
+        "first_run_containers": {
+            "default": 1000,
+            "required": false,
+            "description": "Maximum number of incidents to poll in the first run of the scheduled polling",
             "data_type": "numeric",
-            "order": 4,
-            "contains": [
-                "threatstream organization id"
-            ],
-            "description": "Organization ID for filtering incidents when polling",
-            "required": false
+            "order": 4
         },
         "ingest_only_published_incidents": {
             "data_type": "boolean",
             "order": 5,
             "description": "Ingest only incidents marked published",
             "required": false
-        },
-        "max_containers": {
-            "default": 100,
-            "required": false,
-            "description": "Maximum incidents for scheduled polling",
-            "data_type": "numeric",
-            "order": 4
         }
     },
     "actions": [
@@ -86,6 +79,8 @@
                     "description": "Hash of file",
                     "data_type": "string",
                     "contains": [
+                        "sha1",
+                        "sha256",
                         "md5",
                         "hash"
                     ],
@@ -102,6 +97,8 @@
                     "data_path": "action_result.parameter.hash",
                     "data_type": "string",
                     "contains": [
+                        "sha1",
+                        "sha256",
                         "md5",
                         "hash"
                     ]
@@ -3937,64 +3934,6 @@
                 "type": "table",
                 "height": 5
             },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality",
-            "verbose": "",
-            "type": "generic",
-            "identifier": "on_poll",
-            "read_only": true,
-            "parameters": {
-                "observable_type": {
-                    "value_list": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "hash"
-                    ],
-                    "required": true,
-                    "description": "Type of observable to import",
-                    "data_type": "string",
-                    "order": 0
-                },
-                "value": {
-                    "required": true,
-                    "description": "Observable value",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "md5",
-                        "sha1",
-                        "hash"
-                    ],
-                    "primary": true,
-                    "order": 1
-                },
-                "classification": {
-                    "description": "Designate classification for observable",
-                    "data_type": "string",
-                    "value_list": [
-                        "public",
-                        "private"
-                    ],
-                    "required": true,
-                    "default": "private",
-                    "order": 2
-                },
-                "fields": {
-                    "required": false,
-                    "description": "JSON formatted string of fields to include with the observable",
-                    "data_type": "string",
-                    "order": 3
-                }
-            },
-            "output": [],
             "versions": "EQ(*)"
         },
         {

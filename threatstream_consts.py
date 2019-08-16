@@ -34,7 +34,8 @@ ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
-THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response"
+THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from the server: {error}"
+THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response. Error from the server: {error}"
 THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"

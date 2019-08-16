@@ -333,7 +333,11 @@ class ThreatstreamConnector(BaseConnector):
         if (resp_json['data'] == WHOIS_NO_DATA):
             return action_result.set_status(phantom.APP_ERROR, WHOIS_NO_DATA)
 
-        whois_response = pythonwhois.parse.parse_raw_whois([resp_json['data']], True)
+        try:
+            whois_response = pythonwhois.parse.parse_raw_whois([resp_json['data']], True)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_FETCH_REPLY.format(error=str(e)))
+
         try:
             # Need to work on the json, it contains certain fields that are not
             # parsable, so will need to go the 'fallback' way.
@@ -342,7 +346,7 @@ class ThreatstreamConnector(BaseConnector):
             whois_response = json.loads(whois_response)
             action_result.add_data(whois_response)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY, e)
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
 
         if 'admin' in whois_response:
             if all(key in whois_response['admin'] for key in whois_fields):
@@ -400,6 +404,8 @@ class ThreatstreamConnector(BaseConnector):
     def _file_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_HASH]
+
+        ioc_type = None
 
         if phantom.is_md5(value):
             ioc_type = "md5"
@@ -875,62 +881,133 @@ class ThreatstreamConnector(BaseConnector):
         # Set the action_result status to error, the handler function will most probably return as is
         return phantom.APP_ERROR, None
 
+    def _check_and_update_container_already_exists(self, incident_id, incident_name):
+
+        url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}'.format(self.get_phantom_base_url(), incident_id, self.get_asset_id())
+
+        try:
+            r = requests.get(url, verify=False)
+            resp_json = r.json()
+        except Exception as e:
+            self.debug_print("Unable to query ThreatStream incident container: ", e)
+            return None
+
+        if (resp_json.get('count', 0) <= 0):
+            self.debug_print("No container matched")
+            return None
+
+        try:
+            container_id = resp_json.get('data', [])[0]['id']
+        except Exception as e:
+            self.debug_print("Container results are not proper: ", e)
+            return None
+
+        # If the container exists and he name of the incident has been updated,
+        # update the name of the container as well to stay in sync with the UI of ThreatStream
+        if container_id and (resp_json.get('data', [])[0]['name'] != incident_name):
+            url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
+            try:
+                data = {"name": incident_name}
+                r = requests.post(url, verify=False, json=data)
+                resp_json = r.json()
+            except Exception as e:
+                self.debug_print("Unable to update the name of the ThreatStream incident container: ", e)
+                return container_id
+
+            if not resp_json.get('success'):
+                self.debug_print("Container with ID: {0} could not be updated with the current incident_name: {1} of the incident ID: {2}".format(
+                                    container_id, incident_name, incident_id))
+                self.debug_print("Response of the container updation is: {0}".format(str(resp_json)))
+                return container_id
+
+        return container_id
+
     def _handle_on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
 
-        org_id = config.get("organization_id", None)
+        org_id = config.get("organization_id")
         if org_id is None:
             return action_result.set_status(phantom.APP_ERROR, "Please set the organization ID config value before polling")
 
         self.save_progress("Retrieving incidents...")
-        payload = self._generate_payload(limit=param.get("limit", "1000"))
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload)
 
-        if (not ret_val):
-            return action_result.get_status()
-        # This set will be used to track all incidents added on this poll and
-        # save state for future polls
-        start_incident_id = self._state.get("last_incident_id", 0)
-        if self.is_poll_now():
-            max_containers = int(param.get("container_count", 100))
+        try:
+            # Fetch the last fetched incident's ID in case of subsequent
+            # polls for the scheduled polling
+            start_ingestion_time = None
+
+            if not self.is_poll_now() and self._state.get("first_run") is False:
+                start_ingestion_time = self._state.get("last_incident_time")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the incident ID of the last ingestion run. Error: {0}".format(str(e)))
+
+        try:
+            if self.is_poll_now():
+                # Manual polling
+                limit = int(param.get("container_count", 1000))
+                parameter = "container_count"
+            elif self._state.get("first_run", True):
+                # Scheduled polling first run
+                limit = int(param.get("first_run_containers", 1000))
+                self._state["first_run"] = False
+                parameter = "first_run_containers"
+            else:
+                # Poll every new update in the subsequent polls
+                # of the scheduled_polling
+                limit = None
+
+            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param=parameter))
+
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the number of containers to be ingested. Error: {0}".format(str(e)))
+
+        if start_ingestion_time:
+            payload = self._generate_payload(order_by="modified_ts", modified_ts__gte=start_ingestion_time)
         else:
-            max_containers = int(config.get("max_containers", 100))
-        added_containers = 0
+            payload = self._generate_payload(order_by="modified_ts")
 
-        for incident in resp_json['objects']:
+        incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
+
+        if incidents is None:
+            return action_result.get_status()
+
+        self.save_progress("Fetched {0} incidents".format(len(incidents)))
+
+        for incident in incidents:
+            self.send_progress("Creating containers and artifacts for the incident ID: {0}".format(incident.get("id")))
+            # Handle the ingest_only_published_incidents scenario
             if config.get("ingest_only_published_incidents", True):
-                if incident["publication_status"] != "published":
+                if "published" != incident.get("publication_status"):
+                    self.debug_print("Skipping incident ID: {0} because ingest_only_published_incidents configuration parameter is marked true".format(incident.get("id")))
                     continue
-            if all([incident["organization_id"] == int(org_id),
-                    int(incident["id"]) > start_incident_id,
-                    added_containers < max_containers]):
-                container = {"description": "Container added by ThreatStream App"}
-                self.save_progress("Retrieving details for incident {0}...".format(incident["id"]))
-                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload)
+
+            if incident.get("organization_id") == int(org_id):
+                self.debug_print("Retrieving details for incident ID: {0}".format(incident.get("id")))
+
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload=payload)
+
                 if (not ret_val):
                     return action_result.get_status()
-                container['source_data_identifier'] = resp_json["id"]
-                container['name'] = resp_json["name"]
-                container['data'] = resp_json
-                container['artifacts'] = []
 
-                intelligence = resp_json.pop("intelligence")
-                if intelligence != []:
-                    for item in intelligence:
-                        artifact = {"label": "artifact",
-                                    "type": "network",
-                                    "name": "intelligence artifact",
-                                    "description": "Artifact added by ThreatStream App",
-                                    "source_data_identifier": item["id"]
+                # Create the list of artifacts to be created
+                artifacts_list = []
+                intelligence = resp_json.pop("intelligence", [])
+                for item in intelligence:
+                    artifact = {"label": "artifact",
+                                "type": "network",
+                                "name": "intelligence artifact",
+                                "description": "Artifact added by ThreatStream App",
+                                "source_data_identifier": item["id"]
+                                }
+                    artifact['cef'] = item
+                    artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
+                            'owner_organization_id': [ "threatstream organization id" ],
+                            'ip': [ "ip" ],
+                            'value': [ "ip", "domain", "url", "email", "md5", "sha1", "hash" ]
                                     }
-                        artifact['cef'] = item
-                        artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
-                                'owner_organization_id': [ "threatstream organization id" ],
-                                'ip': [ "ip" ],
-                                'value': [ "ip", "domain", "md5", "sha1", "hash" ]
-                                        }
-                        container['artifacts'].append(artifact)
+                    artifacts_list.append(artifact)
 
                 artifact = {"label": "artifact",
                             "type": "network",
@@ -939,30 +1016,54 @@ class ThreatstreamConnector(BaseConnector):
                             "source_data_identifier": resp_json["id"]
                             }
                 artifact['cef'] = resp_json
-                artifact['cef_types'] = {'id': [ "threatstream incident id" ],
-                            'organization_id': [ "threatstream organization id" ]
-                                         }
-                container['artifacts'].append(artifact)
+                artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
+                artifacts_list.append(artifact)
 
-                self.save_progress("Saving container and adding artifacts...")
-                ret_val, message, container_id = self.save_container(container)
+                existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
 
-                if (phantom.is_fail(ret_val)):
-                    message = "Failed to add Container error msg: {0}".format(message)
-                    self.debug_print(message)
-                    return action_result.set_status(phantom.APP_ERROR, "Failed Creating container")
+                self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
 
-                if (not container_id):
-                    message = "save_container did not return a container_id"
-                    self.debug_print(message)
-                    return action_result.set_status(phantom.APP_ERROR, "Failed Creating container")
-                # Add incident ID to tracking set for state saving later
-                added_containers += 1
+                if not existing_container_id:
+                    container = dict()
+                    container['description'] = "Container added by ThreatStream app"
+                    container['source_data_identifier'] = resp_json.get("id")
+                    container['name'] = resp_json.get("name")
+                    container['data'] = resp_json
+                    container['artifacts'] = artifacts_list
 
-                if (not self.is_poll_now()):
-                    self._state["last_incident_id"] = int(resp_json["id"])
+                    ret_val, message, container_id = self.save_container(container)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved list of incidents")
+                    if (phantom.is_fail(ret_val)):
+                        message = "Failed to add container error msg: {0}".format(message)
+                        self.debug_print(message)
+                        return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
+
+                    if (not container_id):
+                        message = "save_container did not return a container_id"
+                        self.debug_print(message)
+                        return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
+                else:
+                    for artifact in artifacts_list:
+                        artifact['container_id'] = existing_container_id
+
+                    ret_val, message, _ = self.save_artifacts(artifacts_list)
+
+                    if (not ret_val):
+                        self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
+                        return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
+                                                            resp_json.get("id"), message))
+            else:
+                self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
+                                incident.get("id"), incident.get("organization_id"), org_id))
+
+        if not self.is_poll_now() and incidents:
+            # 2019-08-14T11:37:01.113736 to 2019-08-14T11:37:01 conversion
+            # The incidents are sorted in the ascending order
+            last_incident_time = incidents[-1].get("modified_ts")
+            if last_incident_time:
+                self._state["last_incident_time"] = last_incident_time[:-7]
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 
     def handle_action(self, param):
 
