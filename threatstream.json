@@ -1446,7 +1446,7 @@
             "action": "list incidents",
             "description": "List incidents in ThreatStream",
             "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "list_incidents",
             "read_only": true,
             "parameters": {
@@ -1803,7 +1803,7 @@
             "action": "get incident",
             "description": "Get incident in ThreatStream by ID number",
             "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_incident",
             "read_only": true,
             "parameters": {
@@ -4096,10 +4096,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Detonate File",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Group Info",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -4119,6 +4120,9 @@
                     "order": 1
                 },
                 "url": {
+                    "contains": [
+                        "url"
+                    ],
                     "required": true,
                     "description": "URL to be detonated",
                     "data_type": "string",
@@ -4150,6 +4154,9 @@
                 {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
                     "column_name": "URL",
                     "column_order": "1"
                 },
@@ -4263,10 +4270,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Detonate Url",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Group Info",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -4274,14 +4282,18 @@
             "action": "get status",
             "description": "Retrieve detonation status in Threatstream",
             "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_status",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "endpoint": {
                     "required": true,
                     "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
+                    "primary": true,
+                    "contains":[
+                        "threatstream endpoint status"
+                    ],
                     "order": 0
                 }
             },
@@ -4442,7 +4454,9 @@
                     "example_values": [
                         "processing"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4
                 },
                 {
                     "contains": [
@@ -4549,14 +4563,18 @@
             "action": "get report",
             "description": "Retrieve detonation report in Threatstream",
             "verbose": "",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "endpoint": {
                     "required": true,
+                    "primary": true,
                     "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
+                    "contains":[
+                        "threatstream endpoint report"
+                    ],
                     "order": 0
                 }
             },
@@ -5187,7 +5205,7 @@
             "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }",
             "type": "investigate",
             "identifier": "run_query",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "query": {
                     "description": "Search string in JSON format using the Anomali filter language (as seen on advanced search page)",

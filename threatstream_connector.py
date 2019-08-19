@@ -1029,7 +1029,6 @@ class ThreatstreamConnector(BaseConnector):
                     container['source_data_identifier'] = resp_json.get("id")
                     container['name'] = resp_json.get("name")
                     container['data'] = resp_json
-                    container['artifacts'] = artifacts_list
 
                     ret_val, message, container_id = self.save_container(container)
 
@@ -1042,16 +1041,20 @@ class ThreatstreamConnector(BaseConnector):
                         message = "save_container did not return a container_id"
                         self.debug_print(message)
                         return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
-                else:
-                    for artifact in artifacts_list:
-                        artifact['container_id'] = existing_container_id
 
-                    ret_val, message, _ = self.save_artifacts(artifacts_list)
+                    existing_container_id = container_id
 
-                    if (not ret_val):
-                        self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
-                        return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
-                                                            resp_json.get("id"), message))
+                # Add the artifacts_list to either the created or
+                # the existing container with ID in existing_container_id
+                for artifact in artifacts_list:
+                    artifact['container_id'] = existing_container_id
+
+                ret_val, message, _ = self.save_artifacts(artifacts_list)
+
+                if (not ret_val):
+                    self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
+                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
+                                                        resp_json.get("id"), message))
             else:
                 self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
                                 incident.get("id"), incident.get("organization_id"), org_id))

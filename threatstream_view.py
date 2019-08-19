@@ -43,4 +43,7 @@ def display_view(provides, all_app_runs, context):
     if provides == "update incident":
         ret_val = 'threatstream_update_incident.html'
 
+    if provides == "detonate url" or provides == "detonate file":
+        ret_val = 'threatstream_detonate_url.html'
+
     return ret_val
