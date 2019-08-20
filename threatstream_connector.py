@@ -60,7 +60,9 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_URL_REPUTATION = "url_reputation"
     ACTION_ID_FILE_REPUTATION = "file_reputation"
     ACTION_ID_LIST_INCIDENTS = "list_incidents"
+    ACTION_ID_LIST_VULNERABILITY = "list_vulnerabilities"
     ACTION_ID_GET_INCIDENT = "get_incident"
+    ACTION_ID_GET_VULNERABILITY = "get_vulnerability"
     ACTION_ID_DELETE_INCIDENT = "delete_incident"
     ACTION_ID_CREATE_INCIDENT = "create_incident"
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
@@ -482,6 +484,8 @@ class ThreatstreamConnector(BaseConnector):
         else:
             payload = self._generate_payload(limit=DEFAULT_MAX_RESULTS)
 
+        payload['offset'] = offset
+
         while True:
             ret_val, items = self._make_rest_call(action_result, endpoint, payload)
 
@@ -500,6 +504,27 @@ class ThreatstreamConnector(BaseConnector):
             payload['offset'] = offset
 
         return items_list
+
+    def _handle_list_vulnerability(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        limit = param.get("limit")
+
+        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        vulnerability = self._paginator(ENDPOINT_VULNERABILITY, action_result, limit=limit)
+
+        if vulnerability is None:
+            return action_result.get_status()
+
+        for vul in vulnerability:
+            action_result.add_data(vul)
+
+        summary = action_result.update_summary({})
+        summary['vulnerabilities_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_incidents(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -537,6 +562,18 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved incident")
+
+    def _handle_get_vulnerability(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=param["vulnerability_id"]), payload)
+
+        if (not ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved vulnerability")
 
     def _handle_delete_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -968,10 +1005,41 @@ class ThreatstreamConnector(BaseConnector):
         else:
             payload = self._generate_payload(order_by="modified_ts")
 
-        incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
+        incidents = []
+        if limit:
+            offset = 0
+            while len(incidents) < limit:
+                interim_incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, offset=offset, limit=DEFAULT_MAX_RESULTS)
 
-        if incidents is None:
-            return action_result.get_status()
+                if interim_incidents is None:
+                    return action_result.get_status()
+
+                for incident in interim_incidents:
+                    if incident.get("organization_id") == int(org_id):
+                        incidents.append(incident)
+                    else:
+                        self.debug_print("Skipping incident ID: {0} due to organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
+                                    incident.get("id"), incident.get("organization_id"), org_id))
+
+                if not interim_incidents:
+                    break
+
+                offset += DEFAULT_MAX_RESULTS
+
+            # Fetch only the incidents equal to the number denoted by limit
+            incidents = incidents[:limit]
+        else:
+            interim_incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
+
+            if interim_incidents is None:
+                return action_result.get_status()
+
+            for incident in interim_incidents:
+                if incident.get("organization_id") == int(org_id):
+                    incidents.append(incident)
+                else:
+                    self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
+                                incident.get("id"), incident.get("organization_id"), org_id))
 
         self.save_progress("Fetched {0} incidents".format(len(incidents)))
 
@@ -983,81 +1051,77 @@ class ThreatstreamConnector(BaseConnector):
                     self.debug_print("Skipping incident ID: {0} because ingest_only_published_incidents configuration parameter is marked true".format(incident.get("id")))
                     continue
 
-            if incident.get("organization_id") == int(org_id):
-                self.debug_print("Retrieving details for incident ID: {0}".format(incident.get("id")))
+            self.debug_print("Retrieving details for the incident ID: {0}".format(incident.get("id")))
 
-                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload=payload)
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident["id"]), payload=payload)
 
-                if (not ret_val):
-                    return action_result.get_status()
+            if (not ret_val):
+                return action_result.get_status()
 
-                # Create the list of artifacts to be created
-                artifacts_list = []
-                intelligence = resp_json.pop("intelligence", [])
-                for item in intelligence:
-                    artifact = {"label": "artifact",
-                                "type": "network",
-                                "name": "intelligence artifact",
-                                "description": "Artifact added by ThreatStream App",
-                                "source_data_identifier": item["id"]
-                                }
-                    artifact['cef'] = item
-                    artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
-                            'owner_organization_id': [ "threatstream organization id" ],
-                            'ip': [ "ip" ],
-                            'value': [ "ip", "domain", "url", "email", "md5", "sha1", "hash" ]
-                                    }
-                    artifacts_list.append(artifact)
-
+            # Create the list of artifacts to be created
+            artifacts_list = []
+            intelligence = resp_json.pop("intelligence", [])
+            for item in intelligence:
                 artifact = {"label": "artifact",
                             "type": "network",
-                            "name": "incident artifact",
+                            "name": "intelligence artifact",
                             "description": "Artifact added by ThreatStream App",
-                            "source_data_identifier": resp_json["id"]
+                            "source_data_identifier": item["id"]
                             }
-                artifact['cef'] = resp_json
-                artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
+                artifact['cef'] = item
+                artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
+                        'owner_organization_id': [ "threatstream organization id" ],
+                        'ip': [ "ip" ],
+                        'value': [ "ip", "domain", "url", "email", "md5", "sha1", "hash" ]
+                                }
                 artifacts_list.append(artifact)
 
-                existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
+            artifact = {"label": "artifact",
+                        "type": "network",
+                        "name": "incident artifact",
+                        "description": "Artifact added by ThreatStream App",
+                        "source_data_identifier": resp_json["id"]
+                        }
+            artifact['cef'] = resp_json
+            artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
+            artifacts_list.append(artifact)
 
-                self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
+            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
 
-                if not existing_container_id:
-                    container = dict()
-                    container['description'] = "Container added by ThreatStream app"
-                    container['source_data_identifier'] = resp_json.get("id")
-                    container['name'] = resp_json.get("name")
-                    container['data'] = resp_json
+            self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
 
-                    ret_val, message, container_id = self.save_container(container)
+            if not existing_container_id:
+                container = dict()
+                container['description'] = "Container added by ThreatStream app"
+                container['source_data_identifier'] = resp_json.get("id")
+                container['name'] = resp_json.get("name")
+                container['data'] = resp_json
 
-                    if (phantom.is_fail(ret_val)):
-                        message = "Failed to add container error msg: {0}".format(message)
-                        self.debug_print(message)
-                        return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
+                ret_val, message, container_id = self.save_container(container)
 
-                    if (not container_id):
-                        message = "save_container did not return a container_id"
-                        self.debug_print(message)
-                        return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
+                if (phantom.is_fail(ret_val)):
+                    message = "Failed to add container error msg: {0}".format(message)
+                    self.debug_print(message)
+                    return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
 
-                    existing_container_id = container_id
+                if (not container_id):
+                    message = "save_container did not return a container_id"
+                    self.debug_print(message)
+                    return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
 
-                # Add the artifacts_list to either the created or
-                # the existing container with ID in existing_container_id
-                for artifact in artifacts_list:
-                    artifact['container_id'] = existing_container_id
+                existing_container_id = container_id
 
-                ret_val, message, _ = self.save_artifacts(artifacts_list)
+            # Add the artifacts_list to either the created or
+            # the existing container with ID in existing_container_id
+            for artifact in artifacts_list:
+                artifact['container_id'] = existing_container_id
 
-                if (not ret_val):
-                    self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
-                    return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
-                                                        resp_json.get("id"), message))
-            else:
-                self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
-                                incident.get("id"), incident.get("organization_id"), org_id))
+            ret_val, message, _ = self.save_artifacts(artifacts_list)
+
+            if (not ret_val):
+                self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
+                                                    resp_json.get("id"), message))
 
         if not self.is_poll_now() and incidents:
             # 2019-08-14T11:37:01.113736 to 2019-08-14T11:37:01 conversion
@@ -1091,8 +1155,12 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._whois_ip(param)
         elif (action == self.ACTION_ID_LIST_INCIDENTS):
             ret_val = self._handle_list_incidents(param)
+        elif (action == self.ACTION_ID_LIST_VULNERABILITY):
+            ret_val = self._handle_list_vulnerability(param)
         elif (action == self.ACTION_ID_GET_INCIDENT):
             ret_val = self._handle_get_incident(param)
+        elif (action == self.ACTION_ID_GET_VULNERABILITY):
+            ret_val = self._handle_get_vulnerability(param)
         elif (action == self.ACTION_ID_DELETE_INCIDENT):
             ret_val = self._handle_delete_incident(param)
         elif (action == self.ACTION_ID_CREATE_INCIDENT):

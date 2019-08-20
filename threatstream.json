@@ -27,6 +27,7 @@
             "data_type": "numeric",
             "order": 1,
             "description": "Organization ID for filtering incidents when polling",
+            "verbose": "Organization ID is mandatory while polling and is used for filtering the incidents to ingest.",
             "required": false
         },
         "username": {
@@ -1439,6 +1440,664 @@
                 "height": 5,
                 "type": "table",
                 "title": "Whois details"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get vulnerability",
+            "description": "Get incident in ThreatStream by ID number",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "get_vulnerability",
+            "read_only": true,
+            "parameters": {
+                "vulnerability_id": {
+                    "required": true,
+                    "description": "ID number of vulnerability to return",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream vulnerability id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.is_system",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logo_s3_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://ts-optic.s3.amazonaws.com/userUploads/2018-05-04/20180504_232749_userId-6609_78b77cf5-65b5-4372-9603-6e123d18de9f_Anomali_Logo_BlackBlue.png?Signature=vHwhahr5OQurRp5m6GFxpIB3xng%3D&Expires=1566393855&AWSAccessKeyId=AKIAJQVWTELQGUS65RPA"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "451620"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.published_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1999-12-30T05:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cvss2_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ],
+                    "column_name": "CVSS Score",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aliases",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.me",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.body_content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "richtext"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip_input.c in BSD-derived TCP/IP implementations allows remote attackers to cause a denial of service (crash or hang) via crafted packets."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.embedded_content_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mitre_cve_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-1999-0001"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "mitre"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vendors.*.products.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vendors.*.products.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "bsd_os"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vendors.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "bsdi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes_private_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "146"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Anomali Curated OSINT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/trustedcircle/146/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "published"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://www.osvdb.org/5707"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.r_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "U"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.s3_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1421526
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_references.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/vulnerabilityexternalreference/1421526/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "CWE-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cvss3_score",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2010-12-16T05:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-11-16T00:43:49.307763"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "white"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-1999-0001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assignee_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2_CWE-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CWE-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.embedded_content_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ThreatStream"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/userorganization/2/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/vulnerability/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved vulnerability"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vulnerability_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Group Info",
+                "view": "threatstream_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list vulnerabilities",
+            "description": "List vulnerabilities in ThreatStream",
+            "type": "investigate",
+            "identifier": "list_vulnerabilities",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "required": false,
+                    "description": "Total number of vulnerabilities to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "146"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Anomali Curated OSINT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.circles.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/trustedcircle/146/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publication_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "published"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-11-16T00:43:49.307763"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "white"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-1999-0001"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "NVD-CWE-Other"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.assignee_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2_CWE-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CWE-20"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_system",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.published_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1999-12-30T05:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "mitre"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "451620"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2010-12-16T05:00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes_private_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/vulnerability/1/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vulnerabilities returned: 1000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vulnerabilities_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List Vulnerabilities",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
