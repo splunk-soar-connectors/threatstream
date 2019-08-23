@@ -628,7 +628,13 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON.".format(e))
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON.".format(e))
+                return None
+
+            if not isinstance(fields, dict):
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary. Please ensure that you format as JSON dictionary")
+                return None
+
             data.update(fields)
 
         intel = []
@@ -805,10 +811,12 @@ class ThreatstreamConnector(BaseConnector):
         # return action_result.set_status(phantom.APP_SUCCESS, param.get('classification'))
         vault_info = Vault.get_file_info(vault_id=param.get('vault_id'))
 
+        if not vault_info:
+            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
+
         for item in vault_info:
             vault_path = item.get('path')
             if vault_path is None:
-
                 return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
             try:
                 vault_file = open(vault_path)
