@@ -3917,6 +3917,372 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "import email observables",
+            "description": "Import email observables into ThreatStream",
+            "type": "generic",
+            "identifier": "import_email_observables",
+            "read_only": false,
+            "parameters": {
+                "email": {
+                    "description": "",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 0,
+                    "required": true
+                },
+                "indicator_type": {
+                    "description": "Type of observable to import",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true
+                },
+                "confidence": {
+                    "description": "Confidence level",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "required": true
+                },
+                "classification": {
+                    "description": "Designate classification for observable",
+                    "data_type": "string",
+                    "order": 3,
+                    "value_list": [
+                        "public",
+                        "private"
+                    ],
+                    "default": "private",
+                    "required": false
+                },
+                "severity": {
+                    "description": "",
+                    "data_type": "string",
+                    "value_list": [
+                        "low",
+                        "medium",
+                        "high",
+                        "very-high"
+                    ],
+                    "order": 4,
+                    "required": false
+                },
+                "tags": {
+                    "description": "Comma-separated list of tags to associate with this Observable",
+                    "data_type": "string",
+                    "order": 5,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "compromised_email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-24T12:52:17.248Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_editable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4790031538
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "test11@domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "compromised"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        77
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "1dde7f15-2d4d-4749-a77f-23912d252e77"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        53567999120
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        55
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.extended_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        77
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-08-26T12:52:17.271Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-08-26T12:52:17.271Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 16783"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/intelligence/53567999120/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully imported the observable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        77
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "public"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "compromised_email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "test11@domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Import Email Observables",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "import observables",
             "description": "Import observables into ThreatStream",
             "type": "generic",
@@ -4959,7 +5325,7 @@
                     "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
                     "primary": true,
-                    "contains":[
+                    "contains": [
                         "threatstream endpoint status"
                     ],
                     "order": 0
@@ -5240,7 +5606,7 @@
                     "primary": true,
                     "description": "Endpoint given by Detonate File/URL (eg: /api/v1/submit/12345/)",
                     "data_type": "string",
-                    "contains":[
+                    "contains": [
                         "threatstream endpoint report"
                     ],
                     "order": 0

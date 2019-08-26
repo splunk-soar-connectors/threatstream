@@ -25,6 +25,7 @@ import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
 from urlparse import urlsplit
+from time import sleep
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -67,6 +68,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_CREATE_INCIDENT = "create_incident"
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
+    ACTION_ID_IMPORT_EMAIL_OBSERVABLES = "import_email_observables"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_TAG_IOC = "tag_observable"
     ACTION_ID_ON_POLL = "on_poll"
@@ -196,7 +198,13 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        if '/v2/intelligence' not in endpoint:
+            url = self._base_url + endpoint
+        else:
+            base_url = self._base_url.split(':')
+            base_url[0] = 'http'
+            url = ':'.join(base_url) + endpoint
+
         if use_json:
             try:
                 r = request_func(
@@ -695,6 +703,76 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def import_support(self, param, action_result):
+
+        payload = self._generate_payload()
+        indicator_type = param['indicator_type']
+        confidence = param.get('confidence', None)
+        classification = param.get('classification')
+        severity = param.get('severity')
+        tags = param.get('tags')
+
+        action_name = self.get_action_identifier()
+
+        object_dict = {"itype": indicator_type}
+
+        if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
+            value = param['email']
+            object_dict.update({"email": value})
+
+        if confidence:
+            object_dict.update({"confidence": confidence})
+
+        if severity:
+            object_dict.update({"severity": severity})
+
+        if classification:
+            object_dict.update({"classification": classification})
+
+        if tags:
+            tag = [x.strip() for x in tags.split(',')]
+            tag = list(filter(None, tag))
+            object_dict.update({"tags": tag})
+
+        data = {
+                "objects": [
+                    object_dict
+                ]
+                }
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload, data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload.update({"value": value, "order_by": "-created_ts", "extend_source": "true"})
+
+        for i in range(1, 13):
+            sleep(5)
+
+            intelligence = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=50)
+
+            if intelligence is None:
+                return action_result.get_status()
+
+            for intel in intelligence:
+                if intel.get('itype') == indicator_type and intel.get('confidence') == confidence:
+                    action_result.add_data(intel)
+                    break
+
+            if action_result.get_data():
+                break
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Error while importing the observable on the ThreatStream server")
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported the observable")
+
+    def _handle_import_email_observables(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val = self.import_support(param, action_result)
+        return action_result.get_status()
+
     def _handle_import_ioc(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1177,6 +1255,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_update_incident(param)
         elif (action == self.ACTION_ID_IMPORT_IOC):
             ret_val = self._handle_import_ioc(param)
+        elif (action == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES):
+            ret_val = self._handle_import_email_observables(param)
         elif (action == self.ACTION_ID_RUN_QUERY):
             ret_val = self._handle_run_query(param)
         elif (action == self.ACTION_ID_ON_POLL):
