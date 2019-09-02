@@ -69,6 +69,10 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
     ACTION_ID_IMPORT_EMAIL_OBSERVABLES = "import_email_observables"
+    ACTION_ID_IMPORT_FILE_OBSERVABLES = "import_file_observables"
+    ACTION_ID_IMPORT_IP_OBSERVABLES = "import_ip_observables"
+    ACTION_ID_IMPORT_URL_OBSERVABLES = "import_url_observables"
+    ACTION_ID_IMPORT_DOMAIN_OBSERVABLES = "import_domain_observables"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_TAG_IOC = "tag_observable"
     ACTION_ID_ON_POLL = "on_poll"
@@ -198,12 +202,7 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        if '/v2/intelligence' not in endpoint:
-            url = self._base_url + endpoint
-        else:
-            base_url = self._base_url.split(':')
-            base_url[0] = 'http'
-            url = ':'.join(base_url) + endpoint
+        url = self._base_url + endpoint
 
         if use_json:
             try:
@@ -711,6 +710,14 @@ class ThreatstreamConnector(BaseConnector):
         classification = param.get('classification')
         severity = param.get('severity')
         tags = param.get('tags')
+        timeout_minutes = param.get('timeout_minutes', 2)
+        if timeout_minutes == 0 or (timeout_minutes and (not str(timeout_minutes).isdigit() or timeout_minutes <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_TIMEOUT)
+
+        if (confidence and confidence < 0) or (confidence and (not str(confidence).isdigit() or confidence <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_CONFIDENCE)
+
+        timeout = (timeout_minutes * 2) + 1
 
         action_name = self.get_action_identifier()
 
@@ -719,6 +726,22 @@ class ThreatstreamConnector(BaseConnector):
         if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
             value = param['email']
             object_dict.update({"email": value})
+
+        if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
+            value = param['file_hash']
+            object_dict.update({"md5": value})
+
+        if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
+            value = param['ip_address']
+            object_dict.update({"srcip": value})
+
+        if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
+            value = param['url']
+            object_dict.update({"url": value})
+
+        if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
+            value = param['domain']
+            object_dict.update({"domain": value})
 
         if confidence:
             object_dict.update({"confidence": confidence})
@@ -738,17 +761,24 @@ class ThreatstreamConnector(BaseConnector):
                 "objects": [
                     object_dict
                 ]
-                }
+            }
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload, data=data, method="patch")
+        cur_ts = time.time()
+        cur_ts_list = str(cur_ts).split('.')
+        if cur_ts_list[1]:
+            milli_sec = cur_ts_list[1]
+
+        curren_ts = "{}.{}Z".format((datetime.datetime.fromtimestamp(int(cur_ts)).strftime('%Y-%m-%dT%H:%M:%S')), milli_sec)
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload=payload, data=data, method="patch")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        payload.update({"value": value, "order_by": "-created_ts", "extend_source": "true"})
+        payload.update({"value": value, "order_by": "-created_ts", "extend_source": "true", "created_ts__gte": curren_ts})
 
-        for i in range(1, 13):
-            sleep(5)
+        for i in range(1, timeout):
+            sleep(30)
 
             intelligence = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=50)
 
@@ -756,7 +786,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
             for intel in intelligence:
-                if intel.get('itype') == indicator_type and intel.get('confidence') == confidence:
+                if intel.get('itype') == indicator_type:
                     action_result.add_data(intel)
                     break
 
@@ -770,7 +800,31 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_import_email_observables(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val = self.import_support(param, action_result)
+        self.import_support(param, action_result)
+        return action_result.get_status()
+
+    def _handle_import_file_observables(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.import_support(param, action_result)
+        return action_result.get_status()
+
+    def _handle_import_ip_observables(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.import_support(param, action_result)
+        return action_result.get_status()
+
+    def _handle_import_url_observables(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.import_support(param, action_result)
+        return action_result.get_status()
+
+    def _handle_import_domain_observables(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self.import_support(param, action_result)
         return action_result.get_status()
 
     def _handle_import_ioc(self, param):
@@ -1257,6 +1311,14 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_import_ioc(param)
         elif (action == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES):
             ret_val = self._handle_import_email_observables(param)
+        elif (action == self.ACTION_ID_IMPORT_FILE_OBSERVABLES):
+            ret_val = self._handle_import_file_observables(param)
+        elif (action == self.ACTION_ID_IMPORT_IP_OBSERVABLES):
+            ret_val = self._handle_import_ip_observables(param)
+        elif (action == self.ACTION_ID_IMPORT_URL_OBSERVABLES):
+            ret_val = self._handle_import_url_observables(param)
+        elif (action == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES):
+            ret_val = self._handle_import_domain_observables(param)
         elif (action == self.ACTION_ID_RUN_QUERY):
             ret_val = self._handle_run_query(param)
         elif (action == self.ACTION_ID_ON_POLL):

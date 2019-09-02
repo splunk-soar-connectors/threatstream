@@ -17,7 +17,7 @@ THREATSTREAM_JSON_SOURCE_USER_ID = "source_user_id"
 # THREATSTREAM_JSON_IOC_VALUE = "ioc_value"
 # THREATSTREAM_JSON_IOC_TYPE = "ioc_type"
 
-ENDPOINT_INTELLIGENCE = "/v2/intelligence/"
+ENDPOINT_INTELLIGENCE = "/v2/intelligence"
 ENDPOINT_PDNS = "/v1/pdns/{ioc_type}/{ioc_value}/"
 ENDPOINT_INISGHT = "/v1/inteldetails/insights/"
 ENDPOINT_REFERENCE = "/v1/inteldetails/references/{ioc_value}/"
@@ -41,3 +41,5 @@ THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response. Error from the s
 THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"
+THREARSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
+THREARSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
