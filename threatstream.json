@@ -1445,7 +1445,7 @@
         },
         {
             "action": "get vulnerability",
-            "description": "Get vulnerability in ThreatStream by ID number",
+            "description": "Get vulnerability present in ThreatStream by ID number",
             "verbose": "",
             "type": "investigate",
             "identifier": "get_vulnerability",
@@ -1869,7 +1869,7 @@
         },
         {
             "action": "list vulnerabilities",
-            "description": "List vulnerabilities in ThreatStream",
+            "description": "List vulnerabilities present in ThreatStream",
             "type": "investigate",
             "identifier": "list_vulnerabilities",
             "read_only": true,
@@ -2102,7 +2102,7 @@
         },
         {
             "action": "list incidents",
-            "description": "List incidents in ThreatStream",
+            "description": "List incidents present in ThreatStream",
             "verbose": "",
             "type": "investigate",
             "identifier": "list_incidents",
@@ -3924,7 +3924,7 @@
             "read_only": false,
             "parameters": {
                 "domain": {
-                    "description": "",
+                    "description": "Value of domain",
                     "data_type": "string",
                     "contains": [],
                     "order": 0,
@@ -3948,7 +3948,7 @@
                     "required": false
                 },
                 "severity": {
-                    "description": "",
+                    "description": "Severity of the observable",
                     "data_type": "string",
                     "value_list": [
                         "low",
@@ -3966,7 +3966,7 @@
                     "required": false
                 },
                 "timeout_minutes": {
-                    "description": "",
+                    "description": "Defines the time for which the action will try to import the observable",
                     "data_type": "numeric",
                     "default": 2,
                     "order": 6,
@@ -4370,10 +4370,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Import Domain Observables",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Domain Observable",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -4385,7 +4386,7 @@
             "read_only": false,
             "parameters": {
                 "url": {
-                    "description": "",
+                    "description": "Value of URL",
                     "data_type": "string",
                     "contains": [],
                     "order": 0,
@@ -4409,7 +4410,7 @@
                     "required": false
                 },
                 "severity": {
-                    "description": "",
+                    "description": "Severity of the observable",
                     "data_type": "string",
                     "value_list": [
                         "low",
@@ -4427,7 +4428,7 @@
                     "required": false
                 },
                 "timeout_minutes": {
-                    "description": "",
+                    "description": "Defines the time for which the action will try to import the observable",
                     "data_type": "numeric",
                     "default": 2,
                     "order": 6,
@@ -4780,10 +4781,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Import URL Observables",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "URL Observable",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -4795,7 +4797,7 @@
             "read_only": false,
             "parameters": {
                 "ip_address": {
-                    "description": "",
+                    "description": "Value of IP",
                     "data_type": "string",
                     "contains": [],
                     "order": 0,
@@ -4819,7 +4821,7 @@
                     "required": false
                 },
                 "severity": {
-                    "description": "",
+                    "description": "Severity of the observable",
                     "data_type": "string",
                     "value_list": [
                         "low",
@@ -4837,7 +4839,7 @@
                     "required": false
                 },
                 "timeout_minutes": {
-                    "description": "",
+                    "description": "Defines the time for which the action will try to import the observable",
                     "data_type": "numeric",
                     "default": 2,
                     "order": 6,
@@ -5184,10 +5186,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Import IP Observables",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "IP Observable",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -5199,8 +5202,14 @@
             "read_only": false,
             "parameters": {
                 "file_hash": {
-                    "description": "",
+                    "description": "Hash value of file",
                     "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "hash"
+                    ],
                     "order": 0,
                     "required": true
                 },
@@ -5228,7 +5237,7 @@
                     "required": false
                 },
                 "severity": {
-                    "description": "",
+                    "description": "Severity of the observable",
                     "data_type": "string",
                     "value_list": [
                         "low",
@@ -5246,7 +5255,7 @@
                     "required": false
                 },
                 "timeout_minutes": {
-                    "description": "",
+                    "description": "Defines the time for which the action will try to import the observable",
                     "data_type": "numeric",
                     "default": 2,
                     "order": 6,
@@ -5524,7 +5533,10 @@
                         "A23FBAA1E2ABEB86C28CEF93683695CA"
                     ],
                     "contains": [
-                        "md5"
+                        "sha1",
+                        "sha256",
+                        "md5",
+                        "hash"
                     ]
                 },
                 {
@@ -5585,10 +5597,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Import File Observables",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "File Observable",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -5600,7 +5613,7 @@
             "read_only": false,
             "parameters": {
                 "email": {
-                    "description": "",
+                    "description": "Value of email",
                     "data_type": "string",
                     "contains": [
                         "email"
@@ -5632,7 +5645,7 @@
                     "required": false
                 },
                 "severity": {
-                    "description": "",
+                    "description": "Severity of the observable",
                     "data_type": "string",
                     "value_list": [
                         "low",
@@ -5650,7 +5663,7 @@
                     "required": false
                 },
                 "timeout_minutes": {
-                    "description": "",
+                    "description": "Defines the time for which the action will try to import the observable",
                     "data_type": "numeric",
                     "default": 2,
                     "order": 6,
@@ -5966,10 +5979,11 @@
                 }
             ],
             "render": {
-                "width": 12,
-                "title": "Import Email Observables",
-                "type": "table",
-                "height": 5
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Email Observable",
+                "view": "threatstream_view.display_view"
             },
             "versions": "EQ(*)"
         },
@@ -6428,18 +6442,18 @@
         {
             "action": "tag observable",
             "identifier": "tag_observable",
-            "description": "Tag an observable",
+            "description": "Add a tag to the observable",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "Indicator ID",
+                    "description": "Intelligence ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "threatstream indicator id"
+                        "threatstream intelligence id"
                     ],
                     "order": 0
                 },
@@ -6485,7 +6499,7 @@
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "contains": [
-                        "threatstream indicator id"
+                        "threatstream intelligence id"
                     ],
                     "example_values": [
                         "51590754288"
@@ -6679,7 +6693,7 @@
                 },
                 "classification": {
                     "required": true,
-                    "description": "classification of the sandbox submission - private or public",
+                    "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 2
                 }
@@ -6855,7 +6869,7 @@
                 },
                 "classification": {
                     "required": true,
-                    "description": "classification of the sandbox submission - private or public",
+                    "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 1
                 }
@@ -7005,7 +7019,7 @@
         },
         {
             "action": "get status",
-            "description": "Retrieve detonation status in Threatstream",
+            "description": "Retrieve detonation status present in Threatstream",
             "verbose": "",
             "type": "investigate",
             "identifier": "get_status",
@@ -7286,7 +7300,7 @@
         },
         {
             "action": "get report",
-            "description": "Retrieve detonation report in Threatstream",
+            "description": "Retrieve detonation report present in Threatstream",
             "verbose": "",
             "type": "investigate",
             "identifier": "get_report",

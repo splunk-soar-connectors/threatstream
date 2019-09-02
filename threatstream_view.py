@@ -46,4 +46,9 @@ def display_view(provides, all_app_runs, context):
     if provides == "detonate url" or provides == "detonate file":
         ret_val = 'threatstream_detonate_url.html'
 
+    observables_list = ["import email observables", "import ip observables", "import url observables", "import domain observables", "import file observables"]
+
+    if provides in observables_list:
+        ret_val = 'threatstream_import_observables.html'
+
     return ret_val

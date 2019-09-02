@@ -119,19 +119,23 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {})
         elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
-        try:
-            soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text
-            split_lines = error_text.split('\n')
-            split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
-        except:
-            error_text = "Cannot parse error details"
 
         data_message = ""
-        # Error text can still be an empty string
-        if error_text:
-            data_message = " Data from server:\n{0}\n".format(error_text.encode('utf-8'))
+        if not response.text:
+            data_message = "Empty response and no information in the header"
+        else:
+            try:
+                soup = BeautifulSoup(response.text, "html.parser")
+                error_text = soup.text
+                split_lines = error_text.split('\n')
+                split_lines = [x.strip() for x in split_lines if x.strip()]
+                error_text = '\n'.join(split_lines)
+            except:
+                error_text = "Cannot parse error details"
+
+            # Error text can still be an empty string
+            if error_text:
+                data_message = " Data from server:\n{0}\n".format(error_text.encode('utf-8'))
 
         message = "Status Code: {0}. {1}".format(status_code, data_message)
 
@@ -155,9 +159,12 @@ class ThreatstreamConnector(BaseConnector):
             if resp_json.get('error', None) is None:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        # You should process the error returned in the json
-        message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        if not r.text:
+            message = "Status Code: {0}. {1}".format(status_code, "Empty response and no information in the header")
+        else:
+            # You should process the error returned in the json
+            message = "Error from server. Status Code: {0} Data from server: {1}".format(
+                    r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
