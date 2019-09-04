@@ -1,5 +1,5 @@
 # File: threatstream_view.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2018-2019 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -39,6 +39,9 @@ def display_view(provides, all_app_runs, context):
 
     if provides == "get incident":
         ret_val = 'threatstream_get_incident.html'
+
+    if provides == "get vulnerability":
+        ret_val = 'threatstream_get_vulnerability.html'
 
     if provides == "update incident":
         ret_val = 'threatstream_update_incident.html'

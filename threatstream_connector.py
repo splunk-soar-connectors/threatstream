@@ -1,7 +1,7 @@
 # File: threatstream_connector.py
-# Copyright (c) 2016-2018 Splunk Inc.
+# Copyright (c) 2018-2019 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL – Use or disclosure of this material in whole or in part
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom imports
@@ -142,7 +142,7 @@ class ThreatstreamConnector(BaseConnector):
         message = message.replace('{', '{{').replace('}', '}}')
 
         if len(message) > 500:
-            message = "Status Code: {0}. Error while connecting to the server. Please check the asset and the action's input parameters.".format(status_code)
+            message = "Status Code: {0}. Error while connecting to the server. Please check the asset and the action's input parameters".format(status_code)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -642,7 +642,7 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
-                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON.".format(e))
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON".format(e))
                 return None
 
             if not isinstance(fields, dict):
@@ -659,14 +659,14 @@ class ThreatstreamConnector(BaseConnector):
                 try:
                     intel = [int(x.strip()) for x in intel if x.strip() != '']
                 except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers.".format(e))
+                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers".format(e))
                     return None
             else:
                 try:
                     intel = param["intelligence"].strip().split(",")
                     intel = [int(x.strip()) for x in intel if x.strip() != '']
                 except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers.".format(e))
+                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers".format(e))
                     return None
             data.update({"intelligence": intel})
 
@@ -712,63 +712,90 @@ class ThreatstreamConnector(BaseConnector):
     def import_support(self, param, action_result):
 
         payload = self._generate_payload()
-        indicator_type = param['indicator_type']
-        confidence = param.get('confidence', None)
-        classification = param.get('classification')
-        severity = param.get('severity')
-        tags = param.get('tags')
+        action_name = self.get_action_identifier()
+
         timeout_minutes = param.get('timeout_minutes', 2)
         if timeout_minutes == 0 or (timeout_minutes and (not str(timeout_minutes).isdigit() or timeout_minutes <= 0)):
             return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_TIMEOUT)
 
-        if (confidence and confidence < 0) or (confidence and (not str(confidence).isdigit() or confidence <= 0)):
-            return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_CONFIDENCE)
-
         timeout = (timeout_minutes * 2) + 1
 
-        action_name = self.get_action_identifier()
+        if action_name == self.ACTION_ID_IMPORT_IOC:
+            if param["observable_type"] == "ip":
+                ob_type = "srcip"
+            elif param["observable_type"] == "hash":
+                ob_type = "md5"
+            else:
+                ob_type = param["observable_type"]
 
-        object_dict = {"itype": indicator_type}
+            value = param["value"]
 
-        if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
-            value = param['email']
-            object_dict.update({"email": value})
+            data = {
+                    "objects": [
+                        {ob_type: value, "classification": param["classification"]}
+                    ]
+                }
 
-        if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
-            value = param['file_hash']
-            object_dict.update({"md5": value})
+            if param.get("fields", None):
+                try:
+                    fields = ast.literal_eval(param["fields"])
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON".format(e))
 
-        if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
-            value = param['ip_address']
-            object_dict.update({"srcip": value})
+                data["objects"][0].update(fields)
+                #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
 
-        if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
-            value = param['url']
-            object_dict.update({"url": value})
+        else:
+            indicator_type = param['indicator_type']
+            confidence = param.get('confidence', None)
+            classification = param.get('classification')
+            severity = param.get('severity')
+            tags = param.get('tags')
 
-        if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
-            value = param['domain']
-            object_dict.update({"domain": value})
+            if (confidence and confidence < 0) or (confidence and (not str(confidence).isdigit() or confidence <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_CONFIDENCE)
 
-        if confidence:
-            object_dict.update({"confidence": confidence})
+            object_dict = {"itype": indicator_type}
 
-        if severity:
-            object_dict.update({"severity": severity})
+            if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
+                value = param['email']
+                object_dict.update({"email": value})
 
-        if classification:
-            object_dict.update({"classification": classification})
+            if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
+                value = param['file_hash']
+                object_dict.update({"md5": value})
 
-        if tags:
-            tag = [x.strip() for x in tags.split(',')]
-            tag = list(filter(None, tag))
-            object_dict.update({"tags": tag})
+            if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
+                value = param['ip_address']
+                object_dict.update({"srcip": value})
 
-        data = {
-                "objects": [
-                    object_dict
-                ]
-            }
+            if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
+                value = param['url']
+                object_dict.update({"url": value})
+
+            if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
+                value = param['domain']
+                object_dict.update({"domain": value})
+
+            if confidence:
+                object_dict.update({"confidence": confidence})
+
+            if severity:
+                object_dict.update({"severity": severity})
+
+            if classification:
+                object_dict.update({"classification": classification})
+
+            if tags:
+                tag = [x.strip() for x in tags.split(',')]
+                tag = list(filter(None, tag))
+                object_dict.update({"tags": tag})
+
+            data = {
+                    "objects": [
+                        object_dict
+                    ]
+                }
 
         cur_ts = time.time()
         cur_ts_list = str(cur_ts).split('.')
@@ -793,7 +820,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
             for intel in intelligence:
-                if intel.get('itype') == indicator_type:
+                if intel.get('value') == value:
                     action_result.add_data(intel)
                     break
 
@@ -837,53 +864,8 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_import_ioc(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        payload = self._generate_payload()
-        if param["observable_type"] == "ip":
-            ob_type = "srcip"
-        elif param["observable_type"] == "hash":
-            ob_type = "md5"
-        else:
-            ob_type = param["observable_type"]
-
-        data = {
-                "objects": [
-                    {ob_type: param["value"], "classification": param["classification"]}
-                ]
-               }
-
-        if param.get("fields", None):
-            try:
-                fields = ast.literal_eval(param["fields"])
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON.".format(e))
-
-            data["objects"][0].update(fields)
-            #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
-
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload, data=data, method="patch")
-
-        if (not ret_val):
-            return action_result.get_status()
-
-        need_info = True
-        counter = 1
-        while need_info and counter <= 5:
-            self.save_progress("Retrieving intelligence details attempt {0} of 5".format(counter))
-            time.sleep(5)
-            payload = self._generate_payload(extend_source="true", limit="25", offset="0",
-                                         order_by="-created_ts", value=param["value"])
-
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
-
-            if resp_json['objects'] != []:
-                for detail in resp_json['objects']:
-                    action_result.add_data(detail)
-                need_info = False
-            counter += 1
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported observable. Perform a reputation action if details are not included in this action.")
+        self.import_support(param, action_result)
+        return action_result.get_status()
 
     def _handle_tag_ioc(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -977,7 +959,7 @@ class ThreatstreamConnector(BaseConnector):
             if (phantom.is_fail(ret_val)):
                 return action_result.get_status()
             action_result.add_data(resp_json)
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file.")
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
 
     def _handle_detonate_url(self, param):
 
@@ -994,7 +976,7 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
         action_result.add_data(resp_json)
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated URL.")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated URL")
 
     def _handle_get_pcap(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1022,7 +1004,7 @@ class ThreatstreamConnector(BaseConnector):
         try:
             pcap = response['pcap']
         except KeyError:
-            return action_result.set_status(phantom.APP_ERROR, "Could not find PCAP file to download from report."), None
+            return action_result.set_status(phantom.APP_ERROR, "Could not find PCAP file to download from report"), None
 
         filename = os.path.basename(urlsplit(pcap).path)
 
@@ -1030,16 +1012,20 @@ class ThreatstreamConnector(BaseConnector):
         try:
             pcap_file = requests.get(pcap).content
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file."), None
+            return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file"), None
 
         # Creating temporary directory and file
         try:
-            temp_dir = tempfile.mkdtemp()
+            if hasattr(Vault, 'get_vault_tmp_dir'):
+                temp_dir = Vault.get_vault_tmp_dir()
+            else:
+                temp_dir = "/opt/phantom/vault/tmp/"
+            temp_dir = tempfile.mkdtemp(dir=temp_dir)
             file_path = os.path.join(temp_dir, filename)
             with open(file_path, 'wb') as file_obj:
                 file_obj.write(pcap_file)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error while writing to temporary file.", e), None
+            return action_result.set_status(phantom.APP_ERROR, "Error while writing to temporary file", e), None
 
         # Adding pcap to vault
         vault_ret_dict = Vault.add_attachment(file_path, container_id, filename)
