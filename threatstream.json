@@ -1444,6 +1444,700 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get observable",
+            "description": "Get observable present in ThreatStream by ID number",
+            "type": "investigate",
+            "identifier": "get_observable",
+            "read_only": true,
+            "parameters": {
+                "intelligence_id": {
+                    "required": true,
+                    "description": "ID number of intelligence to return",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "mal_md5"
+                    ],
+                    "column_name": "Indicator Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-05T08:52:19.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_editable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2656
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4887524197
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "e495b7a92257bfa56e55654ad4e76894b811a2b4cd4dfd8195a8a527cf957cd6"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "malware"
+                    ],
+                    "column_name": "Threat Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.watched_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.starred_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.votes.me",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.votes.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "93602515-e476-4ebe-9f49-18a51485ec8c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "numeric",
+                    "example_values": [
+                        146
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        53702850367
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "URLHaus Hashes"
+                    ],
+                    "column_name": "Source",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.starred_total_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_cloneable",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes_private_only"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "pqi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "exe"
+                    ],
+                    "contains": [
+                        "url",
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        75
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        68
+                    ],
+                    "column_name": "Threatscore",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        75
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-06T08:56:15.807Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-06T08:56:15.807Z"
+                    ],
+                    "column_name": "Created At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 668"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "medium"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.watched_by_me",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/intelligence/53702850367/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved observable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.intelligence_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "53702850367"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 10,
+                "title": "Observable Info"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list observables",
+            "description": "List observables present in ThreatStream",
+            "type": "investigate",
+            "identifier": "list_observables",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "tor_ip"
+                    ],
+                    "column_name": "Indicator Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-07T08:27:17.860Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "94.46.90.171"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_editable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        122
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4887255342
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "94.46.90.171"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "tor"
+                    ],
+                    "column_name": "Threat Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        57
+                    ],
+                    "column_name": "Confidence",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f6cb8db-bb18-45e0-b46a-da9b2f783d1c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.trusted_circle_ids",
+                    "data_type": "numeric",
+                    "example_values": [
+                        146
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        53702579051
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "TOR Exit Nodes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        49.7739
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        15
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-06T08:27:20.995Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string",
+                    "example_values": [
+                        "ENTEGA Medianet GmbH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-06T08:27:20.995Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "DE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8.8844
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        57
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 668"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/intelligence/53702579051/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Observables returned: 5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.observables_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "List Observables",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "get vulnerability",
             "description": "Get vulnerability present in ThreatStream by ID number",
             "type": "investigate",
@@ -3911,10 +4605,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "import domain observables",
-            "description": "Import domain observables into ThreatStream",
+            "action": "import domain observable",
+            "description": "Import domain observable into ThreatStream",
             "type": "generic",
-            "identifier": "import_domain_observables",
+            "identifier": "import_domain_observable",
             "read_only": false,
             "parameters": {
                 "domain": {
@@ -3960,13 +4654,6 @@
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
                     "order": 4,
-                    "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 6,
                     "required": false
                 }
             },
@@ -4015,13 +4702,6 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
                     ]
                 },
                 {
@@ -4372,19 +5052,18 @@
                 }
             ],
             "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 10,
-                "title": "Domain Observable",
-                "view": "threatstream_view.display_view"
+                "width": 12,
+                "title": "Domain Observables",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "import url observables",
-            "description": "Import URL observables into ThreatStream",
+            "action": "import url observable",
+            "description": "Import URL observable into ThreatStream",
             "type": "generic",
-            "identifier": "import_url_observables",
+            "identifier": "import_url_observable",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -4431,13 +5110,6 @@
                     "data_type": "string",
                     "order": 4,
                     "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 6,
-                    "required": false
                 }
             },
             "output": [
@@ -4475,13 +5147,6 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -4791,19 +5456,18 @@
                 }
             ],
             "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 10,
-                "title": "URL Observable",
-                "view": "threatstream_view.display_view"
+                "width": 12,
+                "title": "URL Observables",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "import ip observables",
-            "description": "Import IP observables into ThreatStream",
+            "action": "import ip observable",
+            "description": "Import IP observable into ThreatStream",
             "type": "generic",
-            "identifier": "import_ip_observables",
+            "identifier": "import_ip_observable",
             "read_only": false,
             "parameters": {
                 "ip_address": {
@@ -4849,13 +5513,6 @@
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
                     "order": 4,
-                    "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 6,
                     "required": false
                 }
             },
@@ -4904,13 +5561,6 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
                     ]
                 },
                 {
@@ -5204,19 +5854,18 @@
                 }
             ],
             "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 10,
-                "title": "IP Observable",
-                "view": "threatstream_view.display_view"
+                "width": 12,
+                "title": "IP Observables",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "import file observables",
-            "description": "Import file observables into ThreatStream",
+            "action": "import file observable",
+            "description": "Import file observable into ThreatStream",
             "type": "generic",
-            "identifier": "import_file_observables",
+            "identifier": "import_file_observable",
             "read_only": false,
             "parameters": {
                 "file_hash": {
@@ -5271,13 +5920,6 @@
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
                     "order": 5,
-                    "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 6,
                     "required": false
                 }
             },
@@ -5336,13 +5978,6 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
                     ]
                 },
                 {
@@ -5615,19 +6250,18 @@
                 }
             ],
             "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 10,
-                "title": "File Observable",
-                "view": "threatstream_view.display_view"
+                "width": 12,
+                "title": "File Observables",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "import email observables",
-            "description": "Import email observables into ThreatStream",
+            "action": "import email observable",
+            "description": "Import email observable into ThreatStream",
             "type": "generic",
-            "identifier": "import_email_observables",
+            "identifier": "import_email_observable",
             "read_only": false,
             "parameters": {
                 "email": {
@@ -5679,13 +6313,6 @@
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
                     "order": 5,
-                    "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 6,
                     "required": false
                 }
             },
@@ -5739,10 +6366,6 @@
                 {
                     "data_path": "action_result.parameter.tags",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -6005,11 +6628,10 @@
                 }
             ],
             "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 10,
-                "title": "Email Observable",
-                "view": "threatstream_view.display_view"
+                "width": 12,
+                "title": "Email Observables",
+                "type": "table",
+                "height": 5
             },
             "versions": "EQ(*)"
         },
@@ -6066,13 +6688,6 @@
                     "data_type": "string",
                     "order": 3,
                     "required": false
-                },
-                "timeout_minutes": {
-                    "description": "Defines the time for which the action will try to import the observable",
-                    "data_type": "numeric",
-                    "default": 2,
-                    "order": 4,
-                    "required": false
                 }
             },
             "output": [
@@ -6104,10 +6719,6 @@
                         "ip"
                     ],
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.timeout_minutes",
-                    "data_type": "numeric"
                 },
                 {
                     "contains": [
@@ -6649,45 +7260,58 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "numeric"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file_name",
                     "data_type": "string",
-                    "contains": [
-                        "file name"
+                    "example_values": [
+                        "20190819_134705_userId-16783_dump.pcap"
                     ],
-                    "column_name": "Report File Name",
+                    "column_name": "File Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.vault_id",
                     "data_type": "string",
+                    "example_values": [
+                        "285ed37b6be7b4bf1583b59150b22e9a741caede"
+                    ],
                     "contains": [
+                        "sha1",
                         "vault id"
                     ],
                     "column_name": "Vault ID",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        445798
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -7929,7 +8553,7 @@
         {
             "action": "run query",
             "description": "Run observables query in ThreatStream",
-            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
+            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter. If <b>query</b> parameter is left empty all the observables will be fetched.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,

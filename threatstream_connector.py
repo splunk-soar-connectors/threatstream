@@ -14,9 +14,8 @@ from phantom.vault import Vault
 from threatstream_consts import *
 
 import ast
-import time
 import os
-import tempfile
+import uuid
 import shutil
 import requests
 import datetime
@@ -25,7 +24,6 @@ import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
 from urlparse import urlsplit
-from time import sleep
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -62,17 +60,19 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_FILE_REPUTATION = "file_reputation"
     ACTION_ID_LIST_INCIDENTS = "list_incidents"
     ACTION_ID_LIST_VULNERABILITY = "list_vulnerabilities"
+    ACTION_ID_LIST_OBSERVABLE = "list_observables"
     ACTION_ID_GET_INCIDENT = "get_incident"
+    ACTION_ID_GET_OBSERVABLE = "get_observable"
     ACTION_ID_GET_VULNERABILITY = "get_vulnerability"
     ACTION_ID_DELETE_INCIDENT = "delete_incident"
     ACTION_ID_CREATE_INCIDENT = "create_incident"
     ACTION_ID_UPDATE_INCIDENT = "update_incident"
     ACTION_ID_IMPORT_IOC = "import_observables"
-    ACTION_ID_IMPORT_EMAIL_OBSERVABLES = "import_email_observables"
-    ACTION_ID_IMPORT_FILE_OBSERVABLES = "import_file_observables"
-    ACTION_ID_IMPORT_IP_OBSERVABLES = "import_ip_observables"
-    ACTION_ID_IMPORT_URL_OBSERVABLES = "import_url_observables"
-    ACTION_ID_IMPORT_DOMAIN_OBSERVABLES = "import_domain_observables"
+    ACTION_ID_IMPORT_EMAIL_OBSERVABLES = "import_email_observable"
+    ACTION_ID_IMPORT_FILE_OBSERVABLES = "import_file_observable"
+    ACTION_ID_IMPORT_IP_OBSERVABLES = "import_ip_observable"
+    ACTION_ID_IMPORT_URL_OBSERVABLES = "import_url_observable"
+    ACTION_ID_IMPORT_DOMAIN_OBSERVABLES = "import_domain_observable"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_TAG_IOC = "tag_observable"
     ACTION_ID_ON_POLL = "on_poll"
@@ -519,6 +519,30 @@ class ThreatstreamConnector(BaseConnector):
 
         return items_list
 
+    def _handle_list_observable(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        limit = param.get("limit")
+
+        payload = self._generate_payload()
+        payload["order_by"] = "-created_ts"
+
+        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        observable = self._paginator(ENDPOINT_INTELLIGENCE, action_result, limit=limit, payload=payload)
+
+        if observable is None:
+            return action_result.get_status()
+
+        for obs in observable:
+            action_result.add_data(obs)
+
+        summary = action_result.update_summary({})
+        summary['observables_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_list_vulnerability(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -576,6 +600,20 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved incident")
+
+    def _handle_get_observable(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+
+        endpoint = "{}/{}/".format(ENDPOINT_INTELLIGENCE, param["intelligence_id"])
+
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload)
+
+        if (not ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved observable")
 
     def _handle_get_vulnerability(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -714,12 +752,6 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
 
-        timeout_minutes = param.get('timeout_minutes', 2)
-        if timeout_minutes == 0 or (timeout_minutes and (not str(timeout_minutes).isdigit() or timeout_minutes <= 0)):
-            return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_TIMEOUT)
-
-        timeout = (timeout_minutes * 2) + 1
-
         if action_name == self.ACTION_ID_IMPORT_IOC:
             if param["observable_type"] == "ip":
                 ob_type = "srcip"
@@ -797,65 +829,38 @@ class ThreatstreamConnector(BaseConnector):
                     ]
                 }
 
-        cur_ts = time.time()
-        cur_ts_list = str(cur_ts).split('.')
-        if cur_ts_list[1]:
-            milli_sec = cur_ts_list[1]
-
-        curren_ts = "{}.{}Z".format((datetime.datetime.fromtimestamp(int(cur_ts)).strftime('%Y-%m-%dT%H:%M:%S')), milli_sec)
-
         ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload=payload, data=data, method="patch")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        payload.update({"value": value, "order_by": "-created_ts", "extend_source": "true", "created_ts__gte": curren_ts})
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent the request for importing the observable")
 
-        for i in range(1, timeout):
-            sleep(30)
-
-            intelligence = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=50)
-
-            if intelligence is None:
-                return action_result.get_status()
-
-            for intel in intelligence:
-                if intel.get('value') == value:
-                    action_result.add_data(intel)
-                    break
-
-            if action_result.get_data():
-                break
-        else:
-            return action_result.set_status(phantom.APP_ERROR, "Error while importing the observable on the ThreatStream server")
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully imported the observable")
-
-    def _handle_import_email_observables(self, param):
+    def _handle_import_email_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_import_file_observables(self, param):
+    def _handle_import_file_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_import_ip_observables(self, param):
+    def _handle_import_ip_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_import_url_observables(self, param):
+    def _handle_import_url_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_import_domain_observables(self, param):
+    def _handle_import_domain_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.import_support(param, action_result)
@@ -1020,8 +1025,10 @@ class ThreatstreamConnector(BaseConnector):
                 temp_dir = Vault.get_vault_tmp_dir()
             else:
                 temp_dir = "/opt/phantom/vault/tmp/"
-            temp_dir = tempfile.mkdtemp(dir=temp_dir)
+            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
+
             with open(file_path, 'wb') as file_obj:
                 file_obj.write(pcap_file)
         except Exception as e:
@@ -1290,10 +1297,14 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_list_incidents(param)
         elif (action == self.ACTION_ID_LIST_VULNERABILITY):
             ret_val = self._handle_list_vulnerability(param)
+        elif (action == self.ACTION_ID_LIST_OBSERVABLE):
+            ret_val = self._handle_list_observable(param)
         elif (action == self.ACTION_ID_GET_INCIDENT):
             ret_val = self._handle_get_incident(param)
         elif (action == self.ACTION_ID_GET_VULNERABILITY):
             ret_val = self._handle_get_vulnerability(param)
+        elif (action == self.ACTION_ID_GET_OBSERVABLE):
+            ret_val = self._handle_get_observable(param)
         elif (action == self.ACTION_ID_DELETE_INCIDENT):
             ret_val = self._handle_delete_incident(param)
         elif (action == self.ACTION_ID_CREATE_INCIDENT):
@@ -1303,15 +1314,15 @@ class ThreatstreamConnector(BaseConnector):
         elif (action == self.ACTION_ID_IMPORT_IOC):
             ret_val = self._handle_import_ioc(param)
         elif (action == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES):
-            ret_val = self._handle_import_email_observables(param)
+            ret_val = self._handle_import_email_observable(param)
         elif (action == self.ACTION_ID_IMPORT_FILE_OBSERVABLES):
-            ret_val = self._handle_import_file_observables(param)
+            ret_val = self._handle_import_file_observable(param)
         elif (action == self.ACTION_ID_IMPORT_IP_OBSERVABLES):
-            ret_val = self._handle_import_ip_observables(param)
+            ret_val = self._handle_import_ip_observable(param)
         elif (action == self.ACTION_ID_IMPORT_URL_OBSERVABLES):
-            ret_val = self._handle_import_url_observables(param)
+            ret_val = self._handle_import_url_observable(param)
         elif (action == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES):
-            ret_val = self._handle_import_domain_observables(param)
+            ret_val = self._handle_import_domain_observable(param)
         elif (action == self.ACTION_ID_RUN_QUERY):
             ret_val = self._handle_run_query(param)
         elif (action == self.ACTION_ID_ON_POLL):
