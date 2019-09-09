@@ -1475,6 +1475,9 @@
                     "data_type": "string",
                     "example_values": [
                         "53702850367"
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
                     ]
                 },
                 {
@@ -2174,6 +2177,9 @@
                 {
                     "data_path": "action_result.parameter.vulnerability_id",
                     "data_type": "string",
+                    "contains": [
+                        "threatstream vulnerability id"
+                    ],
                     "example_values": [
                         "1"
                     ],
@@ -6140,7 +6146,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.endpoint",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream endpoint status"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.classification",
@@ -6412,7 +6421,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.endpoint",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream endpoint report"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.pcap",
