@@ -774,9 +774,15 @@ class ThreatstreamConnector(BaseConnector):
                 except Exception as e:
                     return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON".format(e))
 
-                data["objects"][0].update(fields)
+                if "itype" in fields:
+                    data["objects"][0].update(fields)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable. \
+                    E.g. {\"itype\": \"<indicator_type>\"}")
                 #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
-
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable. \
+                E.g. {\"itype\": \"<indicator_type>\"}")
         else:
             indicator_type = param['indicator_type']
             confidence = param.get('confidence', None)

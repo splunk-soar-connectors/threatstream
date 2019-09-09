@@ -4679,7 +4679,7 @@
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "example_values": [
-                        "tewellro.com"
+                        "test.com"
                     ],
                     "contains": [
                         "domain"
@@ -4740,7 +4740,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Domain Observables",
+                "title": "Domain Observable",
                 "type": "table",
                 "height": 5
             },
@@ -4880,7 +4880,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "URL Observables",
+                "title": "URL Observable",
                 "type": "table",
                 "height": 5
             },
@@ -5400,392 +5400,75 @@
             "output": [
                 {
                     "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
                         "success",
                         "failed"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.classification",
-                    "example_values": [
-                        "private"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.fields",
-                    "example_values": [
-                        "{\"itype\": \"actor_ip\", \"detail\": \"smbd\", \"confidence\": 50, \"severity\": \"low\"}"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.observable_type",
-                    "example_values": [
-                        "ip"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "md5",
-                        "sha1",
-                        "hash"
-                    ],
-                    "data_path": "action_result.parameter.value",
-                    "example_values": [
-                        "177.132.23.103",
-                        "24.148.217.110"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.asn",
-                    "example_values": [
-                        "11426"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "column_name": "Confidence",
-                    "data_path": "action_result.data.*.confidence",
-                    "example_values": [
-                        11
-                    ],
-                    "data_type": "numeric",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.country",
-                    "example_values": [
-                        "US"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "column_name": "First Found",
-                    "data_path": "action_result.data.*.created_ts",
-                    "example_values": [
-                        "2018-03-29T23:31:34.986Z"
-                    ],
-                    "data_type": "string",
-                    "column_order": 5
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.expiration_ts",
-                    "example_values": [
-                        "2018-06-27T23:31:35.004Z"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.extended_source",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.feed_id",
-                    "example_values": [
-                        0
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "threatstream intelligence id"
-                    ],
-                    "example_values": [
-                        50630233146
-                    ],
-                    "column_order": 1,
-                    "column_name": "Intel ID"
-                },
-                {
-                    "data_path": "action_result.data.*.import_session_id",
-                    "data_type": "string"
-                },
-                {
-                    "contains": [
-                        "ip"
-                    ],
-                    "data_path": "action_result.data.*.ip",
-                    "example_values": [
-                        "24.148.217.110"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_public",
-                    "example_values": [
-                        true,
-                        false
-                    ],
-                    "data_type": "boolean"
-                },
-                {
-                    "column_name": "Indicator",
-                    "data_path": "action_result.data.*.itype",
-                    "example_values": [
-                        "actor_ip"
-                    ],
-                    "data_type": "string",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.data.*.latitude",
-                    "example_values": [
-                        "35.293600"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.longitude",
-                    "example_values": [
-                        "-80.735000"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.detail",
-                    "example_values": [
-                        "smbd"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.detail2",
-                    "example_values": [
-                        "imported by user 13487 Confirmed as false positive"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.limit",
-                    "example_values": [
-                        25
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.offset",
-                    "example_values": [
-                        0
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.severity",
-                    "example_values": [
-                        "low"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.took",
-                    "example_values": [
-                        4
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.total_count",
-                    "example_values": [
-                        0
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.modified_ts",
-                    "example_values": [
-                        "2018-03-29T23:31:34.986Z"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.org",
-                    "example_values": [
-                        "Test org"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.owner_organization_id",
-                    "example_values": [
-                        2342
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.rdns",
-                    "example_values": [
-                        "user-0c99mbe.test.test.com"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.resource_uri",
-                    "example_values": [
-                        "/api/v2/intelligence/50630233146/"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.retina_confidence",
-                    "example_values": [
-                        11
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.source",
-                    "example_values": [
-                        "test_source.us"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.source_reported_confidence",
-                    "example_values": [
-                        50
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.status",
-                    "example_values": [
-                        "falsepos"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tags.*.id",
-                    "example_values": [
-                        "tpp"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tags.*.name",
-                    "example_values": [
-                        "smbd"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tags.*.org_id",
-                    "example_values": [
-                        "2342"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tags.*.source_user",
-                    "example_values": [
-                        "Customer"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tags.*.source_user_id",
-                    "example_values": [
-                        "13487"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.threat_type",
-                    "example_values": [
-                        "p2p"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "column_name": "Threatscore",
-                    "data_path": "action_result.data.*.threatscore",
-                    "example_values": [
-                        3
-                    ],
-                    "data_type": "numeric",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.trusted_circle_ids",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.type",
-                    "example_values": [
-                        "ip"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.update_id",
-                    "example_values": [
-                        1736852157
-                    ],
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.uuid",
-                    "example_values": [
-                        "a1fbf7f8-cc70-48e9-8ca9-112af586ede5"
-                    ],
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.value",
-                    "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "md5",
-                        "sha1",
-                        "hash"
-                    ],
-                    "example_values": [
-                        "24.148.217.110"
-                    ],
-                    "column_order": 0,
-                    "column_name": "Value"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        "Successfully imported observable",
-                        "Successfully imported observable. Perform a reputation action if details are not included in this action"
+                        "Successfully sent the request for importing the observable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"itype\": \"mal_ip\", \"confidence\": 50, \"severity\": \"low\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "122.183.147.172"
                     ],
-                    "data_type": "string"
+                    "contains": [
+                        "ip",
+                        "domain",
+                        "url",
+                        "email",
+                        "md5",
+                        "sha1",
+                        "hash"
+                    ],
+                    "column_name": "Value",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "public"
+                    ],
+                    "column_name": "Classification",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.observable_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ],
+                    "column_name": "Observable Type",
+                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
+                    "data_type": "numeric",
                     "example_values": [
                         1
-                    ],
-                    "data_type": "numeric"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
                     "example_values": [
                         1
-                    ],
-                    "data_type": "numeric"
+                    ]
                 }
             ],
             "render": {
@@ -5952,7 +5635,7 @@
         },
         {
             "action": "get pcap",
-            "description": "Download pcap file of sample submitted to sandbox and add it to vault",
+            "description": "Download pcap file of a sample submitted to the sandbox and add it to vault",
             "type": "investigate",
             "identifier": "get_pcap",
             "read_only": true,
@@ -7260,13 +6943,13 @@
         {
             "action": "run query",
             "description": "Run observables query in ThreatStream",
-            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
+            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "query": {
-                    "description": "Search string in JSON format using the Anomali filter language (as seen on advanced search page)",
+                    "description": "Search string in JSON format using the Anomali filter language (as seen on the advanced search page)",
                     "data_type": "string",
                     "order": 0,
                     "required": true
