@@ -10,8 +10,8 @@
 		<li>It fetches the incidents (belonging to the configured organization ID in the configuration parameters) and their intelligence data to ingest them as containers and artifacts.</li>
 		<li>Approaches for fetching incidents based on the <b>Ingest only incidents marked published</b> configuration parameter</li>
 			<ul>
-				<li>Parameter kept unchecked - Ingesting all the incidents irrespective of their publication status</li>
-				<li>Parameter kept checked - Ingesting the incidents which are only in the published state</li>
+				<li>Parameter kept unchecked: Ingesting all the incidents irrespective of their publication status</li>
+				<li>Parameter kept checked: Ingesting the incidents which are only in the published state</li>
 			</ul>
 		<li>Types of polling</li>
 		<ul>
@@ -43,8 +43,8 @@
 		<li>The action run is a success if a response of <b>202 Accepted</b> is returned by the Anomali API. The action does not wait for the observable to actually reflect on the Anomali UI.</li>
 		<li>The successful run of the actions does not guarantee the successful import of the observable on the Anomali server</li>
 		<ul>
-			<li>If the provided parameters and their expected combinations are correct, then, the observable will be successfully imported after an indefinite interval of time (based on the Anomali server).</li>
-			<li>If the provided parameters and their combinations are incorrect, then, the action run would be a success (because the API does not return an error response for this and accepts the request) though the observable is not imported on the Anomali server.</li>
+			<li>If the provided parameters and their expected combinations are correct, then the observable will be successfully imported after an indefinite interval of time (based on the Anomali server).</li>
+			<li>If the provided parameters and their combinations are incorrect, then the action run would be a success (because the API does not return an error response for this and accepts the request) though the observable is not imported on the Anomali server.</li>
 		</ul>
 		<li>It is recommended to add a required time delay between the action blocks which are dependent on the successful import of an observable.</li>
 		<li>To check if the observable was successfully imported, user can run and check the <b>List Observables</b> action which fetches the observables in the latest first order (based on <b>created_ts</b> time).</li>
