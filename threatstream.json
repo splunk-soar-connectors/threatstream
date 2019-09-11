@@ -1550,7 +1550,7 @@
             "identifier": "whois_ip",
             "read_only": true,
             "parameters": {
-                "domain": {
+                "ip": {
                     "required": true,
                     "description": "IP",
                     "data_type": "string",
