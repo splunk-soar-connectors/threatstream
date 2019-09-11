@@ -1562,7 +1562,14 @@
                     "order": 0
                 }
             },
-            "output": []
+            "output": [],
+            "render": {
+                "width": 12,
+                "title": "Whois IP",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "whois domain",
@@ -1828,7 +1835,7 @@
                 "width": 12,
                 "height": 5,
                 "type": "table",
-                "title": "Whois details"
+                "title": "Whois domain"
             },
             "versions": "EQ(*)"
         },
