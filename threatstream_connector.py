@@ -1187,10 +1187,12 @@ class ThreatstreamConnector(BaseConnector):
                     self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
                                 incident.get("id"), incident.get("organization_id"), org_id))
 
-        self.save_progress("Fetched {0} incidents".format(len(incidents)))
+        self.save_progress("Fetched {0} incidents in the oldest first order based on modified_ts time.".format(len(incidents)))
 
+        self.save_progress("The config parameter ingest_only_published_incidents is checked: {0}".format(config.get("ingest_only_published_incidents")))
+        self.save_progress("Containers and artifacts will be created for {0} incidents.".format("only published" if config.get("ingest_only_published_incidents") else "all"))
         for incident in incidents:
-            self.send_progress("Creating containers and artifacts for the incident ID: {0}".format(incident.get("id")))
+            self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
             # Handle the ingest_only_published_incidents scenario
             if config.get("ingest_only_published_incidents", True):
                 if "published" != incident.get("publication_status"):
