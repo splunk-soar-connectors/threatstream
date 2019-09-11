@@ -23,6 +23,7 @@ import ipaddress
 import pythonwhois
 import simplejson as json
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 from urlparse import urlsplit
 
 # These are the fields outputted in the widget
@@ -160,7 +161,7 @@ class ThreatstreamConnector(BaseConnector):
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
         if not r.text:
-            message = "Status Code: {0}. {1}".format(status_code, "Empty response and no information in the header")
+            message = "Status Code: {0}. {1}".format(r.status_code, "Empty response and no information in the header")
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {0} Data from server: {1}".format(
@@ -209,7 +210,7 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = UnicodeDammit(self._base_url).unicode_markup.encode('utf-8') + endpoint
 
         if use_json:
             try:
@@ -680,7 +681,7 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
-                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that you format as JSON".format(e))
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that you format as JSON".format(e))
                 return None
 
             if not isinstance(fields, dict):
@@ -697,14 +698,14 @@ class ThreatstreamConnector(BaseConnector):
                 try:
                     intel = [int(x.strip()) for x in intel if x.strip() != '']
                 except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers".format(e))
+                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
                     return None
             else:
                 try:
                     intel = param["intelligence"].strip().split(",")
                     intel = [int(x.strip()) for x in intel if x.strip() != '']
                 except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}  Please supply as comma separated string of integers".format(e))
+                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
                     return None
             data.update({"intelligence": intel})
 
@@ -777,12 +778,12 @@ class ThreatstreamConnector(BaseConnector):
                 if "itype" in fields:
                     data["objects"][0].update(fields)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable. \
-                    E.g. {\"itype\": \"<indicator_type>\"}")
+                    return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
+                    (e.g. {\"itype\": \"<indicator_type>\"}).")
                 #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable. \
-                E.g. {\"itype\": \"<indicator_type>\"}")
+                return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
+                (e.g. {\"itype\": \"<indicator_type>\"}).")
         else:
             indicator_type = param['indicator_type']
             confidence = param.get('confidence', None)
@@ -1085,7 +1086,7 @@ class ThreatstreamConnector(BaseConnector):
             self.debug_print("Container results are not proper: ", e)
             return None
 
-        # If the container exists and he name of the incident has been updated,
+        # If the container exists and the name of the incident has been updated,
         # update the name of the container as well to stay in sync with the UI of ThreatStream
         if container_id and (resp_json.get('data', [])[0]['name'] != incident_name):
             url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)

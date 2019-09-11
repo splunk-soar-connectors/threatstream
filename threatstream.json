@@ -1543,6 +1543,28 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "whois ip",
+            "description": "Execute a whois lookup on the given ip",
+            "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
+            "type": "investigate",
+            "identifier": "whois_ip",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "required": true,
+                    "description": "IP",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": []
+        },
+        {
             "action": "whois domain",
             "description": "Execute a whois lookup on the given domain",
             "verbose": "ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.",
