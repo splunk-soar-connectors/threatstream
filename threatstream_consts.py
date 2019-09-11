@@ -14,8 +14,6 @@ THREATSTREAM_JSON_URL = "url"
 THREATSTREAM_JSON_EMAIL = "email"
 THREATSTREAM_JSON_TAGS = "tags"
 THREATSTREAM_JSON_SOURCE_USER_ID = "source_user_id"
-# THREATSTREAM_JSON_IOC_VALUE = "ioc_value"
-# THREATSTREAM_JSON_IOC_TYPE = "ioc_type"
 
 ENDPOINT_INTELLIGENCE = "/v2/intelligence"
 ENDPOINT_PDNS = "/v1/pdns/{ioc_type}/{ioc_value}/"
