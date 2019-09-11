@@ -92,7 +92,7 @@ class ThreatstreamConnector(BaseConnector):
     def initialize(self):
         config = self.get_config()
 
-        self._base_url = "https://{0}/api".format(config.get('hostname', 'api.threatstream.com'))
+        self._base_url = "https://{0}/api".format(UnicodeDammit(config.get('hostname', 'api.threatstream.com')).unicode_markup.encode('utf-8'))
         self._state = self.load_state()
 
         self.set_validator('ipv6', self._is_ip)
@@ -183,7 +183,7 @@ class ThreatstreamConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -210,7 +210,7 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = UnicodeDammit(self._base_url).unicode_markup.encode('utf-8') + endpoint
+        url = "{0}{1}".format(self._base_url, endpoint)
 
         if use_json:
             try:
