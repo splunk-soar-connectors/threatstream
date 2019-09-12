@@ -4702,7 +4702,7 @@
         },
         {
             "action": "create incident",
-            "description": "Create incident in ThreatStream",
+            "description": "Create an incident in ThreatStream",
             "type": "generic",
             "identifier": "create_incident",
             "read_only": false,
@@ -5090,7 +5090,7 @@
         },
         {
             "action": "update incident",
-            "description": "Update incident in ThreatStream by ID number",
+            "description": "Update an incident in ThreatStream by ID number",
             "type": "generic",
             "identifier": "update_incident",
             "read_only": false,
@@ -5814,7 +5814,23 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "mal_domain"
+                        "adware_domain",
+                        "apt_domain",
+                        "c2_domain",
+                        "comm_proxy_domain",
+                        "compromised_domain",
+                        "disposable_email_domain",
+                        "exfil_domain",
+                        "exploit_domain",
+                        "free_email_domain",
+                        "mal_domain",
+                        "parked_domain",
+                        "phish_domain",
+                        "sinkhole_domain",
+                        "spam_domain",
+                        "suspicious_domain",
+                        "vpn_domain",
+                        "whois_privacy_domain"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 1
@@ -5950,7 +5966,22 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "mal_url"
+                        "apt_url",
+                        "c2_url",
+                        "compromised_url",
+                        "crypto_url",
+                        "exfil_url",
+                        "exploit_url",
+                        "geolocation_url",
+                        "ipcheck_url",
+                        "mal_url",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_url",
+                        "spam_url",
+                        "speedtest_url",
+                        "suspicious_url",
+                        "torrent_tracker_url"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 1
@@ -6098,7 +6129,31 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "mal_ip"
+                        "actor_ip",
+                        "apt_ip",
+                        "bot_ip",
+                        "brute_ip",
+                        "c2_ip",
+                        "comm_proxy_ip",
+                        "compromised_ip",
+                        "crypto_ip",
+                        "ddos_ip",
+                        "exfil_ip",
+                        "exploit_ip",
+                        "i2p_ip",
+                        "mal_ip",
+                        "parked_ip",
+                        "phish_ip",
+                        "proxy_ip",
+                        "scan_ip",
+                        "sinkhole_ip",
+                        "spam_ip",
+                        "ssh_ip",
+                        "suspicious_ip",
+                        "tor_ip",
+                        "vps_ip",
+                        "anon_proxy",
+                        "p2pcnc"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 1
@@ -6279,7 +6334,11 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "mal_md5"
+                        "mal_md5",
+                        "hash",
+                        "apt_md5",
+                        "crypto_hash",
+                        "phish_md5"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 1
@@ -6442,7 +6501,14 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "compromised_email"
+                        "apt_email",
+                        "compromised_email",
+                        "mal_email",
+                        "phish_email",
+                        "spam_email",
+                        "suspicious_email",
+                        "whois_privacy_email",
+                        "whois_bulk_reg_email"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 1
@@ -6580,7 +6646,55 @@
                     "data_path": "action_result.parameter.fields",
                     "data_type": "string",
                     "example_values": [
-                        "{\"itype\": \"mal_ip\", \"confidence\": 50, \"severity\": \"low\"}"
+                        "{\"itype\": \"mal_ip\", \"confidence\": 50, \"severity\": \"low\"}",
+                        "{\"itype\": \"actor_ipv6\"}",
+                        "{\"itype\": \"adware_registry_key\"}",
+                        "{\"itype\": \"anon_proxy_ipv6\"}",
+                        "{\"itype\": \"anon_vpn_ipv6\"}",
+                        "{\"itype\": \"apt_file_name\"}",
+                        "{\"itype\": \"apt_file_path\"}",
+                        "{\"itype\": \"apt_mta\"}",
+                        "{\"itype\": \"apt_mutex\"}",
+                        "{\"itype\": \"apt_registry_key\"}",
+                        "{\"itype\": \"apt_service_description\"}",
+                        "{\"itype\": \"apt_service_name\"}",
+                        "{\"itype\": \"apt_ssdeep\"}",
+                        "{\"itype\": \"apt_subject\"}",
+                        "{\"itype\": \"apt_ua\"}",
+                        "{\"itype\": \"bot_ipv6\"}",
+                        "{\"itype\": \"brute_ipv6\"}",
+                        "{\"itype\": \"c2_ipv6\"}",
+                        "{\"itype\": \"comm_proxy_domain\"}",
+                        "{\"itype\": \"compromised_ipv6\"}",
+                        "{\"itype\": \"crypto_wallet\"}",
+                        "{\"itype\": \"ddos_ipv6\"}",
+                        "{\"itype\": \"dyn_dns\"}",
+                        "{\"itype\": \"exfil_ipv6\"}",
+                        "{\"itype\": \"exploit_ipv6\"}",
+                        "{\"itype\": \"hack_tool\"}",
+                        "{\"itype\": \"i2p_ipv6\"}",
+                        "{\"itype\": \"mal_file_name\"}",
+                        "{\"itype\": \"mal_file_path\"}",
+                        "{\"itype\": \"mal_ipv6\"}",
+                        "{\"itype\": \"mal_mutex\"}",
+                        "{\"itype\": \"mal_registry_key\"}",
+                        "{\"itype\": \"mal_service_description\"}",
+                        "{\"itype\": \"mal_service_displayname\"}",
+                        "{\"itype\": \"mal_service_name\"}",
+                        "{\"itype\": \"mal_ssdeep\"}",
+                        "{\"itype\": \"mal_ua\"}",
+                        "{\"itype\": \"p2pcnc_ipv6\"}",
+                        "{\"itype\": \"parked_ipv6\"}",
+                        "{\"itype\": \"phish_ipv6\"}",
+                        "{\"itype\": \"proxy_ipv6\"}",
+                        "{\"itype\": \"scan_ipv6\"}",
+                        "{\"itype\": \"sinkhole_ipv6\"}",
+                        "{\"itype\": \"spam_ipv6\"}",
+                        "{\"itype\": \"ssh_ipv6\"}",
+                        "{\"itype\": \"ssl_cert_serial_number\"}",
+                        "{\"itype\": \"suppress\"}",
+                        "{\"itype\": \"vps_ipv6\"}",
+                        "{\"itype\": \"tor_ipv6\"}"
                     ]
                 },
                 {
@@ -8155,33 +8269,30 @@
             "identifier": "on_poll",
             "read_only": true,
             "parameters": {
-                "container_count": {
-                    "order": 3,
-                    "data_type": "numeric",
-                    "description": "Maximum number of container records to query for"
-                },
                 "container_id": {
-                    "allow_list": true,
-                    "order": 0,
-                    "data_type": "string",
-                    "description": "Container IDs to limit the ingestion to"
-                },
-                "artifact_count": {
-                    "order": 4,
+                    "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "description": "Maximum number of artifact records to query for"
+                    "order": 0
                 },
                 "start_time": {
-                    "description": "Start of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is past 10 days.",
+                    "description": "Parameter ignored in this app",
                     "data_type": "numeric",
                     "order": 1
                 },
                 "end_time": {
-                    "description": "End of time range, in epoch time (milliseconds)",
-                    "verbose": "If not specified, the default is now.",
+                    "description": "Parameter ignored in this app",
                     "data_type": "numeric",
                     "order": 2
+                },
+                "container_count": {
+                    "description": "Maximum number of container records (incidents) to query for",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 4
                 }
             },
             "output": [],
