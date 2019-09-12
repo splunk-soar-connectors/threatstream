@@ -1009,7 +1009,7 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result.add_data(vault_details)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "PCAP file added successfully to the vault")
 
     def _save_pcap_to_vault(self, response, container_id, action_result):
         # get URL to pcap file

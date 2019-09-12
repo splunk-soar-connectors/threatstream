@@ -968,6 +968,9 @@
                     "contains": [
                         "email"
                     ],
+                    "example_values": [
+                        "test.com"
+                    ],
                     "order": 0
                 }
             },
@@ -2683,6 +2686,20 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.meta.registrantion_created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2001-06-28T16:04:59+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.registrantion_updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014-08-13T20:24:31+00:00"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.meta.severity",
                     "data_type": "string",
                     "example_values": [
@@ -2748,6 +2765,10 @@
                     "example_values": [
                         "active"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.tags.*.id",
@@ -3592,7 +3613,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.intel_value",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test@test.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.limit",
@@ -4005,6 +4029,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.assignee_user",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.body_content_type",
                     "example_values": [
                         "markdown"
@@ -4037,6 +4065,25 @@
                     "example_values": [
                         "2018-01-26T18:30:55.108132"
                     ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.embedded_content_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.embedded_content_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.end_date",
                     "data_type": "string"
                 },
                 {
@@ -4363,6 +4410,13 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.intelligence.*.tags.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.intelligence.*.tags_v2.*.id",
                     "data_type": "string",
                     "example_values": [
@@ -4458,6 +4512,14 @@
                 {
                     "data_path": "action_result.data.*.intelligence.*.votes.me",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.is_cloneable",
@@ -4562,10 +4624,18 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.parent",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.publication_status",
                     "example_values": [
                         "new"
                     ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.published_ts",
                     "data_type": "string"
                 },
                 {
@@ -4591,6 +4661,10 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.start_date",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.status.display_name",
                     "example_values": [
                         "New"
@@ -4610,6 +4684,38 @@
                         "/api/v1/incidentstatustype/1/"
                     ],
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status_desc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6xo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.org_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        55
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags_v2.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "white"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.tlp",
@@ -6981,7 +7087,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "PCAP file added successfully to the vault"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -8132,6 +8241,75 @@
                     "data_type": "numeric",
                     "example_values": [
                         6.429553985595703
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.alert",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.process.process_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AdobeUpdater.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.value.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "filesystem"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.value.return",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.value.status",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.value.thread_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1840"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.data.*.signs.*.value.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-08-19 19:38:38,843"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "antisandbox_sleep"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.signatures.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
                     ]
                 },
                 {
