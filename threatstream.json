@@ -52,8 +52,12 @@
         "ingest_only_published_incidents": {
             "data_type": "boolean",
             "order": 5,
-            "description": "Ingest only incidents marked published",
-            "required": false
+            "description": "Ingest only incidents marked published"
+        },
+        "remote_api": {
+            "data_type": "boolean",
+            "order": 6,
+            "description": "Enable API parameter remote_api for all actions"
         }
     },
     "actions": [

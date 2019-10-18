@@ -94,6 +94,7 @@ class ThreatstreamConnector(BaseConnector):
 
         self._base_url = "https://{0}/api".format(UnicodeDammit(config.get('hostname', 'api.threatstream.com')).unicode_markup.encode('utf-8'))
         self._state = self.load_state()
+        self._remote_api = config.get("remote_api", False)
 
         self.set_validator('ipv6', self._is_ip)
 
@@ -203,6 +204,7 @@ class ThreatstreamConnector(BaseConnector):
     def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
 
         resp_json = None
+        payload["remote_api"] = self._remote_api
 
         try:
             request_func = getattr(requests, method)
