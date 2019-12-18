@@ -150,10 +150,6 @@
                         <thead>
                             <tr>
                                 <th>Intelligence ID</th>
-                                <th>Intelligence Type</th>
-                                <th>Intelligence Value</th>
-                                <th>Intelligence Owner Organization ID</th>
-                                <th>Is Public</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -166,22 +162,6 @@
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
                                     </td>
-                                    <td>{{ intelligence.type }}</td>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain', 'url', 'md5', 'sha1', 'hash'], 'value':'{{ intelligence.value }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.value }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream organization id'], 'value':'{{ intelligence.owner_organization_id }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.owner_organization_id }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>{{ intelligence.is_public }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
