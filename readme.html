@@ -8,6 +8,12 @@
 <p><b>Known Issues</b>
 	<ul>
 		<li>For the hybrid on-prem Anomali instance, if the user runs the action <b>Update Incident</b> and tries to associate the intelligence IOCs existing on local (on-prem) with the incidents existing on remote (cloud), the intelligence values won't be successfully associated with the incident due to known API issues.</li>
+		<li>For the hybrid on-prem Anomali instance, the local (on-prem) intelligence IOCs associated with the cloud incident are not getting fetched due to the API issues. This issue has impact on the actions mentioned below.</li>
+		<ul>
+			<li>Get Incident - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
+			<li>On Poll - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
+			<li>Update Incident - The functionality will work fine, but the list (getting displayed in the output of the action) of the current intelligence IOCs associated with the incident will not show the on-prem IOCs for the cloud incident</li>
+		</ul>
 		<li>The action <b>Delete Incident</b> will not work successfully if the authenticated user in the app does not have appropriate permissions of deleting the incidents on the Anomali Threatstream instance.</li>
 	</ul>
 </p>
