@@ -8,7 +8,7 @@
 <p><b>Known Issues</b>
 	<ul>
 		<li>For the hybrid on-prem Anomali instance, if the user runs the action <b>Update Incident</b> and tries to associate the intelligence IOCs existing on local (on-prem) with the incidents existing on remote (cloud), the intelligence values won't be successfully associated with the incident due to known API issues.</li>
-		<li>For the hybrid on-prem Anomali instance, the local (on-prem) intelligence IOCs associated with the cloud incident are not getting fetched due to the API issues. This issue has impact on the actions mentioned below.</li>
+		<li>For the hybrid on-prem Anomali instance, the local (on-prem) intelligence IOCs associated with the cloud incident are not getting fetched due to the API issues. This issue has an impact on the actions mentioned below.</li>
 		<ul>
 			<li>Get Incident - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
 			<li>On Poll - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
@@ -20,7 +20,7 @@
 
 <p><b>Playbook Backward Compatibility</b>
 	<ul>
-		<li>New action parameters have been added in the actions given below. Hence, it is requested to the end user to please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+		<li>New action parameters have been added to the actions given below. Hence, it is requested to the end-user to please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
 		<ul>
 			<li>Create Incident - <b>create_on_cloud</b> parameter has been added</li>
 			<li>Import domain observable - <b>create_on_cloud</b> parameter has been added</li>
@@ -35,7 +35,7 @@
 
 <p><b>Asset Configuration Parameters</b>
 	<ul>
-		<li><b>is_cloud_instance</b> - This boolean parameter is used to indicate whether the Anomali Threatstream instance is on cloud. If the parameter is left unchecked, the app and it's functionalities will internally consider it as an on-prem instance.</li>
+		<li><b>is_cloud_instance</b> - This boolean parameter is used to indicate whether the Anomali Threatstream instance is on the cloud. If the parameter is left unchecked, the app and its functionalities will internally consider it as an on-prem instance.</li>
 	</ul>
 </p>
 
@@ -59,7 +59,7 @@
 			<ul>
 				<li>Same functionality as manual polling along with the additional points mentioned below:</li>
 				<ul>
-					<li><b>Maximum number of incidents to poll in the first run of the scheduled polling</b> configuration parameter governs the number of incidents fetched in the first run.</li>
+					<li><b>The maximum number of incidents to poll in the first run of the scheduled polling</b> configuration parameter governs the number of incidents fetched in the first run.</li>
 					<li>The <b>modified_ts</b> time of the last fetched incident is stored in the <b>last_incident_time</b> key of the state file.</li>
 					<li>For the consecutive runs, the incidents are fetched starting from the time stored in the <b>last_incident_time</b> key of the state file.</li>
 					<li>Please provide a larger value in the <b>Maximum number of incidents to poll in the first run of the scheduled polling</b> configuration parameter to fetch all the existing (older) incidents in the first run itself. From the consecutive runs, the newly created or the modified incidents will be automatically ingested.</li>
@@ -74,13 +74,13 @@
 <p><b>Behavior of import_&lt;indicator_type&gt;_observable and the import_observables actions</b>
 	<ul>
 		<li>The action run just sends a request for importing the observable value to the Anomali server.</li>
-		<li>The action run is a success if a response of <b>202 Accepted</b> is returned by the Anomali API. The action does not wait for the observable to actually reflect on the Anomali UI.</li>
+		<li>The action run is a success if a response of <b>202 Accepted</b> is returned by the Anomali API. The action does not wait for the observable to reflect on the Anomali UI.</li>
 		<li>The successful run of the actions does not guarantee the successful import of the observable on the Anomali server</li>
 		<ul>
 			<li>If the provided parameters and their expected combinations are correct, then the observable will be successfully imported after an indefinite interval of time (based on the Anomali server).</li>
 			<li>If the provided parameters and their combinations are incorrect, then the action run would be a success (because the API does not return an error response for this and accepts the request) though the observable is not imported on the Anomali server.</li>
 		</ul>
 		<li>It is recommended to add a required time delay between the action blocks which are dependent on the successful import of an observable.</li>
-		<li>To check if the observable was successfully imported, user can run and check the <b>List Observables</b> action which fetches the observables in the latest first order (based on <b>created_ts</b> time).</li>
+		<li>To check if the observable was successfully imported, the user can run and check the <b>List Observables</b> action which fetches the observables in the latest first order (based on <b>created_ts</b> time).</li>
 	</ul>
 </p>
