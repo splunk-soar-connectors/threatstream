@@ -745,13 +745,38 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
         final_creation = False
-        if self._is_cloud_instance or create_on_cloud:
+        if not self._is_cloud_instance and not create_on_cloud:
+            intel_data = dict()
+            if data.get("intelligence"):
+                intelligence = data.pop("intelligence")
+                intel_data["ids"] = intelligence
+                intel_data["remote_ids"] = intelligence
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if intel_data:
+                ret_val, response = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=resp_json.get("id")), payload, data=intel_data, method="post")
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+        else:
             final_creation = True
             payload["remote_api"] = "true"
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        intel_list = list()
+
+        for i in intelligence:
+            intel_id_dict = dict()
+            intel_id_dict["id"] = i
+            intel_list.append(intel_id_dict)
+
+        resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
         summary = action_result.update_summary({})
@@ -784,6 +809,22 @@ class ThreatstreamConnector(BaseConnector):
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
         else:
+            if data.get("intelligence"):
+                intelligence = data.pop("intelligence")
+                intel_data = dict()
+                intel_data["ids"] = intelligence
+                intel_data["remote_ids"] = intelligence
+
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                    payload["remote_api"] = "true"
+                    ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+            # Update the incident in all cases with data or with empty data to get the latest intelligence values associated with it
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
 
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
@@ -792,6 +833,15 @@ class ThreatstreamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        intel_list = list()
+
+        for i in intelligence:
+            intel_id_dict = dict()
+            intel_id_dict["id"] = i
+            intel_list.append(intel_id_dict)
+
+        resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
@@ -817,17 +867,20 @@ class ThreatstreamConnector(BaseConnector):
 
         intel = []
         intelligence = param.get("intelligence")
+
+        # 1. Fetch the existing intelligence values in the incident to append to
+        # in case of cloud instance API because it overwrites the existing values
         associated_intell = list()
 
-        if param.get("retain_intelligence") is not None:
-            # Fetch the existing intelligence values in the incident
+        if self.get_action_identifier() == 'update_incident':
+
             ret_val, resp_json = self._get_incident_support(action_result, param)
 
             if phantom.is_fail(ret_val):
                 return None
 
-            for intell in resp_json.get("intelligence"):
-                associated_intell.append(intell.get("id"))
+            for intell in resp_json.get("intelligence", []):
+                associated_intell.append(str(intell.get("id")))
 
         if intelligence:
             # Adding a first check if we have been supplied a list - this will
@@ -835,18 +888,19 @@ class ThreatstreamConnector(BaseConnector):
 
             if type(intelligence) is list:
                 try:
-                    if param.get('retain_intelligence') and associated_intell:
-                        intelligence.extend(associated_intell)
-                    intel = [int(x.strip()) for x in intelligence if x.strip() != '']
+                    intelligence.extend(associated_intell)
+                    intel = [x.strip() for x in intelligence if x.strip() != '']
                 except Exception as e:
                     action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
                     return None
             else:
                 try:
-                    if param.get("retain_intelligence") and associated_intell:
+                    if associated_intell:
                         intelligence = "{}, {}".format(intelligence, ', '.join(associated_intell))
+
                     intel = intelligence.strip().split(",")
-                    intel = [int(x.strip()) for x in intel if x.strip() != '']
+                    intel = [x.strip() for x in intel if x.strip() != '']
+
                 except Exception as e:
                     action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
                     return None
@@ -1392,7 +1446,7 @@ class ThreatstreamConnector(BaseConnector):
                     tags = item.get('tags')
 
                     for i, tag in enumerate(tags):
-                        tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, value) for key, value in tag.items())
+                        tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
 
                     item['tags_formatted'] = tags_dict
 
@@ -1416,7 +1470,7 @@ class ThreatstreamConnector(BaseConnector):
                 tags = resp_json.get('tags_v2')
 
                 for i, tag in enumerate(tags):
-                    tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, value) for key, value in tag.items())
+                    tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
 
                 resp_json['tags_v2_formatted'] = tags_dict
 
@@ -1424,7 +1478,7 @@ class ThreatstreamConnector(BaseConnector):
             artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
             artifacts_list.append(artifact)
 
-            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
+            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), UnicodeDammit(resp_json.get("name")).unicode_markup.encode('utf-8'))
 
             self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
 
@@ -1432,7 +1486,7 @@ class ThreatstreamConnector(BaseConnector):
                 container = dict()
                 container['description'] = "Container added by ThreatStream app"
                 container['source_data_identifier'] = resp_json.get("id")
-                container['name'] = '{}-{}'.format(resp_json.get("id"), resp_json.get("name"))
+                container['name'] = '{}-{}'.format(resp_json.get("id"), UnicodeDammit(resp_json.get("name")).unicode_markup.encode('utf-8'))
                 container['data'] = resp_json
 
                 ret_val, message, container_id = self.save_container(container)

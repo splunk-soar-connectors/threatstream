@@ -4836,14 +4836,9 @@
                 "intelligence": {
                     "allow_list": true,
                     "required": false,
-                    "description": "Comma separated list of intelligence IDs to associate with the incident - Note that this overwrites, not appends",
+                    "description": "Comma-separated list of intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
                     "order": 2
-                },
-                "retain_intelligence": {
-                    "data_type": "boolean",
-                    "description": "Retains all the intelligences that are already associated",
-                    "order": 3
                 },
                 "fields": {
                     "required": false,
@@ -5156,14 +5151,6 @@
                     ],
                     "example_values": [
                         "1000000008"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.retain_intelligence",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
                     ]
                 },
                 {
