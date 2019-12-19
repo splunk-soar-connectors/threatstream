@@ -5,6 +5,34 @@
  without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
+<p><b>Known Issues</b>
+	<ul>
+		<li>For the hybrid on-prem Anomali instance, if the user runs the action <b>Update Incident</b> and tries to associate the intelligence IOCs existing on local (on-prem) with the incidents existing on remote (cloud), the intelligence values won't be successfully associated with the incident due to known API issues.</li>
+		<li>The action <b>Delete Incident</b> will not work successfully if the authenticated user in the app does not have appropriate permissions of deleting the incidents on the Anomali Threatstream instance.</li>
+	</ul>
+</p>
+
+<p><b>Playbook Backward Compatibility</b>
+	<ul>
+		<li>New action parameters have been added in the actions given below. Hence, it is requested to the end user to please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+		<ul>
+			<li>Create Incident - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import domain observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import URL observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import IP observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import file observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import email observable - <b>create_on_cloud</b> parameter has been added</li>
+			<li>Import observables - <b>create_on_cloud</b> parameter has been added</li>
+		</ul>
+	</ul>
+</p>
+
+<p><b>Asset Configuration Parameters</b>
+	<ul>
+		<li><b>is_cloud_instance</b> - This boolean parameter is used to indicate whether the Anomali Threatstream instance is on cloud. If the parameter is left unchecked, the app and it's functionalities will internally consider it as an on-prem instance.</li>
+	</ul>
+</p>
+
 <p><b>On Poll Functionality</b>
 	<ul>
 		<li>It fetches the incidents (belonging to the configured organization ID in the configuration parameters) and their intelligence data to ingest them as containers and artifacts.</li>

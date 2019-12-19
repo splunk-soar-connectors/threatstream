@@ -57,7 +57,7 @@
         "is_cloud_instance": {
             "data_type": "boolean",
             "order": 6,
-            "description": "Is the provided instance in 'hostaname' parameter is cloud?"
+            "description": "Is the provided instance in 'hostaname' parameter cloud?"
         },
         "verify_server_cert": {
             "data_type": "boolean",
@@ -4488,7 +4488,7 @@
                     "order": 1
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 4
                 }
@@ -5237,7 +5237,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 5
                 }
@@ -5420,7 +5420,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 5
                 }
@@ -5602,7 +5602,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 5
                 }
@@ -5802,7 +5802,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 6
                 }
@@ -5991,7 +5991,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 6
                 }
@@ -6176,7 +6176,7 @@
                     "required": false
                 },
                 "create_on_cloud": {
-                    "description": "Create incident on cloud?",
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
                     "order": 4
                 }
