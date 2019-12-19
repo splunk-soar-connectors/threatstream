@@ -745,6 +745,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
         final_creation = False
+        intelligence = None
         if not self._is_cloud_instance and not create_on_cloud:
             intel_data = dict()
             if data.get("intelligence"):
@@ -757,7 +758,8 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
             if intel_data:
-                ret_val, response = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=resp_json.get("id")), payload, data=intel_data, method="post")
+                ret_val, response = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(
+                        incident=resp_json.get("id")), payload, data=intel_data, method="post")
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
@@ -771,12 +773,13 @@ class ThreatstreamConnector(BaseConnector):
 
         intel_list = list()
 
-        for i in intelligence:
-            intel_id_dict = dict()
-            intel_id_dict["id"] = i
-            intel_list.append(intel_id_dict)
+        if intelligence:
+            for i in intelligence:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = i
+                intel_list.append(intel_id_dict)
 
-        resp_json["intelligence"] = intel_list
+            resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
         summary = action_result.update_summary({})
@@ -799,6 +802,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please provide at least one parameter, either 'intelligence' or 'fields' to update the provided incident")
 
         data = {}
+        intels = []
         data = self._build_data(param, data, action_result)
         if data is None:
             return action_result.get_status()
@@ -824,6 +828,37 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
+                provided_intel = param.get("intelligence", '')
+                provided_intel = [x.strip() for x in provided_intel.split(',')]
+                provided_intel = list(filter(None, provided_intel))
+
+                updated_intels = list()
+                associated_intels_list = list()
+                ids = list()
+                remote_ids = list()
+
+                if resp_json.get("ids"):
+                    for temp_id in resp_json.get("ids"):
+                        ids.append(str(temp_id))
+
+                if resp_json.get("remote_ids"):
+                    for remote_id in resp_json.get("remote_ids"):
+                        remote_ids.append(str(remote_id))
+
+                for pintel in provided_intel:
+                    if (ids and pintel in ids) or (remote_ids and pintel in remote_ids):
+                        updated_intels.append(pintel)
+
+                if not updated_intels and provided_intel:
+                    return action_result.set_status(phantom.APP_ERROR, "Failed to associate the provided intelligence IDs with the incident id: {}".format(incident_id))
+
+                for i in intelligence:
+                    if i not in provided_intel:
+                        associated_intels_list.append(i)
+
+                intels.extend(associated_intels_list)
+                intels.extend(updated_intels)
+
             # Update the incident in all cases with data or with empty data to get the latest intelligence values associated with it
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
 
@@ -836,12 +871,13 @@ class ThreatstreamConnector(BaseConnector):
 
         intel_list = list()
 
-        for i in intelligence:
-            intel_id_dict = dict()
-            intel_id_dict["id"] = i
-            intel_list.append(intel_id_dict)
+        if intels:
+            for i in intels:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = i
+                intel_list.append(intel_id_dict)
 
-        resp_json["intelligence"] = intel_list
+            resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
@@ -1446,7 +1482,8 @@ class ThreatstreamConnector(BaseConnector):
                     tags = item.get('tags')
 
                     for i, tag in enumerate(tags):
-                        tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
+                        tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                            key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
 
                     item['tags_formatted'] = tags_dict
 
@@ -1470,7 +1507,8 @@ class ThreatstreamConnector(BaseConnector):
                 tags = resp_json.get('tags_v2')
 
                 for i, tag in enumerate(tags):
-                    tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
+                    tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                        key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
 
                 resp_json['tags_v2_formatted'] = tags_dict
 
