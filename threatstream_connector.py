@@ -724,7 +724,15 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_delete_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
