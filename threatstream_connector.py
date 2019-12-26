@@ -651,8 +651,20 @@ class ThreatstreamConnector(BaseConnector):
                 payload["remote_api"] = "true"
                 ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload)
 
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+            endpoint = "{}{}/".format(ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), "intelligence")
+
+            response = self._paginator(endpoint, action_result, payload=payload)
+
+            if response is None:
+                return action_result.get_status(), None
+
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
+
+        resp_json.update({"intelligence": response})
 
         action_result.set_status(phantom.APP_SUCCESS, "")
 
@@ -747,52 +759,110 @@ class ThreatstreamConnector(BaseConnector):
         data = {
                 "name": param["name"], "is_public": param["is_public"], "status": 1
                }
-        data = self._build_data(param, data, action_result)
-        if data is None:
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
             return action_result.get_status()
+
+        data = data_dict.get("data")
+        local_intelligence = data_dict.get("local_intelligence")
+        cloud_intelligence = data_dict.get("cloud_intelligence")
 
         payload = self._generate_payload()
         final_creation = False
-        intelligence = None
-        if not self._is_cloud_instance and not create_on_cloud:
-            intel_data = dict()
-            if data.get("intelligence"):
-                intelligence = data.pop("intelligence")
-                intel_data["ids"] = intelligence
-                intel_data["remote_ids"] = intelligence
+        intelligence = list()
+
+        if self._is_cloud_instance:
+            final_creation = True
+            payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            if intel_data:
-                ret_val, response = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(
-                        incident=resp_json.get("id")), payload, data=intel_data, method="post")
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
-
-        else:
+        elif create_on_cloud:
             final_creation = True
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            incident_id = resp_json.get("id")
+            if not incident_id:
+                action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID")
+
+            if cloud_intelligence:
+                intel_data = {"ids": cloud_intelligence}
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+                if response.get("ids"):
+                    intelligence.extend(response.get("ids"))
+
+            if local_intelligence:
+                del payload["remote_api"]
+                intel_data = {"local_ids": local_intelligence}
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+                if phantom.is_fail(ret_val):
+                    self.debug_print("Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter".format(
+                        ', '.join(local_intelligence)))
+
+                if response and response.get("local_ids"):
+                    intelligence.extend(response.get("local_ids"))
+
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            incident_id = resp_json.get("id")
+            intel_data = dict()
+
+            if local_intelligence:
+                intel_data["ids"] = local_intelligence
+            if cloud_intelligence:
+                intel_data["remote_ids"] = cloud_intelligence
+
+            if intel_data:
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+                if response.get("remote_ids"):
+                    intelligence.extend(response.get("remote_ids"))
+
+                if response.get("ids"):
+                    intelligence.extend(response.get("ids"))
 
         intel_list = list()
 
         if intelligence:
+            msg_intel = list()
             for i in intelligence:
                 intel_id_dict = dict()
                 intel_id_dict["id"] = i
                 intel_list.append(intel_id_dict)
+                msg_intel.append(str(i))
 
             resp_json["intelligence"] = intel_list
+
+            message = "Incident created successfully. Associated intelligence : {}".format(', '.join(msg_intel))
+
+        elif (local_intelligence or cloud_intelligence) and not intelligence:
+            message = "Incident created successfully. None of the intelligence got associated, please provide valid intelligence"
+
+        else:
+            message = "Incident created successfully"
 
         action_result.add_data(resp_json)
         summary = action_result.update_summary({})
         summary['created_on_cloud'] = final_creation
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created incident")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_update_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -806,14 +876,16 @@ class ThreatstreamConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
 
-        if not param.get("intelligence") and not param.get("fields"):
+        if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields"):
             return action_result.set_status(phantom.APP_ERROR, "Please provide at least one parameter, either 'intelligence' or 'fields' to update the provided incident")
 
         data = {}
-        intels = []
-        data = self._build_data(param, data, action_result)
-        if data is None:
+        intel_ids_list = list()
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
             return action_result.get_status()
+
+        data = data_dict.get("data")
 
         payload = self._generate_payload()
 
@@ -821,51 +893,64 @@ class ThreatstreamConnector(BaseConnector):
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
         else:
-            if data.get("intelligence"):
-                intelligence = data.pop("intelligence")
+            local_intelligence = data_dict.get("local_intelligence")
+            cloud_intelligence = data_dict.get("cloud_intelligence")
+
+            if local_intelligence or cloud_intelligence:
                 intel_data = dict()
-                intel_data["ids"] = intelligence
-                intel_data["remote_ids"] = intelligence
+                if local_intelligence:
+                    intel_data["ids"] = local_intelligence
+
+                if cloud_intelligence:
+                    intel_data["remote_ids"] = cloud_intelligence
 
                 ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                 if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
-                    payload["remote_api"] = "true"
-                    ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+                    intel_data = dict()
+                    if local_intelligence:
+                        intel_data["local_ids"] = local_intelligence
+
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val):
+                            self.debug_print("Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter".format(
+                                ', '.join(local_intelligence)))
+                        del intel_data["local_ids"]
+                        if resp_json and resp_json.get("local_ids"):
+                            intel_ids_list.extend(resp_json.get("local_ids"))
+
+                    if cloud_intelligence:
+                        intel_data["ids"] = cloud_intelligence
+                        payload["remote_api"] = "true"
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
-                provided_intel = param.get("intelligence", '')
-                provided_intel = [x.strip() for x in provided_intel.split(',')]
-                provided_intel = list(filter(None, provided_intel))
-
-                updated_intels = list()
-                associated_intels_list = list()
-                ids = list()
-                remote_ids = list()
-
                 if resp_json.get("ids"):
-                    for temp_id in resp_json.get("ids"):
-                        ids.append(str(temp_id))
-
+                    intel_ids_list.extend(resp_json.get("ids"))
                 if resp_json.get("remote_ids"):
-                    for remote_id in resp_json.get("remote_ids"):
-                        remote_ids.append(str(remote_id))
+                    intel_ids_list.extend(resp_json.get("remote_ids"))
 
-                for pintel in provided_intel:
-                    if (ids and pintel in ids) or (remote_ids and pintel in remote_ids):
-                        updated_intels.append(pintel)
+            if intel_ids_list:
+                msg_intel = list()
+                for i in intel_ids_list:
+                    msg_intel.append(str(i))
 
-                if not updated_intels and provided_intel:
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to associate the provided intelligence IDs with the incident id: {}".format(incident_id))
+                message = "Associated intelligence : {}".format(', '.join(msg_intel))
 
-                for i in intelligence:
-                    if i not in provided_intel:
-                        associated_intels_list.append(i)
+            elif (local_intelligence or cloud_intelligence) and not intel_ids_list:
+                message = "None of the intelligence got associated, please provide valid intelligence"
 
-                intels.extend(associated_intels_list)
-                intels.extend(updated_intels)
+            else:
+                message = None
+
+            associated_intelligence = data_dict.get("associated_intelligence")
+            if associated_intelligence:
+                intel_ids_list.extend(associated_intelligence)
 
             # Update the incident in all cases with data or with empty data to get the latest intelligence values associated with it
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
@@ -879,8 +964,10 @@ class ThreatstreamConnector(BaseConnector):
 
         intel_list = list()
 
-        if intels:
-            for i in intels:
+        intel_ids_list = list(set(intel_ids_list))
+
+        if intel_ids_list:
+            for i in intel_ids_list:
                 intel_id_dict = dict()
                 intel_id_dict["id"] = i
                 intel_list.append(intel_id_dict)
@@ -888,7 +975,10 @@ class ThreatstreamConnector(BaseConnector):
             resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
+        if message:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident. {}".format(message))
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
 
     def _build_data(self, param, data, action_result):
 
@@ -909,8 +999,9 @@ class ThreatstreamConnector(BaseConnector):
 
             data.update(fields)
 
-        intel = []
-        intelligence = param.get("intelligence")
+        data_dict = dict()
+        local_intelligence = param.get("local_intelligence")
+        cloud_intelligence = param.get("cloud_intelligence")
 
         # 1. Fetch the existing intelligence values in the incident to append to
         # in case of cloud instance API because it overwrites the existing values
@@ -924,36 +1015,41 @@ class ThreatstreamConnector(BaseConnector):
                 return None
 
             for intell in resp_json.get("intelligence", []):
-                associated_intell.append(str(intell.get("id")))
+                associated_intell.append(int(intell.get("id")))
 
-        if intelligence:
-            # Adding a first check if we have been supplied a list - this will
-            # be useful for playbooks supplying a list object as the parameter
+        if local_intelligence:
+            local_intelligence = self._create_intelligence(action_result, local_intelligence)
+            if local_intelligence is None:
+                return local_intelligence
 
-            if type(intelligence) is list:
-                try:
-                    intelligence.extend(associated_intell)
-                    intel = [x.strip() for x in intelligence if x.strip() != '']
-                except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
-                    return None
-            else:
-                try:
-                    if associated_intell:
-                        intelligence = "{}, {}".format(intelligence, ', '.join(associated_intell))
+        if cloud_intelligence:
+            cloud_intelligence = self._create_intelligence(action_result, cloud_intelligence)
+            if cloud_intelligence is None:
+                return cloud_intelligence
 
-                    intel = intelligence.strip().split(",")
-                    intel = [x.strip() for x in intel if x.strip() != '']
+        data_dict.update({"data": data, "local_intelligence": local_intelligence, "cloud_intelligence": cloud_intelligence, "associated_intelligence": associated_intell})
 
-                except Exception as e:
-                    action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
-                    return None
-            data.update({"intelligence": intel})
+        return data_dict
 
+    def _create_intelligence(self, action_result, intelligence):
+        # Adding a first check if we have been supplied a list - this will
+        # be useful for playbooks supplying a list object as the parameter
+
+        if type(intelligence) is list:
+            try:
+                intel = [x.strip() for x in intelligence if x.strip() != '']
+            except Exception as e:
+                action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
+                return None
         else:
-            data.update({"intelligence": associated_intell})
+            try:
+                intel = intelligence.strip().split(",")
+                intel = [x.strip() for x in intel if x.strip() != '']
 
-        return data
+            except Exception as e:
+                action_result.set_status(phantom.APP_ERROR, "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(e))
+                return None
+        return intel
 
     def _handle_run_query(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1030,11 +1126,11 @@ class ThreatstreamConnector(BaseConnector):
                     data["objects"][0].update(fields)
                 else:
                     return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
-                    (e.g. {\"itype\": \"<indicator_type>\"}).")
+                    (e.g. {\"itype\": \"<indicator_type>\"})")
                 #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
             else:
                 return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
-                (e.g. {\"itype\": \"<indicator_type>\"}).")
+                (e.g. {\"itype\": \"<indicator_type>\"})")
         else:
             indicator_type = param['indicator_type']
             confidence = param.get('confidence', None)
@@ -1459,8 +1555,10 @@ class ThreatstreamConnector(BaseConnector):
                                 incident.get("id"), incident.get("organization_id"), org_id))
 
         self.save_progress("Fetched {0} incidents in the oldest first order based on modified_ts time.".format(len(incidents)))
+        self.save_progress("Started incident and intelligence artifacts creation...")
 
-        for incident in incidents:
+        for i, incident in enumerate(incidents):
+            self.send_progress("Processing incident and corresponding intelligence artifacts - {} %".format(((i + 1) / len(incidents)) * 100))
             # self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
             # Handle the ingest_only_published_incidents scenario
             if config.get("ingest_only_published_incidents"):
@@ -1470,7 +1568,7 @@ class ThreatstreamConnector(BaseConnector):
 
             self.debug_print("Retrieving details for the incident ID: {0}".format(incident.get("id")))
 
-            ret_val, resp_json = self._get_incident_support(action_result, payload=payload, incident_id=incident["id"])
+            ret_val, resp_json = self._get_incident_support(action_result, incident_id=incident["id"])
 
             if (not ret_val):
                 return action_result.get_status()
@@ -1478,6 +1576,7 @@ class ThreatstreamConnector(BaseConnector):
             # Create the list of artifacts to be created
             artifacts_list = []
             intelligence = resp_json.pop("intelligence", [])
+
             for item in intelligence:
                 artifact = {"label": "artifact",
                             "type": "network",

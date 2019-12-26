@@ -977,9 +977,6 @@
                     "contains": [
                         "email"
                     ],
-                    "example_values": [
-                        "test.com"
-                    ],
                     "order": 0
                 }
             },
@@ -997,6 +994,9 @@
                     "data_type": "string",
                     "contains": [
                         "email"
+                    ],
+                    "example_values": [
+                        "test.com"
                     ]
                 },
                 {
@@ -2143,10 +2143,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.asn",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.confidence",
@@ -2163,7 +2160,7 @@
                     "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -2213,10 +2210,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.import_source",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.ip",
@@ -2284,10 +2278,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.org",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.owner_organization_id",
@@ -2326,7 +2317,7 @@
                     "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -2474,10 +2465,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.asn",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.confidence",
@@ -2954,10 +2942,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.logo_s3_url",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.modified_ts",
@@ -3008,7 +2993,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -3025,7 +3010,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantomuser2"
+                        "testuser2"
                     ]
                 },
                 {
@@ -3074,10 +3059,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.source",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.starred_by_me",
@@ -3096,10 +3078,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.tlp",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.update_id",
@@ -3933,10 +3912,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.asn",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.confidence",
@@ -3953,7 +3929,7 @@
                     "data_path": "action_result.data.*.intelligence.*.created_by",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -4003,10 +3979,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.import_source",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.ip",
@@ -4074,10 +4047,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.org",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.owner_organization_id",
@@ -4100,10 +4070,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.resource_uri",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.intelligence.*.retina_confidence",
@@ -4116,7 +4083,7 @@
                     "data_path": "action_result.data.*.intelligence.*.source",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -4304,7 +4271,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -4321,7 +4288,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantomuser2"
+                        "testuser2"
                     ]
                 },
                 {
@@ -4472,16 +4439,18 @@
             "identifier": "create_incident",
             "read_only": false,
             "parameters": {
-                "intelligence": {
+                "local_intelligence": {
                     "allow_list": true,
                     "required": false,
-                    "description": "Comma separated list of intelligence IDs to associate with the incident",
-                    "verbose": "",
+                    "description": "Comma-separated list of local intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
-                    "contains": [
-                        "threatstream intelligence id"
-                    ],
-                    "primary": true,
+                    "order": 2
+                },
+                "cloud_intelligence": {
+                    "allow_list": true,
+                    "required": false,
+                    "description": "Comma-separated list of remote intelligence IDs to associate with the incident - Note that this appends",
+                    "data_type": "string",
                     "order": 3
                 },
                 "name": {
@@ -4494,18 +4463,18 @@
                     "required": false,
                     "description": "JSON formatted string of fields to include with the incident",
                     "data_type": "string",
-                    "order": 2
+                    "order": 1
                 },
                 "is_public": {
                     "default": false,
                     "description": "Classification designation",
                     "data_type": "boolean",
-                    "order": 1
+                    "order": 4
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 4
+                    "order": 5
                 }
             },
             "output": [
@@ -4533,13 +4502,23 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.intelligence",
+                    "data_path": "action_result.parameter.local_intelligence",
                     "data_type": "string",
                     "contains": [
                         "threatstream intelligence id"
                     ],
                     "example_values": [
                         "1000000003,1000000004"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cloud_intelligence",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "example_values": [
+                        "171831109"
                     ]
                 },
                 {
@@ -4698,7 +4677,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -4715,7 +4694,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantomuser2"
+                        "testuser2"
                     ]
                 },
                 {
@@ -4862,12 +4841,19 @@
             "identifier": "update_incident",
             "read_only": false,
             "parameters": {
-                "intelligence": {
+                "local_intelligence": {
                     "allow_list": true,
                     "required": false,
-                    "description": "Comma-separated list of intelligence IDs to associate with the incident - Note that this appends",
+                    "description": "Comma-separated list of local intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
                     "order": 2
+                },
+                "cloud_intelligence": {
+                    "allow_list": true,
+                    "required": false,
+                    "description": "Comma-separated list of remote intelligence IDs to associate with the incident - Note that this appends",
+                    "data_type": "string",
+                    "order": 3
                 },
                 "fields": {
                     "required": false,
@@ -4913,10 +4899,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.intelligence",
+                    "data_path": "action_result.parameter.local_intelligence",
                     "data_type": "string",
                     "example_values": [
                         "1000000002"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cloud_intelligence",
+                    "data_type": "string",
+                    "example_values": [
+                        "171831109"
                     ]
                 },
                 {
@@ -5059,7 +5052,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+phantomuser2@qa.threatstream.com"
+                        "qa+test@qa.threatstream.com"
                     ],
                     "contains": [
                         "email"
@@ -5076,7 +5069,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantomuser2"
+                        "testuser2"
                     ]
                 },
                 {
@@ -5295,7 +5288,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.create_on_cloud",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         true,
                         false
@@ -6455,8 +6448,8 @@
                     "data_path": "action_result.data.*.success",
                     "data_type": "boolean",
                     "example_values": [
-                        "true",
-                        "false"
+                        true,
+                        false
                     ]
                 },
                 {
@@ -6676,7 +6669,7 @@
                         "sha1"
                     ],
                     "column_name": "Vault ID",
-                    "column_order": "0",
+                    "column_order": 0,
                     "example_values": [
                         "dd88508cda7bcfc71ffdbc0e26afe97d3fb9a0b6"
                     ]
@@ -7027,7 +7020,7 @@
                     "data_path": "action_result.data.*.confidence",
                     "data_type": "string",
                     "column_name": "Confidence",
-                    "column_order": "3"
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.date_added",
@@ -7046,7 +7039,7 @@
                         "/test_file.png"
                     ],
                     "column_name": "File Name",
-                    "column_order": "0",
+                    "column_order": 0,
                     "data_type": "string"
                 },
                 {
@@ -7170,7 +7163,7 @@
                     "data_path": "action_result.data.*.url",
                     "data_type": "string",
                     "column_name": "URL",
-                    "column_order": "1"
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.user.id",
@@ -7200,7 +7193,7 @@
                         "benign"
                     ],
                     "column_name": "Verdict",
-                    "column_order": "2",
+                    "column_order": 2,
                     "data_type": "string"
                 },
                 {
@@ -7471,7 +7464,7 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_order": "1",
+                    "column_order": 1,
                     "column_name": "Process Name"
                 },
                 {
@@ -7753,7 +7746,7 @@
                     "data_path": "action_result.data.*.results.signatures.*.data.*.process.process_name",
                     "data_type": "string",
                     "example_values": [
-                        "AdobeUpdater.exe"
+                        "test.exe"
                     ]
                 },
                 {
@@ -7840,7 +7833,7 @@
                     "example_values": [
                         "box.png"
                     ],
-                    "column_order": "0",
+                    "column_order": 0,
                     "column_name": "File"
                 },
                 {
