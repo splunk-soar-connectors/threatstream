@@ -395,8 +395,8 @@ class ThreatstreamConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
 
-        if 'admin' in whois_response:
-            if all(key in whois_response['admin'] for key in whois_fields):
+        if whois_response.get('contacts') and 'admin' in whois_response.get('contacts'):
+            if all(key in whois_response['contacts']['admin'] for key in whois_fields):
                 return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info but unable to parse all required fields")
 
@@ -555,12 +555,18 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = int(param.get("limit"))
+        limit = param.get("limit")
 
         payload = self._generate_payload()
         payload["order_by"] = "-created_ts"
 
-        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+        try:
+            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+            if limit:
+                limit = int(limit)
+        except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         observable = self._paginator(ENDPOINT_INTELLIGENCE, action_result, limit=limit, payload=payload)
@@ -579,9 +585,15 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_vulnerability(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = int(param.get("limit"))
+        limit = param.get("limit")
 
-        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+        try:
+            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+            if limit:
+                limit = int(limit)
+        except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         vulnerability = self._paginator(ENDPOINT_VULNERABILITY, action_result, limit=limit)
@@ -602,7 +614,13 @@ class ThreatstreamConnector(BaseConnector):
 
         limit = param.get("limit")
 
-        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+        try:
+            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+            if limit:
+                limit = int(limit)
+        except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         if param.get("intel_value", None):
@@ -1067,13 +1085,25 @@ class ThreatstreamConnector(BaseConnector):
         if order_by:
             payload['order_by'] = order_by
 
-        offset = param.get('offset', 0)
-        if offset and (not str(offset).isdigit() or offset <= 0):
-            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="offset"))
+        try:
+            offset = param.get('offset', 0)
+            if offset and (not str(offset).isdigit() or offset < 0):
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer in {param}".format(param="offset"))
 
-        limit = int(param.get("limit"))
+            if offset == 0 or offset:
+                offset = int(offset)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer in {param}".format(param="offset"))
 
-        if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+        limit = param.get("limit")
+
+        try:
+            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+            if limit:
+                limit = int(limit)
+        except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         records = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, offset=offset, limit=limit)
@@ -1140,6 +1170,9 @@ class ThreatstreamConnector(BaseConnector):
 
             if (confidence and confidence < 0) or (confidence and (not str(confidence).isdigit() or confidence <= 0)):
                 return action_result.set_status(phantom.APP_ERROR, THREARSTREAM_INVALID_CONFIDENCE)
+
+            if confidence:
+                confidence = int(confidence)
 
             object_dict = {"itype": indicator_type}
 
@@ -1495,11 +1528,11 @@ class ThreatstreamConnector(BaseConnector):
         try:
             if self.is_poll_now():
                 # Manual polling
-                limit = int(param.get("container_count", 1000))
+                limit = param.get("container_count", 1000)
                 parameter = "container_count"
             elif self._state.get("first_run", True):
                 # Scheduled polling first run
-                limit = int(self._first_run_limit)
+                limit = self._first_run_limit
                 self._state["first_run"] = False
                 parameter = "first_run_containers"
             else:
@@ -1507,7 +1540,13 @@ class ThreatstreamConnector(BaseConnector):
                 # of the scheduled_polling
                 limit = None
 
-            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            try:
+                if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+                    return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param=parameter))
+
+                if limit:
+                    limit = int(limit)
+            except:
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param=parameter))
 
         except Exception as e:
