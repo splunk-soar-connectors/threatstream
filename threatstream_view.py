@@ -12,6 +12,7 @@ def _get_ctx_result(result, provides):
     param = result.get_param()
     summary = result.get_summary()
     data = result.get_data()
+    processed_data = list()
 
     ctx_result['param'] = param
     ctx_result["action_name"] = provides
@@ -21,6 +22,58 @@ def _get_ctx_result(result, provides):
     if not data:
         ctx_result['data'] = {}
         return ctx_result
+
+    if provides == "get report":
+
+        data_final = dict()
+        info_dict = dict()
+        process_list = list()
+        
+        for item in data:
+            info_dict["category"] = item.get("results", {}).get("info", {}).get("category")
+            info_dict["started"] = item.get("results", {}).get("info", {}).get("started")
+            info_dict["ended"] = item.get("results", {}).get("info", {}).get("ended")
+            info_dict["version"] = item.get("version", {}).get("version", {}).get("version")
+            info_dict["duration"] = item.get("results", {}).get("info", {}).get("duration")
+            info_dict["url"] = item.get("results", {}).get("target", {}).get("url")
+            info_dict["pcap"] = item.get("pcap")
+            data_final["info"] = info_dict
+
+            if all(value is None for value in info_dict.values()):
+                data_final["info"] = None
+
+            data_final["screenshots"] = item.get("screenshots")
+            data_final["dropped"] = item.get("results", {}).get("dropped")
+
+            processes = item.get("results", {}).get("behavior", {}).get("processes")
+
+            if processes:
+                process_dict = dict()
+                for process in processes:
+                    if process.get("calls"):
+                        del process["calls"]
+
+                    pname = process.get("process_name")
+                    if pname in process_dict:
+                        process_dict[pname] += 1
+                    else:
+                        process_dict[pname] = 1
+
+                for name, count in process_dict.items():
+                    process_temp = dict()
+                    process_temp["process_name"] = name
+                    process_temp["process_count"] = count
+                    process_list.append(process_temp)
+
+            data_final["processes"] = process_list
+            data_final["behavior_files"] = item.get("results", {}).get("behavior", {}).get("summary", {}).get("files")
+            data_final["behavior_keys"] = item.get("results", {}).get("behavior", {}).get("summary", {}).get("keys")
+            data_final["behavior_mutexes"] = item.get("results", {}).get("behavior", {}).get("summary", {}).get("mutexes")
+
+            processed_data.append(data_final)
+
+    if processed_data:
+        data = processed_data
 
     ctx_result['data'] = data
 
@@ -51,5 +104,8 @@ def display_view(provides, all_app_runs, context):
 
     if provides == "get observable":
         ret_val = 'threatstream_get_observable.html'
+
+    if provides == "get report":
+        ret_val = 'threatstream_get_report.html'
 
     return ret_val

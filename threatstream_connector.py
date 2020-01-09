@@ -395,7 +395,7 @@ class ThreatstreamConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
 
-        if whois_response.get('contacts') and 'admin' in whois_response.get('contacts'):
+        if whois_response.get('contacts') and whois_response.get('contacts', {}).get('admin'):
             if all(key in whois_response['contacts']['admin'] for key in whois_fields):
                 return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info but unable to parse all required fields")
