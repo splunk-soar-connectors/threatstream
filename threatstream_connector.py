@@ -21,6 +21,7 @@ import requests
 import datetime
 import ipaddress
 import pythonwhois
+import ipwhois
 import simplejson as json
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
@@ -372,6 +373,7 @@ class ThreatstreamConnector(BaseConnector):
     def _whois(self, value, action_result, tipe=""):
         payload = self._generate_payload()
         whois = ENDPOINT_WHOIS.format(ioc_value=value)
+        final_response = dict()
 
         ret_val, resp_json = self._make_rest_call(action_result, whois, payload)
         if (phantom.is_fail(ret_val)):
@@ -391,14 +393,16 @@ class ThreatstreamConnector(BaseConnector):
             # TODO: Find a better way to do this
             whois_response = json.dumps(whois_response, default=_json_fallback)
             whois_response = json.loads(whois_response)
-            action_result.add_data(whois_response)
+            final_response = whois_response
+            if tipe == "ip":
+                additional_info = ipwhois.IPWhois(value).lookup_rdap(depth=1)
+                if additional_info:
+                    final_response["addtional_info"] = additional_info
+            action_result.add_data(final_response)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
 
-        if whois_response.get('contacts') and whois_response.get('contacts', {}).get('admin'):
-            if all(key in whois_response['contacts']['admin'] for key in whois_fields):
-                return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info")
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info but unable to parse all required fields")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info")
 
     def _retrieve_ip_domain(self, value, ioc_type, action_result):
         """ Retrieve all the information needed for domains or IPs """
