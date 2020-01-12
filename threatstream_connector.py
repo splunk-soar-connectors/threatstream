@@ -379,7 +379,7 @@ class ThreatstreamConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.set_status(phantom.APP_SUCCESS, "Error making whois request")
 
-        if (resp_json['data'] == WHOIS_NO_DATA):
+        if not resp_json.get("data") or (resp_json['data'] == WHOIS_NO_DATA):
             return action_result.set_status(phantom.APP_ERROR, WHOIS_NO_DATA)
 
         try:
