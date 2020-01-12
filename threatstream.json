@@ -2971,6 +2971,9 @@
                     "data_type": "string",
                     "example_values": [
                         "please query the rdds service of the registrar of record identified in this output for information on how to contact the registrant, admin, or tech contact of the queried domain name."
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
@@ -3055,6 +3058,9 @@
                     "data_type": "string",
                     "example_values": [
                         "please query the rdds service of the registrar of record identified in this output for information on how to contact the registrant, admin, or tech contact of the queried domain name."
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
@@ -3139,6 +3145,9 @@
                     "data_type": "string",
                     "example_values": [
                         "please query the rdds service of the registrar of record identified in this output for information on how to contact the registrant, admin, or tech contact of the queried domain name."
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
