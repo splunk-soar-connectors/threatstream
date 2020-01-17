@@ -39,6 +39,18 @@
 	</ul>
 </p>
 
+<p><b>Confidence action parameter for import observable related actions</b>
+	<ul>
+		<li>For [import file observable] and [import email observable] actions user has to provide the confidence value in [confidence] action parameter</li>
+		<li>For [import domain observable], [import ip observable], and [import url observable] actions ThreatStream automatically gives the confidence value based on some internal logical operations | processes as per the API documentation</li>
+		<li>For [import observable] action user can provide confidence value in 'fields' parameter as {"confidence": &lt;confidence_value&gt;}</li>
+		<ul>
+			<li>For hash and email type of observable, the value of the confidence will be reflected</li>
+			<li>For domain, IP, and URL type of observable, the value of the confidence will be ignored</li>
+		</ul>
+	</ul>
+</p>
+
 <p><b>Domain Reputation</b>
 	<ul>
 		<li>The action will try to find an intelligence with the same name provided in the [domain] parameter in the Anomali ThreatStream instance. If it is not found then, 'None' will be displayed under the corresponding columns in the output view.</li>

@@ -7331,7 +7331,7 @@
         {
             "action": "import observables",
             "description": "Import observables into ThreatStream",
-            "verbose": "<ul><li>For importing observables of type 'URL', 'IP' and 'Domain', user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}).</li><li>For importing observables of type 'Email', 'File', user must provide indicator type and confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li></ul>",
+            "verbose": "<ul><li>For importing observables of type 'URL', 'IP' and 'Domain', user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}). Threatstream itself detects the confidence value for these observable types</li><li>For importing observables of type 'Email', 'File', user must provide indicator type and confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li></ul>",
             "type": "generic",
             "identifier": "import_observables",
             "read_only": false,
