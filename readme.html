@@ -5,16 +5,17 @@
  without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
-<p><b>Known Issues</b>
+<p><b>Prerequisite for [Delete Incident] action</b>
 	<ul>
-		<li>For the hybrid on-prem Anomali instance, if the user runs the action <b>Update Incident</b> and tries to associate the intelligence IOCs existing on local (on-prem) with the incidents existing on remote (cloud), the intelligence values won't be successfully associated with the incident due to known API issues.</li>
-		<li>For the hybrid on-prem Anomali instance, the local (on-prem) intelligence IOCs associated with the cloud incident are not getting fetched due to the API issues. This issue has an impact on the actions mentioned below.</li>
-		<ul>
-			<li>Get Incident - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
-			<li>On Poll - The local (on-prem) IOCs associated with the cloud incident will not be fetched</li>
-			<li>Update Incident - The functionality will work fine, but the list (getting displayed in the output of the action) of the current intelligence IOCs associated with the incident will not show the on-prem IOCs for the cloud incident</li>
-		</ul>
-		<li>The action <b>Delete Incident</b> will not work successfully if the authenticated user in the app does not have appropriate permissions (Organization Admin) of deleting the incidents on the Anomali Threatstream instance.</li>
+		<li>The authenticated user in the app should have appropriate permissions (Organization Admin) of deleting the incidents on the Anomali Threatstream instance for this action to be executed successfully.</li>
+	</ul>
+</p>
+
+<p><b>Prerequisite and behavior for [Whois IP] action</b>
+	<ul>
+		<li>The Phantom environment should be able to connect to the RDAP server (https://rdap.lacnic.net) used internally by the IPWHOIS SDK to fetch the additional whois data for the provided IP in the action parameters.</li>
+		<li>The ports 80/TCP, 443/TCP, and 53/UDP should not be blocked as these ports are also being used internally by the IPWHOIS SDK.</li>
+		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully with an appropriate message.</li>
 	</ul>
 </p>
 

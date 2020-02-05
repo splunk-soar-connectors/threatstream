@@ -393,16 +393,26 @@ class ThreatstreamConnector(BaseConnector):
             # TODO: Find a better way to do this
             whois_response = json.dumps(whois_response, default=_json_fallback)
             whois_response = json.loads(whois_response)
-            final_response = whois_response
-            if tipe == "ip":
-                additional_info = ipwhois.IPWhois(value).lookup_rdap(depth=1)
-                if additional_info:
-                    final_response["addtional_info"] = additional_info
-            action_result.add_data(final_response)
+            final_response.update(whois_response)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved whois info")
+        try:
+            if tipe == "ip":
+                additional_info = ipwhois.IPWhois(value).lookup_rdap(depth=1, asn_methods=["whois", "dns", "http"])
+                if additional_info:
+                    final_response["addtional_info"] = additional_info
+        except Exception as e:
+            final_response["addtional_info"] = None
+            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e)))
+
+            action_result.add_data(final_response)
+            return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
+                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e))))
+
+        action_result.add_data(final_response)
+
+        return action_result.set_status(phantom.APP_SUCCESS, THREATSTREAM_SUCCESS_WHOIS_MESSAGE)
 
     def _retrieve_ip_domain(self, value, ioc_type, action_result):
         """ Retrieve all the information needed for domains or IPs """
