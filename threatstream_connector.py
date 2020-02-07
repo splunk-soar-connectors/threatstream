@@ -21,7 +21,7 @@ import requests
 import datetime
 import ipaddress
 import pythonwhois
-import ipwhois
+from ipwhois import IPWhois
 import simplejson as json
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
@@ -399,9 +399,17 @@ class ThreatstreamConnector(BaseConnector):
 
         try:
             if tipe == "ip":
-                additional_info = ipwhois.IPWhois(value).lookup_rdap(depth=1, asn_methods=["whois", "dns", "http"])
-                if additional_info:
-                    final_response["addtional_info"] = additional_info
+                obj_whois = IPWhois(value)
+                whois_response = obj_whois.lookup_whois()
+                if whois_response:
+                    final_response["addtional_info"] = whois_response
+                else:
+                    final_response["addtional_info"] = None
+                    self.debug_print("The additional info response for the given IP is None")
+
+                    action_result.add_data(final_response)
+                    return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
+                                THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP."))
         except Exception as e:
             final_response["addtional_info"] = None
             self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e)))

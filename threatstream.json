@@ -6,6 +6,10 @@
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
     "app_version": "1.0.33",
+    "latest_tested_versions": [
+        "On-premise v4.0 RED",
+        "Cloud Latest"
+    ],
     "utctime_updated": "2019-09-13T20:24:54.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
@@ -64,14 +68,6 @@
             "order": 7,
             "description": "Verify server certificate"
         }
-    },
-    "pip_dependencies": {
-        "wheel": [
-            {
-                "module": "ipwhois",
-                "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
-            }
-        ]
     },
     "actions": [
         {
@@ -1605,1123 +1601,132 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.addtional_info",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.addtional_info.asn",
                     "data_type": "string",
                     "example_values": [
-                        "4837",
-                        "15169",
-                        "17622"
+                        "4134"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.asn_cidr",
                     "data_type": "string",
                     "example_values": [
-                        "58.17.128.0/17",
-                        "8.8.8.0/24",
-                        "218.107.32.0/19"
+                        "183.64.0.0/13"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.asn_country_code",
                     "data_type": "string",
                     "example_values": [
-                        "CN",
-                        "US"
+                        "CN"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.asn_date",
                     "data_type": "string",
                     "example_values": [
-                        "2005-02-15",
-                        "1992-12-01",
-                        "2001-09-19"
+                        "2009-10-23"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.asn_registry",
                     "data_type": "string",
                     "example_values": [
-                        "apnic",
-                        "arin"
+                        "apnic"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.entities",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "IRT-CU-CN",
-                        "GOGL",
-                        "CG272-AP"
+                        "3 test IP Street Address"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.cidr",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.cidr",
                     "data_type": "string",
                     "example_values": [
-                        "58.17.128.0/17",
-                        "8.8.8.0/24",
-                        "218.107.44.0/22, 218.107.48.0/22, 218.107.52.0/23, 218.107.54.0/24"
+                        "183.65.17.118/32"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.country",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.country",
                     "data_type": "string",
                     "example_values": [
                         "CN"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.end_address",
-                    "data_type": "string",
-                    "example_values": [
-                        "58.17.255.255",
-                        "8.8.8.255",
-                        "218.107.54.255"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.events.*.actor",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2013-08-08T23:29:58Z",
-                        "2014-03-14T15:52:05-04:00",
-                        "2008-09-04T07:01:48Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "58.17.128.0 - 58.17.255.255",
-                        "NET-8-8-8-0-1",
-                        "218.107.44.0 - 218.107.54.255"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.ip_version",
-                    "data_type": "string",
-                    "example_values": [
-                        "v4"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://rdap.apnic.net/ip/58.17.128.0/17",
-                        "https://rdap.arin.net/registry/ip/8.0.0.0/9",
-                        "http://rdap.apnic.net/ip/218.107.44.0/20"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "UNICOM-CQ",
-                        "LVLT-GOGL-8-8-8",
-                        "TY-LEASED-LINE-CUSTOMER"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.notices.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "This is the APNIC WHOIS Database query service. The objects are in RDAP format.",
-                        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.notices.*.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://www.apnic.net/db/dbcopyright.html",
-                        "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.notices.*.title",
-                    "data_type": "string",
-                    "example_values": [
-                        "Terms and Conditions",
-                        "Terms of Service"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.parent_handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "NET-8-0-0-0-1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.raw",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.network.remarks",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.created",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.start_address",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "58.17.128.0",
-                        "8.8.8.0",
-                        "218.107.44.0"
+                        "WX"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.emails",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmalicious@cta.cq.cn"
                     ],
                     "contains": [
-                        "ip"
+                        "email"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.status",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.handle",
                     "data_type": "string",
                     "example_values": [
-                        "active"
+                        "ZL235-AP"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.addtional_info.network.type",
+                    "data_path": "action_result.data.*.addtional_info.nets.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "ALLOCATED PORTABLE",
-                        "ALLOCATION",
-                        "ASSIGNED NON-PORTABLE"
+                        "WX"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.postal_code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.range",
+                    "data_type": "string",
+                    "example_values": [
+                        "183.65.17.118 - 183.65.17.118"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.nets.*.updated",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.nir",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.address.*.type",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "network-test@test.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Abuse"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.phone.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "voice"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.phone.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "+1-650-253-0xxx"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2018-10-24T11:23:55-04:00"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "ABUSE5250-ARIN"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://whois.test.net/rest/poc/ABUSE5250-ARIN"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.notices.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.notices.*.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.notices.*.title",
-                    "data_type": "string",
-                    "example_values": [
-                        "Terms of Service"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "abuse"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ABUSE5250-ARIN.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@test.cn"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "CNCGROUP GD"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.phone.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "voice"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.phone.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "+86-20-22214xxx"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2009-04-14T08:33:40Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "CG272-AP"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://rdap.apnic.net/entity/CG272-AP"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.notices",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.remarks",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "technical"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CG272-AP.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "hqs-test@test.cn"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "individual"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Test Hostmaster"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.phone.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "voice"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.phone.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "+86-10-66259xxx"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2017-08-17T06:13:16Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "CH1302-AP"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://rdap.apnic.net/entity/CH1302-AP"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.notices",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.remarks",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "administrative"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.CH1302-AP.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.email",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "org"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Google LLC"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.phone",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.entities",
-                    "data_type": "string",
-                    "example_values": [
-                        "ZG39-ARIN"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2019-10-31T15:45:45-04:00"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "GOGL"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://whois.arin.net/rest/org/GOGL"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.notices",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "registrant"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.GOGL.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "hqs-test@test.cn"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "IRT-CU-CN"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.phone",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2017-10-23T05:59:13Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "IRT-CU-CN"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://rdap.test.net/entity/IRT-CU-CN"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.notices",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.remarks",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "abuse"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.IRT-CU-CN.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@test.cn"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "individual"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Test Name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.phone.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "voice"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.phone.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "+86-23-86185xxx"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2009-04-21T07:55:52Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "MX379-AP"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://rdap.test.net/entity/MX379-AP"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.notices",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.remarks",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "technical"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.MX379-AP.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.address.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.address.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "test address"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.email.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.email.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "arin-test@test.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.kind",
-                    "data_type": "string",
-                    "example_values": [
-                        "group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Google LLC"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.phone.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "voice"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.phone.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "+1-650-253-0xxx"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.role",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.contact.title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.entities",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.events.*.action",
-                    "data_type": "string",
-                    "example_values": [
-                        "last changed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.events.*.actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.events.*.timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2019-10-30T07:05:21-04:00"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.events_actor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.handle",
-                    "data_type": "string",
-                    "example_values": [
-                        "ZG39-ARIN"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://whois.arin.net/rest/poc/ZG39-ARIN"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.notices.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.notices.*.links",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.notices.*.title",
-                    "data_type": "string",
-                    "example_values": [
-                        "Terms of Service"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.raw",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.remarks",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.roles",
-                    "data_type": "string",
-                    "example_values": [
-                        "technical"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.addtional_info.objects.ZG39-ARIN.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "validated"
-                    ]
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.query",
                     "data_type": "string",
                     "example_values": [
-                        "58.17.221.4",
-                        "8.8.8.8",
-                        "218.107.46.228"
+                        "183.65.17.118"
                     ],
                     "contains": [
                         "ip"
@@ -2729,70 +1734,46 @@
                 },
                 {
                     "data_path": "action_result.data.*.addtional_info.raw",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.contacts.admin",
+                    "data_path": "action_result.data.*.addtional_info.raw_referral",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.addtional_info.referral",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.admin.handle",
                     "data_type": "string",
                     "example_values": [
-                        "CH1302-AP",
-                        "CG272-AP"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.contacts.admin.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Test Hostmaster"
+                        "IM646-AP"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.contacts.billing",
-                    "data_type": "string",
-                    "example_values": []
-                },
-                {
-                    "data_path": "action_result.data.*.contacts.registrant",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.registrant.name",
                     "data_type": "string",
                     "example_values": [
-                        "Test Hostmaster"
+                        "IP Manager"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.contacts.tech",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.tech.handle",
                     "data_type": "string",
                     "example_values": [
-                        "MX379-AP",
-                        "CG272-AP"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.contacts.tech.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Test Name"
+                        "IM646-AP"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.emails",
                     "data_type": "string",
                     "example_values": [
-                        "test@test.cn",
-                        "test@test.cn"
+                        "hostmaster@nic.or.kr"
                     ],
                     "contains": [
                         "email"
@@ -2802,25 +1783,21 @@
                     "data_path": "action_result.data.*.raw",
                     "data_type": "string",
                     "example_values": [
-                        "inetnum:        58.17.128.0 - 58.17.255.255\nnetname:        UNICOM-CQ\ndescr:          China Unicom Chongqing province network\ndescr:          China Unicom\ncountry:        CN\nadmin-c:        CH1302-AP\ntech-c:         MX379-AP\nremarks:        service provider\nmnt-by:         APNIC-HM\nmnt-lower:      MAINT-CNCGROUP-CQ\nmnt-routes:     MAINT-CNCGROUP-RR\nstatus:         ALLOCATED PORTABLE\nmnt-irt:        IRT-CU-CN\nlast-modified:  2013-08-08T23:29:58Z\nsource:         APNIC\nirt:            IRT-CU-CN\naddress:        No.21,Financial Street\naddress:        Beijing,100033\naddress:        P.R.China\ne-mail:         hqs-ipabuse@chinaunicom.cn\nabuse-mailbox:  hqs-ipabuse@chinaunicom.cn\nadmin-c:        CH1302-AP\ntech-c:         CH1302-AP\nauth:           # Filtered\nmnt-by:         MAINT-CNCGROUP\nlast-modified:  2017-10-23T05:59:13Z\nsource:         APNIC\nperson:         ChinaUnicom Hostmaster\nnic-hdl:        CH1302-AP\ne-mail:         hqs-ipabuse@chinaunicom.cn\naddress:        No.21,Jin-Rong Street\naddress:        Beijing,100033\naddress:        P.R.China\nphone:          +86-10-66259764\nfax-no:         +86-10-66259764\ncountry:        CN\nmnt-by:         MAINT-CNCGROUP\nlast-modified:  2017-08-17T06:13:16Z\nsource:         APNIC\nperson:         Min Xiao\nnic-hdl:        MX379-AP\ne-mail:         chenzs11@chinaunicom.cn\naddress:        6/F, K Standard Building, No.52, 4th Keyuan Street, High-Tech Zone, Chongqing, China\nphone:          +86-23-86185233\nfax-no:         +86-23-86185000\ncountry:        CN\nmnt-by:         MAINT-CNCGROUP-CQ\nlast-modified:  2009-04-21T07:55:52Z\nsource:         APNIC\nroute:          58.17.128.0/17\ndescr:          CNC Group CHINA169 Chongqing Province Network\ncountry:        CN\norigin:         AS4837\nmnt-by:         MAINT-CNCGROUP-RR\nlast-modified:  2008-09-04T07:54:33Z\nsource:         APNIC\n",
-                        "Level 3 Parent, LLC LVLT-ORG-8-8 (NET-8-0-0-0-1) 8.0.0.0 - 8.127.255.255\nGoogle LLC LVLT-GOGL-8-8-8 (NET-8-8-8-0-1) 8.8.8.0 - 8.8.8.255\n",
-                        "inetnum:        218.107.44.0 - 218.107.54.255\nnetname:        TY-LEASED-LINE-CUSTOMER\ncountry:        CN\ndescr:          guangzhou city\nadmin-c:        CG272-AP\ntech-c:         CG272-AP\nstatus:         ASSIGNED NON-PORTABLE\nmnt-by:         MAINT-CNCGROUP-GD\nlast-modified:  2008-09-04T07:01:48Z\nsource:         APNIC\nrole:           CNCGROUP GD\nnic-hdl:        CG272-AP\ne-mail:         gdipnoc@chinaunicom.cn\naddress:        XinShiKong Plaza,No 666 Huangpu Rd. Guangzhou 510627,China\nphone:          +86-20-22214226\nfax-no:         +86-20-22214228\nadmin-c:        RP181-AP\ntech-c:         RP181-AP\ncountry:        CN\nmnt-by:         MAINT-CNCGROUP-GD\nlast-modified:  2009-04-14T08:33:40Z\nsource:         APNIC\nroute:          218.107.0.0/18\ndescr:          CNC Group CHINA169 Guangdong Province Network\ncountry:        CN\norigin:         AS17622\nmnt-by:         MAINT-CNCGROUP-RR\nlast-modified:  2013-12-30T01:22:01Z\nsource:         APNIC\nroute:          218.107.0.0/18\ndescr:          CNC Group CHINA169 Guangdong Province Network\ncountry:        CN\norigin:         AS17816\nmnt-by:         MAINT-CNCGROUP-RR\nlast-modified:  2008-09-04T07:54:44Z\nsource:         APNIC\n"
+                        "inetnum:        61.32.0.0 - 61.39.255.255\nnetname:        BORANET\ndescr:          LG DACOM Corporation\nadmin-c:        IM646-AP\ntech-c:         IM646-AP\ncountry:        KR\nstatus:         ALLOCATED PORTABLE\nmnt-by:         MNT-KRNIC-AP\nmnt-irt:        IRT-KRNIC-KR\nlast-modified:  2017-02-03T00:55:02Z\nsource:         APNIC\nirt:            IRT-KRNIC-KR\naddress:        Jeollanam-do Naju-si Jinheung-gil\ne-mail:         irt@nic.or.kr\nabuse-mailbox:  irt@nic.or.kr\nadmin-c:        IM574-AP\ntech-c:         IM574-AP\nauth:           # Filtered\nremarks:        irt@nic.or.kr was validated on 2019-10-01\nmnt-by:         MNT-KRNIC-AP\nlast-modified:  2019-10-01T08:41:39Z\nsource:         APNIC\nperson:         IP Manager\naddress:        Seoul Yongsan-gu Hangang-daero 32\ncountry:        KR\nphone:          +82-2-10-1\ne-mail:         ipadm@lguplus.co.kr\nnic-hdl:        IM646-AP\nmnt-by:         MNT-KRNIC-AP\nlast-modified:  2017-08-07T01:06:21Z\nsource:         APNIC\ninetnum:        61.32.0.0 - 61.39.255.255\nnetname:        BORANET-KR\ndescr:          LG DACOM Corporation\ncountry:        KR\nadmin-c:        IA5-KR\ntech-c:         IA5-KR\nstatus:         ALLOCATED PORTABLE\nmnt-by:         MNT-KRNIC-AP\nmnt-irt:        IRT-KRNIC-KR\nremarks:        This information has been partially mirrored by APNIC from\nremarks:        KRNIC. To obtain more specific information, please use the\nremarks:        KRNIC whois server at whois.test.or.kr.\nchanged:        hostmaster@nic.or.kr\nsource:         KRNIC\nperson:         IP Manager\naddress:        Seoul Yongsan-gu Hangang-daero 32\naddress:        LG UPLUS\ncountry:        KR\nphone:          +82-2-10-1\ne-mail:         ipadm@lguplus.co.kr\nnic-hdl:        IA5-KR\nmnt-by:         MNT-KRNIC-AP\nchanged:        hostmaster@nic.or.kr\nsource:         KRNIC\n"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "Allocated Portable",
-                        "Assigned Non-portable"
+                        "Allocated Portable"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.updated_date",
                     "data_type": "string",
                     "example_values": [
-                        "2008-09-04T07:54:33",
-                        "2008-09-04T07:54:44"
+                        "2017-08-07T01:06:21"
                     ]
                 },
                 {
@@ -2831,7 +1808,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved whois info"
+                        "Successfully retrieved whois info",
+                        "Successfully retrieved whois info. Unable to fetch additional info for the given IP. ERROR: HTTP lookup failed for http://whois.test.or.kr/eng/whois.jsc."
                     ]
                 },
                 {
