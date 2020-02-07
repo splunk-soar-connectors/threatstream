@@ -11,11 +11,10 @@
 	</ul>
 </p>
 
-<p><b>Prerequisite and behavior for [Whois IP] action</b>
+<p><b>Behavior for [Whois IP] action</b>
 	<ul>
-		<li>The Phantom environment should be able to connect to the RDAP server (https://rdap.lacnic.net) used internally by the IPWHOIS SDK to fetch the additional whois data for the provided IP in the action parameters.</li>
-		<li>The ports 80/TCP, 443/TCP, and 53/UDP should not be blocked as these ports are also being used internally by the IPWHOIS SDK.</li>
-		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully with an appropriate message.</li>
+		<li>If the action is able to fetch additional whois data for the provided IP then, the action will pass successfully with that additional data.</li>
+		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully without that additional data but with an appropriate message.</li>
 	</ul>
 </p>
 
