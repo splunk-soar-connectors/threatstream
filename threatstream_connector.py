@@ -128,10 +128,23 @@ class ThreatstreamConnector(BaseConnector):
         status_code = response.status_code
         action = self.get_action_identifier()
 
-        if status_code == 202:
-            return RetVal(phantom.APP_SUCCESS, {})
-        elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
-            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
+        if 200 <= status_code < 399:
+
+            if status_code == 202:
+                return RetVal(phantom.APP_SUCCESS, {})
+            elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
+            else:
+                try:
+                    resp = response.json()
+                    return RetVal(phantom.APP_SUCCESS, resp)
+                except:
+                    if not response.text:
+                        resp_text = "Unknown response from the server"
+                    else:
+                        resp_text = response.text
+                    action_result.set_status(phantom.APP_SUCCESS, "Unable to parse the JSON response. Response Status Code: {}. Response: {}".format(status_code, UnicodeDammit(resp_text).unicode_markup.encode('utf-8')))
+                    return RetVal(phantom.APP_SUCCESS, {})
 
         data_message = ""
         if not response.text:
