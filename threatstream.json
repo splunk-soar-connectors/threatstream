@@ -19,6 +19,18 @@
     "product_version_regex": ".*",
     "min_phantom_version": "4.5.15922",
     "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "dns",
+                "input_file": "wheels/dnspython-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "ipwhois",
+                "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "hostname": {
             "data_type": "string",
