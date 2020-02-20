@@ -1,0 +1,6 @@
+[submodule "ipwhois"]
+	path = ipwhois
+	url = git@cd.splunkdev.com:phantom-external/python-ipwhois.git
+[submodule "dnspython"]
+	path = dnspython
+	url = git@cd.splunkdev.com:phantom-external/dnspython.git
