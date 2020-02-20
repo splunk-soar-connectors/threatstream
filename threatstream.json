@@ -73,7 +73,7 @@
         "is_cloud_instance": {
             "data_type": "boolean",
             "order": 6,
-            "description": "Is the provided instance in hostaname parameter cloud?"
+            "description": "Is the provided instance in hostname parameter cloud?"
         },
         "verify_server_cert": {
             "data_type": "boolean",

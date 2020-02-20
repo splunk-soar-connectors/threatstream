@@ -248,9 +248,19 @@ class ThreatstreamConnector(BaseConnector):
                                 verify=self._verify,
                                 files=files)
             except Exception as e:
-                if str(e):
-                    current_message = str(e).replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(current_message)), resp_json)
+                if e.message:
+                    if isinstance(e.message, basestring):
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
+                    else:
+                        try:
+                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
+                        except:
+                            error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+                else:
+                    error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
+                                                    .format(error_msg)), resp_json)
 
         else:
             try:
@@ -262,9 +272,19 @@ class ThreatstreamConnector(BaseConnector):
                                 verify=self._verify,
                                 files=files)
             except Exception as e:
-                if str(e):
-                    current_message = str(e).replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(current_message)), resp_json)
+                if e.message:
+                    if isinstance(e.message, basestring):
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
+                    else:
+                        try:
+                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
+                        except:
+                            error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+                else:
+                    error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
+
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
+                                                    .format(error_msg)), resp_json)
 
         ret_val, response = self._process_response(r, action_result)
 
@@ -477,12 +497,18 @@ class ThreatstreamConnector(BaseConnector):
         """ Test connectivity to threatstream by doing a simple request """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        self.save_progress("Please verify if the hostname provided in the [hostname] parameter is cloud or on-prem and provide input \
+                            in [Is the provided instance in hostname parameter cloud?] parameter accordingly. \
+                            This parameter will impact the actions' execution of the application.")
+
         self.save_progress("Starting connectivity test")
         payload = self._generate_payload(limit="1")
         ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
+
         if (phantom.is_fail(ret_val)):
             self.save_progress("Connectivity test failed")
             return action_result.get_status()
+
         self.save_progress("Connectivity test passed")
         return action_result.set_status(phantom.APP_SUCCESS, "")
 
@@ -789,16 +815,25 @@ class ThreatstreamConnector(BaseConnector):
 
     def _handle_delete_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        try:
+            incident_id = int(param["incident_id"])
+        except ValueError:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'incident id' parameter")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+
         payload = self._generate_payload()
+
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, method="delete")
         else:
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, method="delete")
 
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
                 payload["remote_api"] = "true"
-                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=param["incident_id"]), payload, method="delete")
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, method="delete")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -808,10 +843,10 @@ class ThreatstreamConnector(BaseConnector):
 
     def _handle_create_incident(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        create_on_cloud = param["create_on_cloud"]
+        create_on_cloud = param.get("create_on_cloud", False)
 
         data = {
-                "name": param["name"], "is_public": param["is_public"], "status": 1
+                "name": param["name"], "is_public": param.get("is_public", False), "status": 1
                }
         data_dict = self._build_data(param, data, action_result)
         if data_dict is None:
@@ -849,6 +884,7 @@ class ThreatstreamConnector(BaseConnector):
                 intel_data = {"ids": cloud_intelligence}
                 ret_val, response = self._make_rest_call(
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
@@ -860,6 +896,7 @@ class ThreatstreamConnector(BaseConnector):
                 intel_data = {"local_ids": local_intelligence}
                 ret_val, response = self._make_rest_call(
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
                 if phantom.is_fail(ret_val):
                     self.debug_print("Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter".format(
                         ', '.join(local_intelligence)))
@@ -884,6 +921,7 @@ class ThreatstreamConnector(BaseConnector):
             if intel_data:
                 ret_val, response = self._make_rest_call(
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
+
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
@@ -1159,7 +1197,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
-        create_on_cloud = param["create_on_cloud"]
+        create_on_cloud = param.get("create_on_cloud", False)
         final_creation = False
 
         if self._is_cloud_instance or create_on_cloud:
