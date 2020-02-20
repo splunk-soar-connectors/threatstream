@@ -143,7 +143,8 @@ class ThreatstreamConnector(BaseConnector):
                         resp_text = "Unknown response from the server"
                     else:
                         resp_text = response.text
-                    action_result.set_status(phantom.APP_SUCCESS, "Unable to parse the JSON response. Response Status Code: {}. Response: {}".format(status_code, UnicodeDammit(resp_text).unicode_markup.encode('utf-8')))
+                    action_result.set_status(phantom.APP_SUCCESS, "Unable to parse the JSON response. Response Status Code: {}. Response: {}".format(
+                                                status_code, UnicodeDammit(resp_text).unicode_markup.encode('utf-8')))
                     return RetVal(phantom.APP_SUCCESS, {})
 
         data_message = ""
@@ -161,7 +162,7 @@ class ThreatstreamConnector(BaseConnector):
 
             # Error text can still be an empty string
             if error_text:
-                data_message = " Data from server:\n{0}\n".format(error_text.encode('utf-8'))
+                data_message = " Data from server:\n{0}\n".format(UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
 
         message = "Status Code: {0}. {1}".format(status_code, data_message)
 
@@ -190,7 +191,7 @@ class ThreatstreamConnector(BaseConnector):
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                    r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                    r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -221,7 +222,7 @@ class ThreatstreamConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -413,7 +414,7 @@ class ThreatstreamConnector(BaseConnector):
         try:
             if tipe == "ip":
                 obj_whois = IPWhois(value)
-                whois_response = obj_whois.lookup_whois()
+                whois_response = obj_whois.lookup_whois(asn_methods=["whois", "dns", "http"])
                 if whois_response:
                     final_response["addtional_info"] = whois_response
                 else:
