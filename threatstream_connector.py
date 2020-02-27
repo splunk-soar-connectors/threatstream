@@ -498,7 +498,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Please verify if the hostname provided in the [hostname] parameter is cloud or on-prem and provide input \
-                            in [Is the provided instance in hostname parameter cloud?] parameter accordingly. \
+                            in the [Is the provided instance in hostname parameter cloud?] parameter accordingly. \
                             This parameter will impact the actions' execution of the application.")
 
         self.save_progress("Starting connectivity test")
