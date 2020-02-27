@@ -1078,7 +1078,14 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
-                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(e))
+                if e.message:
+                    try:
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                    except:
+                        error_msg = "Unknown error occurred"
+                else:
+                    error_msg = "Unknown error occurred"
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
                 return None
 
             if not isinstance(fields, dict):
@@ -1153,7 +1160,14 @@ class ThreatstreamConnector(BaseConnector):
             search_dict = json.loads(search_string)
             payload.update(search_dict)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {0}".format(str(e)))
+            if e.message:
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred."
+            else:
+                error_msg = "Unknown error occurred."
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {0}".format(error_msg))
 
         order_by = param.get("order_by")
         if order_by:
@@ -1224,7 +1238,14 @@ class ThreatstreamConnector(BaseConnector):
                 try:
                     fields = ast.literal_eval(param["fields"])
                 except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}  Please ensure that provided input is in valid JSON format".format(e))
+                    if e.message:
+                        try:
+                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                        except:
+                            error_msg = "Unknown error occurred"
+                    else:
+                        error_msg = "Unknown error occurred"
+                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_msg))
 
                 if "itype" in fields:
                     data["objects"][0].update(fields)
@@ -1420,7 +1441,14 @@ class ThreatstreamConnector(BaseConnector):
         try:
             vault_info = Vault.get_file_info(vault_id=vault_id)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(str(e)))
+            if e.message:
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred."
+            else:
+                error_msg = "Unknown error occurred."
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(error_msg))
 
         if not vault_info:
             return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
@@ -1432,7 +1460,14 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 vault_file = open(vault_path)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: " + str(e))
+                if e.message:
+                    try:
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                    except:
+                        error_msg = "Unknown error occurred."
+                else:
+                    error_msg = "Unknown error occurred."
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
 
             payload = self._generate_payload()
 
@@ -1559,7 +1594,14 @@ class ThreatstreamConnector(BaseConnector):
             r = requests.get(url, verify=False)
             resp_json = r.json()
         except Exception as e:
-            self.debug_print("Unable to query ThreatStream incident container: ", e)
+            if e.message:
+                try:
+                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                except:
+                    error_msg = "Unknown error occurred."
+            else:
+                error_msg = "Unknown error occurred."
+            self.debug_print("Unable to query ThreatStream incident container: {}".format(error_msg))
             return None
 
         if (resp_json.get('count', 0) <= 0):
@@ -1581,7 +1623,14 @@ class ThreatstreamConnector(BaseConnector):
                 r = requests.post(url, verify=False, json=data)
                 resp_json = r.json()
             except Exception as e:
-                self.debug_print("Unable to update the name of the ThreatStream incident container: ", e)
+                if e.message:
+                    try:
+                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
+                    except:
+                        error_msg = "Unknown error occurred."
+                else:
+                    error_msg = "Unknown error occurred."
+                self.debug_print("Unable to update the name of the ThreatStream incident container: {}".format(error_msg))
                 return container_id
 
             if not resp_json.get('success'):
