@@ -532,7 +532,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = param[THREATSTREAM_JSON_DOMAIN]
+        value = UnicodeDammit(param[THREATSTREAM_JSON_DOMAIN]).unicode_markup.encode('utf-8')
         if "/" in value:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
         ioc_type = "domain"
@@ -552,7 +552,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _url_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = param[THREATSTREAM_JSON_URL]
+        value = UnicodeDammit(param[THREATSTREAM_JSON_URL]).unicode_markup.encode("utf-8")
         ret_val = self._intel_details(value, action_result)
         if (not ret_val):
             return action_result.get_status()
@@ -561,7 +561,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _email_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = param[THREATSTREAM_JSON_EMAIL]
+        value = UnicodeDammit(param[THREATSTREAM_JSON_EMAIL]).unicode_markup.encode("utf-8")
         ioc_type = "email"
         ret_val = self._retrieve_email_md5(value, ioc_type, action_result)
         if (not ret_val):
@@ -570,7 +570,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _whois_domain(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = param[THREATSTREAM_JSON_DOMAIN]
+        value = UnicodeDammit(param[THREATSTREAM_JSON_DOMAIN]).unicode_markup.encode("utf-8")
         ret_val = self._whois(value, action_result, tipe="domain")
         if (not ret_val):
             return action_result.get_status()
@@ -1387,7 +1387,7 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_get_status(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
-        endpoint = param.get("endpoint")
+        endpoint = UnicodeDammit(param.get("endpoint")).unicode_markup.encode('utf-8')
         endpoint = endpoint.replace("/api/", "/")
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
 
@@ -1415,7 +1415,12 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         # return action_result.set_status(phantom.APP_SUCCESS, param.get('classification'))
-        vault_info = Vault.get_file_info(vault_id=param.get('vault_id'))
+        vault_id = UnicodeDammit(param.get('vault_id')).unicode_markup.encode('utf-8')
+
+        try:
+            vault_info = Vault.get_file_info(vault_id=vault_id)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(str(e)))
 
         if not vault_info:
             return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
@@ -1467,7 +1472,15 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         payload = self._generate_payload()
-        endpoint = ENDPOINT_GET_REPORT.format(report_id=param['id'])
+        if param and param.get("id"):
+            try:
+                report_id = int(param["id"])
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'id' parameter")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+
+        endpoint = ENDPOINT_GET_REPORT.format(report_id=report_id)
 
         # retrieve report data
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload)
