@@ -1,5 +1,5 @@
 # File: threatstream_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -31,11 +31,13 @@ ENDPOINT_TAG_IOC = "/v1/intelligence/{indicator_id}/tag/"
 ENDPOINT_FILE_DETONATION = "/v1/submit/new/"
 ENDPOINT_URL_DETONATION = "/v1/submit/new/"
 ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
+ENDPOINT_ASSOCIATE_INTELLIGENCE = '/v1/incident/{incident}/intelligence/bulk_add/'
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
 THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from the server: {error}"
 THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response. Error from the server: {error}"
+THREATSTREAM_SUCCESS_WHOIS_MESSAGE = "Successfully retrieved whois info"
 THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"

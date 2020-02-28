@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: threatstream_update_incident.html
-  Copyright (c) 2016-2019 Splunk Inc.
+  Copyright (c) 2016-2020 Splunk Inc.
 
   SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
   without a valid written license from Splunk Inc. is PROHIBITED.
@@ -102,9 +102,13 @@
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                     </a>
                 </td>
-                <td>Intelligence</td>
+                <td>Local Intelligence</td>
                 <td>
-                    {{ result.param.intelligence }}
+                    {{ result.param.local_intelligence }}
+                </td>
+                <td>Cloud Intelligence</td>
+                <td>
+                    {{ result.param.cloud_intelligence }}
                 </td>
                 <td>Fields</td>
                 <td>
@@ -150,10 +154,6 @@
                         <thead>
                             <tr>
                                 <th>Intelligence ID</th>
-                                <th>Intelligence Type</th>
-                                <th>Intelligence Value</th>
-                                <th>Intelligence Owner Organization ID</th>
-                                <th>Is Public</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -166,22 +166,6 @@
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
                                     </td>
-                                    <td>{{ intelligence.type }}</td>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain', 'url', 'md5', 'sha1', 'hash'], 'value':'{{ intelligence.value }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.value }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream organization id'], 'value':'{{ intelligence.owner_organization_id }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.owner_organization_id }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>{{ intelligence.is_public }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
