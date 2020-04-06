@@ -724,6 +724,9 @@ class ThreatstreamConnector(BaseConnector):
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
         else:
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload)
 
@@ -741,10 +744,7 @@ class ThreatstreamConnector(BaseConnector):
             if response is None:
                 return action_result.get_status(), None
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status(), None
-
-        resp_json.update({"intelligence": response})
+            resp_json.update({"intelligence": response})
 
         action_result.set_status(phantom.APP_SUCCESS, "")
 
@@ -1245,7 +1245,8 @@ class ThreatstreamConnector(BaseConnector):
                             error_msg = "Unknown error occurred"
                     else:
                         error_msg = "Unknown error occurred"
-                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_msg))
+                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. \
+                        Please ensure that provided input is in valid JSON format".format(error_msg))
 
                 if "itype" in fields:
                     data["objects"][0].update(fields)
