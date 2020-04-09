@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "reputation",
     "main_module": "threatstream_connector.pyc",
-    "app_version": "1.0.35",
+    "app_version": "1.0.37",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud Latest"
