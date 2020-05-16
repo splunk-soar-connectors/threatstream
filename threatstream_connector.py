@@ -862,6 +862,8 @@ class ThreatstreamConnector(BaseConnector):
 
         if self._is_cloud_instance:
             final_creation = True
+            if cloud_intelligence:
+                data.update({"intelligence": cloud_intelligence})
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
 
@@ -878,7 +880,7 @@ class ThreatstreamConnector(BaseConnector):
 
             incident_id = resp_json.get("id")
             if not incident_id:
-                action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID")
+                return action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID of the created incident on the cloud")
 
             if cloud_intelligence:
                 intel_data = {"ids": cloud_intelligence}
@@ -911,6 +913,10 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
             incident_id = resp_json.get("id")
+
+            if not incident_id:
+                return action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID of the created incident on the on-prem")
+
             intel_data = dict()
 
             if local_intelligence:
@@ -945,7 +951,7 @@ class ThreatstreamConnector(BaseConnector):
 
             message = "Incident created successfully. Associated intelligence : {}".format(', '.join(msg_intel))
 
-        elif (local_intelligence or cloud_intelligence) and not intelligence:
+        elif (local_intelligence or cloud_intelligence) and not intelligence and not self._is_cloud_instance:
             message = "Incident created successfully. None of the intelligence got associated, please provide valid intelligence"
 
         else:
@@ -961,6 +967,7 @@ class ThreatstreamConnector(BaseConnector):
 
         ret_val = None
         resp_json = None
+        message = None
         try:
             incident_id = int(param["incident_id"])
         except ValueError:
@@ -977,16 +984,18 @@ class ThreatstreamConnector(BaseConnector):
         if data_dict is None:
             return action_result.get_status()
 
+        local_intelligence = data_dict.get("local_intelligence")
+        cloud_intelligence = data_dict.get("cloud_intelligence")
         data = data_dict.get("data")
 
         payload = self._generate_payload()
 
         if self._is_cloud_instance:
+            if cloud_intelligence:
+                data.update({"intelligence": cloud_intelligence})
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch")
         else:
-            local_intelligence = data_dict.get("local_intelligence")
-            cloud_intelligence = data_dict.get("cloud_intelligence")
 
             if local_intelligence or cloud_intelligence:
                 intel_data = dict()
