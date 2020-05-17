@@ -95,7 +95,7 @@
         {
             "action": "file reputation",
             "description": "Get information about a file",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that file.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that file. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
@@ -112,6 +112,13 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -135,6 +142,10 @@
                     "example_values": [
                         "9bfc3649f7e6067764ce8ef18e8bfbb837bc68f2dd83e37daa05477c604492b2"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -377,7 +388,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -392,6 +403,13 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -413,6 +431,10 @@
                     "example_values": [
                         "test.com"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -676,7 +698,7 @@
         {
             "action": "ip reputation",
             "description": "Get information about a given IP",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -691,6 +713,13 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -712,6 +741,10 @@
                     "example_values": [
                         "106.12.128.24"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -981,6 +1014,7 @@
         {
             "action": "email reputation",
             "description": "Get information about a given email",
+            "verbose": "If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "email_reputation",
             "read_only": true,
@@ -994,6 +1028,13 @@
                         "email"
                     ],
                     "order": 0
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -1014,6 +1055,10 @@
                     "example_values": [
                         "test.com"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -1259,7 +1304,7 @@
         {
             "action": "url reputation",
             "description": "Get information about a URL",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "url_reputation",
             "read_only": true,
@@ -1273,6 +1318,13 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -1293,6 +1345,10 @@
                     "example_values": [
                         "http://5.230.22.132/"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -2614,6 +2670,7 @@
         {
             "action": "list observables",
             "description": "List observables present in ThreatStream",
+            "verbose": "<ul><li>The observables will be listed in the latest first order on the bases of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_observables",
             "read_only": true,
@@ -3330,6 +3387,7 @@
         {
             "action": "list vulnerabilities",
             "description": "List vulnerabilities present in ThreatStream",
+            "verbose": "<ul><li>The vulnerabilities will be listed in the latest first order on the bases of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_vulnerabilities",
             "read_only": true,
@@ -3597,6 +3655,7 @@
         {
             "action": "list incidents",
             "description": "List incidents present in ThreatStream",
+            "verbose": "<ul><li>The incidents will be listed in the latest first order on the bases of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_incidents",
             "read_only": true,

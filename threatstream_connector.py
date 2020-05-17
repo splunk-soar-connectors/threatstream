@@ -326,7 +326,7 @@ class ThreatstreamConnector(BaseConnector):
             payload[k] = v
         return payload
 
-    def _intel_details(self, value, action_result):
+    def _intel_details(self, value, action_result, limit=None):
         """ Use the intelligence endpoint to get general details """
 
         # strip out scheme because API cannot find
@@ -335,9 +335,9 @@ class ThreatstreamConnector(BaseConnector):
             host = urlsplit(value).netloc
             value_regexp = r'.*{0}.*'.format(host)
 
-            payload = self._generate_payload(extend_source="true", type="url", order_by="-created_ts", value__regexp=value_regexp)
+            payload = self._generate_payload(extend_source="true", type="url", order_by="-created_ts", value__regexp=value_regexp, limit=limit)
         else:
-            payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value)
+            payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value, limit=limit)
 
         intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload)
 
@@ -456,9 +456,9 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, THREATSTREAM_SUCCESS_WHOIS_MESSAGE)
 
-    def _retrieve_ip_domain(self, value, ioc_type, action_result):
+    def _retrieve_ip_domain(self, value, ioc_type, action_result, limit=None):
         """ Retrieve all the information needed for domains or IPs """
-        ret_val = self._intel_details(value, action_result)
+        ret_val = self._intel_details(value, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
 
@@ -476,10 +476,10 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _retrieve_email_md5(self, value, ioc_type, action_result):
+    def _retrieve_email_md5(self, value, ioc_type, action_result, limit=None):
         """ Retrieve all the information needed for email or md5 hashes """
 
-        ret_val = self._intel_details(value, action_result)
+        ret_val = self._intel_details(value, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
 
@@ -516,6 +516,13 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_HASH]
 
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
         ioc_type = None
 
         if phantom.is_md5(value):
@@ -525,7 +532,7 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_sha256(value):
             ioc_type = "sha256"
 
-        ret_val = self._retrieve_email_md5(value, ioc_type, action_result)
+        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on File")
@@ -533,10 +540,19 @@ class ThreatstreamConnector(BaseConnector):
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = UnicodeDammit(param[THREATSTREAM_JSON_DOMAIN]).unicode_markup.encode('utf-8')
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
         if "/" in value:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
+
         ioc_type = "domain"
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result)
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Domain")
@@ -545,7 +561,15 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
         ioc_type = "ip"
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result)
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on IP")
@@ -553,7 +577,15 @@ class ThreatstreamConnector(BaseConnector):
     def _url_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = UnicodeDammit(param[THREATSTREAM_JSON_URL]).unicode_markup.encode("utf-8")
-        ret_val = self._intel_details(value, action_result)
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        ret_val = self._intel_details(value, action_result, limit=limit)
         if (not ret_val):
             return action_result.get_status()
 
@@ -561,11 +593,22 @@ class ThreatstreamConnector(BaseConnector):
 
     def _email_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+
         value = UnicodeDammit(param[THREATSTREAM_JSON_EMAIL]).unicode_markup.encode("utf-8")
         ioc_type = "email"
-        ret_val = self._retrieve_email_md5(value, ioc_type, action_result)
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit)
+
         if (not ret_val):
             return action_result.get_status()
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Email")
 
     def _whois_domain(self, param):
@@ -617,19 +660,15 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_observable(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = param.get("limit")
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         payload = self._generate_payload()
         payload["order_by"] = "-created_ts"
-
-        try:
-            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
-                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
-
-            if limit:
-                limit = int(limit)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
         observable = self._paginator(ENDPOINT_INTELLIGENCE, action_result, limit=limit, payload=payload)
 
@@ -647,18 +686,15 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_vulnerability(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = param.get("limit")
-
         try:
-            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
-
-            if limit:
-                limit = int(limit)
         except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
-        vulnerability = self._paginator(ENDPOINT_VULNERABILITY, action_result, limit=limit)
+        payload = self._generate_payload(order_by="-created_ts")
+        vulnerability = self._paginator(ENDPOINT_VULNERABILITY, action_result, payload=payload, limit=limit)
 
         if vulnerability is None:
             return action_result.get_status()
@@ -674,22 +710,20 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_incidents(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = param.get("limit")
-
         try:
-            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
-
-            if limit:
-                limit = int(limit)
         except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
+        payload = self._generate_payload(order_by="-created_ts")
+
         if param.get("intel_value", None):
-            payload = self._generate_payload(value=param["intel_value"])
+            payload["value"] = param["intel_value"]
             incidents = self._paginator(ENDPOINT_INCIDENT_WITH_VALUE, action_result, payload=payload, limit=limit)
         else:
-            incidents = self._paginator(ENDPOINT_INCIDENT, action_result, limit=limit)
+            incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
 
         if incidents is None:
             return action_result.get_status()
@@ -1192,14 +1226,10 @@ class ThreatstreamConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer in {param}".format(param="offset"))
 
-        limit = param.get("limit")
-
         try:
-            if limit == 0 or (limit and (not str(limit).isdigit() or limit <= 0)):
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
-
-            if limit:
-                limit = int(limit)
         except:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
 
