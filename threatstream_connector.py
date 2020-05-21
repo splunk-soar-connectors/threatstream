@@ -904,6 +904,9 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
+            for intel in resp_json.get("intelligence", []):
+                intelligence.appen(intel.get("id"))
+
         elif create_on_cloud:
             final_creation = True
             payload["remote_api"] = "true"
@@ -985,7 +988,7 @@ class ThreatstreamConnector(BaseConnector):
 
             message = "Incident created successfully. Associated intelligence : {}".format(', '.join(msg_intel))
 
-        elif (local_intelligence or cloud_intelligence) and not intelligence and not self._is_cloud_instance:
+        elif (local_intelligence or cloud_intelligence) and not intelligence:
             message = "Incident created successfully. None of the intelligence got associated, please provide valid intelligence"
 
         else:
