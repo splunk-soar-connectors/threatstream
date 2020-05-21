@@ -1065,6 +1065,9 @@ class ThreatstreamConnector(BaseConnector):
                         ret_val, resp_json = self._make_rest_call(
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
+
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
 
