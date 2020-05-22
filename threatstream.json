@@ -385,7 +385,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -694,7 +694,7 @@
         {
             "action": "ip reputation",
             "description": "Get information about a given IP",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -1009,7 +1009,7 @@
         {
             "action": "email reputation",
             "description": "Get information about a given email",
-            "verbose": "If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "email_reputation",
             "read_only": true,
@@ -1298,7 +1298,7 @@
         {
             "action": "url reputation",
             "description": "Get information about a URL",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "url_reputation",
             "read_only": true,
@@ -2663,7 +2663,7 @@
         {
             "action": "list observables",
             "description": "List observables present in ThreatStream",
-            "verbose": "<ul><li>The observables will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
+            "verbose": "<ul><li>The observables will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_observables",
             "read_only": true,
@@ -3379,7 +3379,7 @@
         {
             "action": "list vulnerabilities",
             "description": "List vulnerabilities present in ThreatStream",
-            "verbose": "<ul><li>The vulnerabilities will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
+            "verbose": "<ul><li>The vulnerabilities will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_vulnerabilities",
             "read_only": true,
@@ -3646,7 +3646,7 @@
         {
             "action": "list incidents",
             "description": "List incidents present in ThreatStream",
-            "verbose": "<ul><li>The incidents will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
+            "verbose": "<ul><li>The incidents will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_incidents",
             "read_only": true,
@@ -8180,7 +8180,7 @@
         {
             "action": "run query",
             "description": "Run observables query in ThreatStream",
-            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
+            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
