@@ -93,7 +93,7 @@
         {
             "action": "file reputation",
             "description": "Get information about a file",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that file. If the limit parameter is not provided then, the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that file. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
