@@ -905,7 +905,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
             for intel in resp_json.get("intelligence", []):
-                intelligence.appen(intel.get("id"))
+                intelligence.append(intel.get("id"))
 
         elif create_on_cloud:
             final_creation = True
