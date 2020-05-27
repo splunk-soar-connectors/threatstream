@@ -43,8 +43,7 @@
             "data_type": "numeric",
             "order": 1,
             "description": "Organization ID for filtering incidents when polling",
-            "verbose": "Organization ID is mandatory while polling and is used for filtering the incidents to ingest.",
-            "required": false
+            "verbose": "Organization ID is mandatory while polling and is used for filtering the incidents to ingest."
         },
         "username": {
             "data_type": "string",
@@ -60,7 +59,6 @@
         },
         "first_run_containers": {
             "default": 1000,
-            "required": false,
             "description": "Maximum number of incidents to poll in the first run of the scheduled polling",
             "data_type": "numeric",
             "order": 4
@@ -95,7 +93,7 @@
         {
             "action": "file reputation",
             "description": "Get information about a file",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that file.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that file. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "file_reputation",
             "read_only": true,
@@ -112,6 +110,12 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -135,6 +139,10 @@
                     "example_values": [
                         "9bfc3649f7e6067764ce8ef18e8bfbb837bc68f2dd83e37daa05477c604492b2"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -377,7 +385,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -392,6 +400,12 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -413,6 +427,10 @@
                     "example_values": [
                         "test.com"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -676,7 +694,7 @@
         {
             "action": "ip reputation",
             "description": "Get information about a given IP",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data.",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -691,6 +709,12 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -712,6 +736,10 @@
                     "example_values": [
                         "106.12.128.24"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -981,6 +1009,7 @@
         {
             "action": "email reputation",
             "description": "Get information about a given email",
+            "verbose": "If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "email_reputation",
             "read_only": true,
@@ -994,6 +1023,12 @@
                         "email"
                     ],
                     "order": 0
+                },
+                "limit": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -1014,6 +1049,10 @@
                     "example_values": [
                         "test.com"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -1259,7 +1298,7 @@
         {
             "action": "url reputation",
             "description": "Get information about a URL",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
             "type": "investigate",
             "identifier": "url_reputation",
             "read_only": true,
@@ -1273,6 +1312,12 @@
                     ],
                     "primary": true,
                     "order": 0
+                },
+                "limit": {
+                    "description": "Total number of observables to return",
+                    "data_type": "numeric",
+                    "default": 1000,
+                    "order": 1
                 }
             },
             "output": [
@@ -1293,6 +1338,10 @@
                     "example_values": [
                         "http://5.230.22.132/"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.asn",
@@ -2614,12 +2663,12 @@
         {
             "action": "list observables",
             "description": "List observables present in ThreatStream",
+            "verbose": "<ul><li>The observables will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_observables",
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "required": false,
                     "description": "Total number of observables to return",
                     "data_type": "numeric",
                     "default": 1000,
@@ -3330,12 +3379,12 @@
         {
             "action": "list vulnerabilities",
             "description": "List vulnerabilities present in ThreatStream",
+            "verbose": "<ul><li>The vulnerabilities will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_vulnerabilities",
             "read_only": true,
             "parameters": {
                 "limit": {
-                    "required": false,
                     "description": "Total number of vulnerabilities to return",
                     "data_type": "numeric",
                     "default": 1000,
@@ -3597,18 +3646,17 @@
         {
             "action": "list incidents",
             "description": "List incidents present in ThreatStream",
+            "verbose": "<ul><li>The incidents will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>",
             "type": "investigate",
             "identifier": "list_incidents",
             "read_only": true,
             "parameters": {
                 "intel_value": {
-                    "required": false,
                     "description": "Intelligence value to filter incidents (ie. google.com)",
                     "data_type": "string",
                     "order": 0
                 },
                 "limit": {
-                    "required": false,
                     "description": "Total number of incidents to return",
                     "data_type": "numeric",
                     "default": 1000,
@@ -4620,7 +4668,6 @@
             "parameters": {
                 "local_intelligence": {
                     "allow_list": true,
-                    "required": false,
                     "primary": true,
                     "description": "Comma-separated list of local intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
@@ -4631,7 +4678,6 @@
                 },
                 "cloud_intelligence": {
                     "allow_list": true,
-                    "required": false,
                     "primary": true,
                     "description": "Comma-separated list of remote intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
@@ -4647,7 +4693,6 @@
                     "description": "Name to give the incident"
                 },
                 "fields": {
-                    "required": false,
                     "description": "JSON formatted string of fields to include with the incident",
                     "data_type": "string",
                     "order": 1
@@ -5030,20 +5075,17 @@
             "parameters": {
                 "local_intelligence": {
                     "allow_list": true,
-                    "required": false,
                     "description": "Comma-separated list of local intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
                     "order": 2
                 },
                 "cloud_intelligence": {
                     "allow_list": true,
-                    "required": false,
                     "description": "Comma-separated list of remote intelligence IDs to associate with the incident - Note that this appends",
                     "data_type": "string",
                     "order": 3
                 },
                 "fields": {
-                    "required": false,
                     "description": "JSON formatted string of fields to update on the incident",
                     "data_type": "string",
                     "order": 1
@@ -5428,8 +5470,7 @@
                         "public",
                         "private"
                     ],
-                    "default": "private",
-                    "required": false
+                    "default": "private"
                 },
                 "severity": {
                     "description": "Severity of the observable",
@@ -5440,14 +5481,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5611,8 +5650,7 @@
                         "public",
                         "private"
                     ],
-                    "default": "private",
-                    "required": false
+                    "default": "private"
                 },
                 "severity": {
                     "description": "Severity of the observable",
@@ -5623,14 +5661,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5793,8 +5829,7 @@
                         "public",
                         "private"
                     ],
-                    "default": "private",
-                    "required": false
+                    "default": "private"
                 },
                 "severity": {
                     "description": "Severity of the observable",
@@ -5805,14 +5840,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5993,8 +6026,7 @@
                         "public",
                         "private"
                     ],
-                    "default": "private",
-                    "required": false
+                    "default": "private"
                 },
                 "severity": {
                     "description": "Severity of the observable",
@@ -6005,14 +6037,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
-                    "required": false
+                    "order": 5
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -6182,8 +6212,7 @@
                         "public",
                         "private"
                     ],
-                    "default": "private",
-                    "required": false
+                    "default": "private"
                 },
                 "severity": {
                     "description": "Severity of the observable",
@@ -6194,14 +6223,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
-                    "required": false
+                    "order": 5
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -6385,8 +6412,7 @@
                 "fields": {
                     "description": "JSON formatted string of fields to include with the observable",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -6586,7 +6612,6 @@
                         "red"
                     ],
                     "default": "red",
-                    "required": false,
                     "order": 3
                 }
             },
@@ -6802,7 +6827,6 @@
             "parameters": {
                 "platform": {
                     "default": "ALL",
-                    "required": false,
                     "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
                     "data_type": "string",
                     "order": 1
@@ -7019,7 +7043,6 @@
             "parameters": {
                 "platform": {
                     "default": "ALL",
-                    "required": false,
                     "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
                     "data_type": "string",
                     "order": 1
@@ -8157,7 +8180,7 @@
         {
             "action": "run query",
             "description": "Run observables query in ThreatStream",
-            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then, convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
+            "verbose": "For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts__gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { \"modifed_ts__gt\": \"2018-01-10\", \"status\": \"active\" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
@@ -8171,22 +8194,19 @@
                 "order_by": {
                     "description": "Field by which the query results will be ordered",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "offset": {
                     "description": "Record offset (used with paging, when returning many results)",
                     "data_type": "numeric",
                     "order": 2,
-                    "default": 0,
-                    "required": false
+                    "default": 0
                 },
                 "limit": {
                     "description": "Record limit",
                     "data_type": "numeric",
                     "order": 3,
-                    "default": 1000,
-                    "required": false
+                    "default": 1000
                 }
             },
             "render": {
