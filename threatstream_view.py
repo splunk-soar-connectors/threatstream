@@ -28,7 +28,7 @@ def _get_ctx_result(result, provides):
         data_final = dict()
         info_dict = dict()
         process_list = list()
-        
+
         for item in data:
             info_dict["category"] = item.get("results", {}).get("info", {}).get("category")
             info_dict["started"] = item.get("results", {}).get("info", {}).get("started")
