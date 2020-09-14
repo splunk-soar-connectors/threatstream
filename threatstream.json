@@ -6605,7 +6605,6 @@
                 },
                 "tlp": {
                     "description": "TLP to assign to each tag",
-                    "verbose": "A TLP of red will make the tag private for the user's organization.",
                     "data_type": "string",
                     "values_list": [
                         "white",

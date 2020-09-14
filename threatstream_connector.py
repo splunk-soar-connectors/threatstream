@@ -121,8 +121,13 @@ class ThreatstreamConnector(BaseConnector):
 
     def _process_empty_reponse(self, response, action_result):
 
-        if response.status_code == 200:
+        status_code = response.status_code
+        action = self.get_action_identifier()
+
+        if status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
+        elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
@@ -1527,7 +1532,7 @@ class ThreatstreamConnector(BaseConnector):
             if vault_path is None:
                 return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
             try:
-                vault_file = open(vault_path)
+                vault_file = open(vault_path, "rb")
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
