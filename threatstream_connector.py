@@ -254,7 +254,6 @@ class ThreatstreamConnector(BaseConnector):
         return input_str
 
     def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
-        
         resp_json = None
 
         try:
