@@ -96,6 +96,7 @@ class ThreatstreamConnector(BaseConnector):
         self._verify = None
         self._is_cloud_instance = None
         self._first_run_limit = None
+        self._python_version = None
         self._data_dict = {}  # Blank dict to contain data from all API calls
         return
 
@@ -162,6 +163,9 @@ class ThreatstreamConnector(BaseConnector):
         else:
             try:
                 soup = BeautifulSoup(response.text, "html.parser")
+                # Remove the script, style, footer and navigation part from the HTML message
+                for element in soup(["script", "style", "footer", "nav"]):
+                    element.extract()
                 error_text = soup.text
                 split_lines = error_text.split('\n')
                 split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -250,7 +254,7 @@ class ThreatstreamConnector(BaseConnector):
         return input_str
 
     def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
-
+        
         resp_json = None
 
         try:
@@ -454,11 +458,11 @@ class ThreatstreamConnector(BaseConnector):
                                 THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP."))
         except Exception as e:
             final_response["addtional_info"] = None
-            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e)))
+            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e)))
 
             action_result.add_data(final_response)
             return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
-                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e))))
+                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e))))
 
         action_result.add_data(final_response)
 
@@ -1277,7 +1281,7 @@ class ThreatstreamConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the threatstream server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Threatstream server. Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
@@ -1374,10 +1378,7 @@ class ThreatstreamConnector(BaseConnector):
 
             if tags:
                 tag = [x.strip() for x in tags.split(',')]
-                try:
-                    tag = list(filter(None, tag))
-                except:
-                    tag = list([_f for _f in tags if _f])
+                tag = list(filter(None, tag))
 
                 object_dict.update({"tags": tag})
 
@@ -1451,10 +1452,7 @@ class ThreatstreamConnector(BaseConnector):
 
         # tags should be a comma-separated list
         tags = [x.strip() for x in param[THREATSTREAM_JSON_TAGS].split(',')]
-        try:
-            tags = list(filter(None, tags))
-        except:
-            tags = list([_f for _f in tags if _f])
+        tags = list(filter(None, tags))
 
         data = {THREATSTREAM_JSON_TAGS: []}
 
