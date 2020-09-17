@@ -4,11 +4,10 @@
     "description": "Integrates a variety of generic, reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
     "publisher": "Splunk",
     "type": "reputation",
-    "main_module": "threatstream_connector.pyc",
-    "app_version": "1.0.38",
+    "main_module": "threatstream_connector.py",
+    "app_version": "2.0.0",
     "latest_tested_versions": [
-        "On-premise v4.0 RED",
-        "Cloud Latest"
+        "Cloud 15-SEPT-2020"
     ],
     "utctime_updated": "2020-05-28T00:27:42.000000Z",
     "package_name": "phantom_threatstream",
@@ -17,7 +16,8 @@
     "product_vendor": "Anomali",
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.6.19142",
+    "python_version": "3",
+    "min_phantom_version": "4.8.24304",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
@@ -28,6 +28,10 @@
             {
                 "module": "ipwhois",
                 "input_file": "ipwhois/ipwhois-1.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pythonwhois",
+                "input_file": "pythonwhois/pythonwhois-2.4.3-py2.py3-none-any.whl"
             }
         ]
     },
@@ -484,7 +488,7 @@
                     "data_path": "action_result.data.*.external_references.urlscan.io",
                     "data_type": "string",
                     "example_values": [
-                        "https://urlscan.io/domain/uponvoice.net"
+                        "https://test.io/domain/uponvoice.net"
                     ]
                 },
                 {
@@ -734,7 +738,7 @@
                         "ipv6"
                     ],
                     "example_values": [
-                        "106.12.128.24"
+                        "122.122.122.122"
                     ]
                 },
                 {
@@ -793,7 +797,7 @@
                     "data_path": "action_result.data.*.external_references.urlscan.io",
                     "data_type": "string",
                     "example_values": [
-                        "https://urlscan.io/domain/uponvoice.net"
+                        "https://test.io/domain/uponvoice.net"
                     ]
                 },
                 {
@@ -1000,7 +1004,7 @@
             ],
             "render": {
                 "width": 12,
-                "title": "Ip Reputation",
+                "title": "IP Reputation",
                 "type": "table",
                 "height": 5
             },
@@ -1110,7 +1114,7 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "example_values": [
-                        "test@gmail.com"
+                        "test@test.com"
                     ]
                 },
                 {
@@ -1336,7 +1340,7 @@
                         "url"
                     ],
                     "example_values": [
-                        "http://5.230.22.132/"
+                        "http://122.122.122.122/"
                     ]
                 },
                 {
@@ -1451,7 +1455,7 @@
                     "data_path": "action_result.data.*.meta.registrant_email",
                     "data_type": "string",
                     "example_values": [
-                        "test@gmail.com"
+                        "test@test.com"
                     ]
                 },
                 {
@@ -1652,9 +1656,7 @@
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "example_values": [
-                        "58.17.221.4",
-                        "8.8.8.8",
-                        "218.107.46.228"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip",
@@ -1676,7 +1678,7 @@
                     "data_path": "action_result.data.*.addtional_info.asn_cidr",
                     "data_type": "string",
                     "example_values": [
-                        "183.64.0.0/13"
+                        "122.122.122.122/13"
                     ]
                 },
                 {
@@ -1711,7 +1713,7 @@
                     "data_path": "action_result.data.*.addtional_info.nets.*.cidr",
                     "data_type": "string",
                     "example_values": [
-                        "183.65.17.118/32"
+                        "122.122.122.122/32"
                     ]
                 },
                 {
@@ -1768,7 +1770,7 @@
                     "data_path": "action_result.data.*.addtional_info.nets.*.range",
                     "data_type": "string",
                     "example_values": [
-                        "183.65.17.118 - 183.65.17.118"
+                        "122.122.122.122 - 122.122.122.122"
                     ]
                 },
                 {
@@ -1787,7 +1789,7 @@
                     "data_path": "action_result.data.*.addtional_info.query",
                     "data_type": "string",
                     "example_values": [
-                        "183.65.17.118"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -2030,8 +2032,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.contacts.billing",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.contacts.registrant",
@@ -2388,7 +2389,7 @@
                     "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -2545,7 +2546,7 @@
                     "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -2756,7 +2757,7 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "example_values": [
-                        "94.46.90.171"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -2832,7 +2833,7 @@
                     "data_path": "action_result.data.*.meta.registrant_email",
                     "data_type": "string",
                     "example_values": [
-                        "test@gmail.com"
+                        "test@test00.com"
                     ]
                 },
                 {
@@ -3002,7 +3003,7 @@
                     "data_path": "action_result.data.*.value",
                     "data_type": "string",
                     "example_values": [
-                        "94.46.90.171"
+                        "122.122.122.122"
                     ],
                     "column_name": "Value",
                     "column_order": 1
@@ -3197,7 +3198,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "qa.threatstream.com"
+                        "qa.test.com"
                     ]
                 },
                 {
@@ -3221,7 +3222,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "test@qa.test.com"
                     ],
                     "contains": [
                         "email"
@@ -4156,7 +4157,7 @@
                     "data_path": "action_result.data.*.intelligence.*.created_by",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "qa+test@test00.com"
                     ],
                     "contains": [
                         "email"
@@ -4310,7 +4311,7 @@
                     "data_path": "action_result.data.*.intelligence.*.source",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "qa+test@test00.com"
                     ],
                     "contains": [
                         "email"
@@ -4474,7 +4475,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "qa.threatstream.com"
+                        "qa.test.com"
                     ]
                 },
                 {
@@ -4498,7 +4499,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "qa+test@qa.test.com"
                     ],
                     "contains": [
                         "email"
@@ -4885,7 +4886,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "qa.threatstream.com"
+                        "qa.test.com"
                     ]
                 },
                 {
@@ -4909,7 +4910,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "qa+test@qa.test.com"
                     ],
                     "contains": [
                         "email"
@@ -5257,7 +5258,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "qa.threatstream.com"
+                        "qa.test.com"
                     ]
                 },
                 {
@@ -5281,7 +5282,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "qa+test@qa.threatstream.com"
+                        "qa+test@qa.test.com"
                     ],
                     "contains": [
                         "email"
@@ -5746,7 +5747,7 @@
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "example_values": [
-                        "http://46.166.151.87/"
+                        "http://122.122.122.122/"
                     ],
                     "contains": [
                         "url"
@@ -5916,7 +5917,7 @@
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
                     "example_values": [
-                        "46.166.151.87"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -6514,7 +6515,7 @@
                     "data_path": "action_result.parameter.value",
                     "data_type": "string",
                     "example_values": [
-                        "122.183.147.172"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip",
@@ -6574,9 +6575,9 @@
         },
         {
             "action": "tag observable",
-            "identifier": "tag_observable",
             "description": "Add a tag to the observable",
             "type": "generic",
+            "identifier": "tag_observable",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -6603,7 +6604,6 @@
                 },
                 "tlp": {
                     "description": "TLP to assign to each tag",
-                    "verbose": "A TLP of red will make the tag private for the user's organization.",
                     "data_type": "string",
                     "values_list": [
                         "white",
@@ -7822,7 +7822,7 @@
                     "data_path": "action_result.data.*.results.network.hosts",
                     "data_type": "string",
                     "example_values": [
-                        "72.14.188.52"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -7859,7 +7859,7 @@
                     "data_path": "action_result.data.*.results.network.tcp.*.dst",
                     "data_type": "string",
                     "example_values": [
-                        "192.168.101.14"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -7883,7 +7883,7 @@
                     "data_path": "action_result.data.*.results.network.tcp.*.src",
                     "data_type": "string",
                     "example_values": [
-                        "192.168.101.11"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -7907,7 +7907,7 @@
                     "data_path": "action_result.data.*.results.network.udp.*.dst",
                     "data_type": "string",
                     "example_values": [
-                        "192.168.101.11"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -7931,7 +7931,7 @@
                     "data_path": "action_result.data.*.results.network.udp.*.src",
                     "data_type": "string",
                     "example_values": [
-                        "192.168.101.14"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -8209,12 +8209,6 @@
                     "default": 1000
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Run Query",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -8314,7 +8308,7 @@
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "example_values": [
-                        "24.148.217.110"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
@@ -8523,6 +8517,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Run Query",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         }
     ]

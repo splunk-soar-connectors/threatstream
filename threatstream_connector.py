@@ -25,7 +25,11 @@ from ipwhois import IPWhois
 import simplejson as json
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
-from urlparse import urlsplit
+
+try:
+    from urlparse import urlsplit
+except:
+    from urllib.parse import urlsplit
 
 # These are the fields outputted in the widget
 # Check to see if all of these are in the the
@@ -92,13 +96,14 @@ class ThreatstreamConnector(BaseConnector):
         self._verify = None
         self._is_cloud_instance = None
         self._first_run_limit = None
+        self._python_version = None
         self._data_dict = {}  # Blank dict to contain data from all API calls
         return
 
     def initialize(self):
         config = self.get_config()
 
-        self._base_url = "https://{0}/api".format(UnicodeDammit(config.get('hostname', 'api.threatstream.com')).unicode_markup.encode('utf-8'))
+        self._base_url = "https://{0}/api".format(self._handle_py_ver_compat_for_input_str(config.get('hostname', 'api.threatstream.com')))
         self._state = self.load_state()
         self._verify = config.get("verify_server_cert")
         self._is_cloud_instance = config.get("is_cloud_instance")
@@ -117,8 +122,13 @@ class ThreatstreamConnector(BaseConnector):
 
     def _process_empty_reponse(self, response, action_result):
 
-        if response.status_code == 200:
+        status_code = response.status_code
+        action = self.get_action_identifier()
+
+        if status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
+        elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
@@ -144,7 +154,7 @@ class ThreatstreamConnector(BaseConnector):
                     else:
                         resp_text = response.text
                     action_result.set_status(phantom.APP_SUCCESS, "Unable to parse the JSON response. Response Status Code: {}. Response: {}".format(
-                                                status_code, UnicodeDammit(resp_text).unicode_markup.encode('utf-8')))
+                                                status_code, self._handle_py_ver_compat_for_input_str(resp_text)))
                     return RetVal(phantom.APP_SUCCESS, {})
 
         data_message = ""
@@ -153,6 +163,9 @@ class ThreatstreamConnector(BaseConnector):
         else:
             try:
                 soup = BeautifulSoup(response.text, "html.parser")
+                # Remove the script, style, footer and navigation part from the HTML message
+                for element in soup(["script", "style", "footer", "nav"]):
+                    element.extract()
                 error_text = soup.text
                 split_lines = error_text.split('\n')
                 split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -162,7 +175,7 @@ class ThreatstreamConnector(BaseConnector):
 
             # Error text can still be an empty string
             if error_text:
-                data_message = " Data from server:\n{0}\n".format(UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
+                data_message = " Data from server:\n{0}\n".format(self._handle_py_ver_compat_for_input_str(error_text))
 
         message = "Status Code: {0}. {1}".format(status_code, data_message)
 
@@ -191,7 +204,7 @@ class ThreatstreamConnector(BaseConnector):
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                    r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
+                    r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -222,12 +235,25 @@ class ThreatstreamConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('utf-8'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
+        return input_str
+
+    def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
         resp_json = None
 
         try:
@@ -241,26 +267,16 @@ class ThreatstreamConnector(BaseConnector):
         if use_json:
             try:
                 r = request_func(
-                                url,
-                                json=data,
-                                headers=headers,
-                                params=payload,
-                                verify=self._verify,
-                                files=files)
+                    url,
+                    json=data,
+                    headers=headers,
+                    params=payload,
+                    verify=self._verify,
+                    files=files)
             except Exception as e:
-                if e.message:
-                    if isinstance(e.message, basestring):
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                    else:
-                        try:
-                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                        except:
-                            error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-                else:
-                    error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-
+                error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
-                                                    .format(error_msg)), resp_json)
+                                                       .format(error_msg)), resp_json)
 
         else:
             try:
@@ -272,17 +288,7 @@ class ThreatstreamConnector(BaseConnector):
                                 verify=self._verify,
                                 files=files)
             except Exception as e:
-                if e.message:
-                    if isinstance(e.message, basestring):
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('UTF-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                    else:
-                        try:
-                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8').replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
-                        except:
-                            error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-                else:
-                    error_msg = "Unknown error occurred. Please check the asset configuration and|or the action parameters."
-
+                error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
                                                     .format(error_msg)), resp_json)
 
@@ -308,7 +314,7 @@ class ThreatstreamConnector(BaseConnector):
         ip_address_input = input_ip_address
 
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            ipaddress.ip_address(UnicodeDammit(ip_address_input).unicode_markup)
         except:
             return False
 
@@ -322,8 +328,13 @@ class ThreatstreamConnector(BaseConnector):
         config = self.get_config()
         payload['username'] = config[THREATSTREAM_JSON_USERNAME]
         payload['api_key'] = config[THREATSTREAM_JSON_API_KEY]
-        for k, v in kwargs.iteritems():
-            payload[k] = v
+        try:
+            for k, v in kwargs.iteritems():
+                payload[k] = v
+        except:
+            for k, v in kwargs.items():
+                payload[k] = v
+
         return payload
 
     def _intel_details(self, value, action_result, limit=None):
@@ -446,11 +457,11 @@ class ThreatstreamConnector(BaseConnector):
                                 THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP."))
         except Exception as e:
             final_response["addtional_info"] = None
-            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e)))
+            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e)))
 
             action_result.add_data(final_response)
             return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
-                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=str(e))))
+                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e))))
 
         action_result.add_data(final_response)
 
@@ -539,7 +550,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = UnicodeDammit(param[THREATSTREAM_JSON_DOMAIN]).unicode_markup.encode('utf-8')
+        value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
 
         try:
             limit = int(param.get("limit", 1000))
@@ -576,7 +587,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _url_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = UnicodeDammit(param[THREATSTREAM_JSON_URL]).unicode_markup.encode("utf-8")
+        value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_URL])
 
         try:
             limit = int(param.get("limit", 1000))
@@ -594,7 +605,7 @@ class ThreatstreamConnector(BaseConnector):
     def _email_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        value = UnicodeDammit(param[THREATSTREAM_JSON_EMAIL]).unicode_markup.encode("utf-8")
+        value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_EMAIL])
         ioc_type = "email"
 
         try:
@@ -613,7 +624,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _whois_domain(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        value = UnicodeDammit(param[THREATSTREAM_JSON_DOMAIN]).unicode_markup.encode("utf-8")
+        value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
         ret_val = self._whois(value, action_result, tipe="domain")
         if (not ret_val):
             return action_result.get_status()
@@ -644,7 +655,10 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return None
 
-            items_list.extend(items.get("objects"))
+            items_list.extend(items.get("objects", []))
+
+            if len(items_list) <= 0:
+                return None
 
             if limit and len(items_list) >= limit:
                 return items_list[:limit]
@@ -1127,14 +1141,9 @@ class ThreatstreamConnector(BaseConnector):
             try:
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
-                if e.message:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred"
-                else:
-                    error_msg = "Unknown error occurred"
-                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
+                error_msg = self._get_error_message_from_exception(e)
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
                 return None
 
             if not isinstance(fields, dict):
@@ -1209,13 +1218,7 @@ class ThreatstreamConnector(BaseConnector):
             search_dict = json.loads(search_string)
             payload.update(search_dict)
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Unknown error occurred."
-            else:
-                error_msg = "Unknown error occurred."
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {0}".format(error_msg))
 
         order_by = param.get("order_by")
@@ -1252,6 +1255,38 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_error_message_from_exception(self, e):
+        """ This function is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        error_code = "Error code unavailable"
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Threatstream server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+
     def import_support(self, param, action_result):
 
         payload = self._generate_payload()
@@ -1283,13 +1318,7 @@ class ThreatstreamConnector(BaseConnector):
                 try:
                     fields = ast.literal_eval(param["fields"])
                 except Exception as e:
-                    if e.message:
-                        try:
-                            error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                        except:
-                            error_msg = "Unknown error occurred"
-                    else:
-                        error_msg = "Unknown error occurred"
+                    error_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. \
                         Please ensure that provided input is in valid JSON format".format(error_msg))
 
@@ -1349,6 +1378,7 @@ class ThreatstreamConnector(BaseConnector):
             if tags:
                 tag = [x.strip() for x in tags.split(',')]
                 tag = list(filter(None, tag))
+
                 object_dict.update({"tags": tag})
 
             data = {
@@ -1422,6 +1452,7 @@ class ThreatstreamConnector(BaseConnector):
         # tags should be a comma-separated list
         tags = [x.strip() for x in param[THREATSTREAM_JSON_TAGS].split(',')]
         tags = list(filter(None, tags))
+
         data = {THREATSTREAM_JSON_TAGS: []}
 
         for tag in tags:
@@ -1454,7 +1485,7 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_get_status(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
-        endpoint = UnicodeDammit(param.get("endpoint")).unicode_markup.encode('utf-8')
+        endpoint = self._handle_py_ver_compat_for_input_str(param.get("endpoint"))
         endpoint = endpoint.replace("/api/", "/")
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
 
@@ -1482,18 +1513,12 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         # return action_result.set_status(phantom.APP_SUCCESS, param.get('classification'))
-        vault_id = UnicodeDammit(param.get('vault_id')).unicode_markup.encode('utf-8')
+        vault_id = self._handle_py_ver_compat_for_input_str(param.get('vault_id'))
 
         try:
             vault_info = Vault.get_file_info(vault_id=vault_id)
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Unknown error occurred."
-            else:
-                error_msg = "Unknown error occurred."
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(error_msg))
 
         if not vault_info:
@@ -1504,15 +1529,9 @@ class ThreatstreamConnector(BaseConnector):
             if vault_path is None:
                 return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
             try:
-                vault_file = open(vault_path)
+                vault_file = open(vault_path, "rb")
             except Exception as e:
-                if e.message:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred."
-                else:
-                    error_msg = "Unknown error occurred."
+                error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
 
             payload = self._generate_payload()
@@ -1640,13 +1659,7 @@ class ThreatstreamConnector(BaseConnector):
             r = requests.get(url, verify=False)
             resp_json = r.json()
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Unknown error occurred."
-            else:
-                error_msg = "Unknown error occurred."
+            error_msg = self._get_error_message_from_exception(e)
             self.debug_print("Unable to query ThreatStream incident container: {}".format(error_msg))
             return None
 
@@ -1669,13 +1682,7 @@ class ThreatstreamConnector(BaseConnector):
                 r = requests.post(url, verify=False, json=data)
                 resp_json = r.json()
             except Exception as e:
-                if e.message:
-                    try:
-                        error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                    except:
-                        error_msg = "Unknown error occurred."
-                else:
-                    error_msg = "Unknown error occurred."
+                error_msg = self._get_error_message_from_exception(e)
                 self.debug_print("Unable to update the name of the ThreatStream incident container: {}".format(error_msg))
                 return container_id
 
@@ -1810,8 +1817,12 @@ class ThreatstreamConnector(BaseConnector):
                     tags = item.get('tags')
 
                     for i, tag in enumerate(tags):
-                        tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                            key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
+                        try:
+                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                                key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, basestring) else value) for key, value in tag.items())
+                        except:
+                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                                key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, str) else value) for key, value in list(tag.items()))
 
                     item['tags_formatted'] = tags_dict
 
@@ -1835,8 +1846,12 @@ class ThreatstreamConnector(BaseConnector):
                 tags = resp_json.get('tags_v2')
 
                 for i, tag in enumerate(tags):
-                    tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                        key, UnicodeDammit(value).unicode_markup.encode('utf-8') if isinstance(value, basestring) else value) for key, value in tag.items())
+                    try:
+                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                            key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, basestring) else value) for key, value in tag.items())
+                    except:
+                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
+                            key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, str) else value) for key, value in list(tag.items()))
 
                 resp_json['tags_v2_formatted'] = tags_dict
 
@@ -1844,7 +1859,7 @@ class ThreatstreamConnector(BaseConnector):
             artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
             artifacts_list.append(artifact)
 
-            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), UnicodeDammit(resp_json.get("name")).unicode_markup.encode('utf-8'))
+            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), self._handle_py_ver_compat_for_input_str(resp_json.get("name")))
 
             self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
 
@@ -1852,7 +1867,7 @@ class ThreatstreamConnector(BaseConnector):
                 container = dict()
                 container['description'] = "Container added by ThreatStream app"
                 container['source_data_identifier'] = resp_json.get("id")
-                container['name'] = '{}-{}'.format(resp_json.get("id"), UnicodeDammit(resp_json.get("name")).unicode_markup.encode('utf-8'))
+                container['name'] = '{}-{}'.format(resp_json.get("id"), self._handle_py_ver_compat_for_input_str(resp_json.get("name")))
                 container['data'] = resp_json
 
                 ret_val, message, container_id = self.save_container(container)
@@ -1988,6 +2003,6 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
         # Dump the return value
-        print ret_val
+        print(ret_val)
 
     exit(0)
