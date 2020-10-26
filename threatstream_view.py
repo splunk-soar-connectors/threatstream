@@ -108,4 +108,7 @@ def display_view(provides, all_app_runs, context):
     if provides == "get report":
         ret_val = 'threatstream_get_report.html'
 
+    if provides == "import session update":
+        ret_val = 'threatstream_get_import_session.html'
+
     return ret_val

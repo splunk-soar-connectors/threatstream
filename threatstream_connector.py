@@ -657,13 +657,10 @@ class ThreatstreamConnector(BaseConnector):
 
             items_list.extend(items.get("objects", []))
 
-            if len(items_list) <= 0:
-                return None
-
             if limit and len(items_list) >= limit:
                 return items_list[:limit]
 
-            if len(items.get("objects")) < DEFAULT_MAX_RESULTS:
+            if len(items.get("objects", [])) < DEFAULT_MAX_RESULTS:
                 break
 
             offset = offset + DEFAULT_MAX_RESULTS
@@ -1905,6 +1902,217 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 
+    def _handle_import_session_search(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        try:
+            offset = int(param.get("offset", 0))
+            if offset < 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_ZERO_ALLOWED_INVALID_PARAM.format(param="offset"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_ZERO_ALLOWED_INVALID_PARAM.format(param="offset"))
+
+        payload = self._generate_payload()
+        status = param.get('status_in')
+
+        if param.get('date_modified_gte'):
+            payload["date_modified__gte"] = param.get('date_modified_gte')
+
+        if status:
+            status_list = [x.strip() for x in status.split(',')]
+            status_list = list(filter(None, status_list))
+
+            status = ",".join(status_list)
+            payload["status__in"] = status
+
+        import_sessions = self._paginator(ENDPOINT_IMPORT_SESSION, action_result, limit=limit, payload=payload, offset=offset)
+
+        if import_sessions is None:
+            return action_result.get_status()
+
+        for import_session in import_sessions:
+            action_result.add_data(import_session)
+
+        summary = action_result.update_summary({})
+        summary['import_sessions_returned'] = action_result.get_data_size()
+
+        return phantom.APP_SUCCESS
+
+    def _handle_import_session_update(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        config = self.get_config()
+
+        intelligence_source = param.get("intelligence_source")
+        item_id = param.get("item_id")
+        tlp = param.get("tlp")
+        tags = param.get("tags")
+        comment = param.get("comment")
+        expire_time = param.get("expire_time")
+        threat_model_type = param.get("threat_model_type")
+        threat_model_to_associate = param.get("threat_model_to_associate")
+
+        resp_json = {}
+        messages = []
+
+        updated = False
+
+        if (threat_model_type or threat_model_to_associate) and not(threat_model_type and threat_model_to_associate):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide both 'threat_model_type' and 'threat_model_to_associate' parameters")
+        if not(tlp or tags or comment or intelligence_source or expire_time) and not(threat_model_type and threat_model_to_associate):
+            return action_result.set_status(phantom.APP_ERROR, "Please provide either 'tlp' or 'tags' or 'comment' or 'threat_model_type' and 'threat_model_associate' parameter")
+
+        payload = self._generate_payload()
+
+        if tlp or intelligence_source or expire_time or (threat_model_type and threat_model_to_associate):
+            data = {}
+            threat_model_msg = ""
+            param_list = []
+            if tlp:
+                data["tlp"] = tlp
+                param_list.append("tlp")
+            if intelligence_source:
+                data["intelligence_source"] = intelligence_source
+                param_list.append("intelligence_source")
+            if expire_time:
+                if expire_time == "null":
+                    expire_time = None
+                data["expiration_ts"] = expire_time
+                param_list.append("expire_time")
+            if threat_model_type and threat_model_to_associate:
+                threat_model_type_list = [x.strip() for x in threat_model_type.split(',')]
+                threat_model_type_list = list(filter(None, threat_model_type_list))
+
+                threat_model_to_associate_list = [x.strip() for x in threat_model_to_associate.split(',')]
+                threat_model_to_associate_list = list(filter(None, threat_model_to_associate_list))
+
+                if len(threat_model_to_associate_list) != len(threat_model_type_list):
+                    return action_result.set_status(phantom.APP_ERROR,
+                                                    "Please provide same number of values in 'threat_model_type_list' and 'threat_model_to_associate_list' parameters")
+
+                for i, value in enumerate(threat_model_type_list):
+                    if not data.get(value):
+                        data[value] = [threat_model_to_associate_list[i]]
+                    else:
+                        data[value].append(threat_model_to_associate_list[i])
+
+                threat_model_msg = "Request for association sent successfully. "
+
+            endpoint = ENDPOINT_IMPORT_SESSION + "{}/".format(item_id)
+
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method='patch')
+            if (phantom.is_fail(ret_val)):
+                msg = "{}Error: {}".format("Unable to update {}. ".format(param_list if param_list else ""), action_result.get_message())
+                messages.append(msg)
+            else:
+                updated = True
+                messages.append("{}{}".format(threat_model_msg, "Successfully updated {}".format(param_list) if param_list else ""))
+
+        if tags:
+            data = {}
+            final_tags = []
+            config = self.get_config()
+
+            org_id = config.get("organization_id", None)
+
+            tags_list = [x.strip() for x in tags.split(',')]
+            tags_list = list(filter(None, tags_list))
+
+            for tag in tags_list:
+                final_tags.append({
+                    "name": tag,
+                    "org_id": org_id
+                })
+
+            data[THREATSTREAM_JSON_TAGS] = final_tags
+
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_TAG_IMPORT_SESSION.format(session_id=item_id),
+                                                    payload=payload, headers=None, data=data, method='post')
+            if (phantom.is_fail(ret_val)):
+                messages.append("Unable to update the tags. Error: {}".format(action_result.get_message()))
+            else:
+                updated = True
+                messages.append("Successfully updated tags")
+
+        if comment:
+            payload["default_comment"] = comment
+
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id),
+                                                    payload=payload, method='patch')
+            if (phantom.is_fail(ret_val)):
+                messages.append("Unable to update the comment. Error: {}".format(action_result.get_message()))
+            else:
+                updated = True
+                messages.append("Successfully updated comment")
+
+        if not updated:
+            return action_result.set_status(phantom.APP_ERROR, ". ".join(messages))
+
+        endpoint = ENDPOINT_IMPORT_SESSION + "{}/".format(item_id)
+
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload)
+        if (phantom.is_fail(ret_val)):
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the details. {}".format(". ".join(messages)))
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, ". ".join(messages))
+
+    def _handle_threat_model_search(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        try:
+            limit = int(param.get("limit", 1000))
+            if limit <= 0:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param="limit"))
+
+        payload = self._generate_payload()
+
+        if param.get('modified_ts__gte'):
+            payload["modified_ts__gte"] = param.get('modified_ts__gte')
+
+        if param.get("model_type"):
+            payload["model_type"] = param.get('model_type')
+
+        if param.get("tags_name"):
+            payload["tags.name"] = param.get("tags_name")
+
+        threat_models = self._paginator(ENDPOINT_THREAT_MODEL_SEARCH, action_result, limit=limit, payload=payload)
+
+        if threat_models is None:
+            return action_result.get_status()
+
+        new_limit = limit - len(threat_models)
+
+        if new_limit and not param.get("model_type"):
+            payload["model_type"] = "vulnerability"
+
+            vulnerability_threat_models = self._paginator(ENDPOINT_THREAT_MODEL_SEARCH, action_result, limit=new_limit, payload=payload)
+
+            if vulnerability_threat_models is None:
+                return action_result.get_status()
+
+            threat_models.extend(vulnerability_threat_models)
+
+        for threat_model in threat_models:
+            action_result.add_data(threat_model)
+
+        summary = action_result.update_summary({})
+        summary['threat_models_returned'] = action_result.get_data_size()
+
+        return phantom.APP_SUCCESS
+
     def handle_action(self, param):
 
         action = self.get_action_identifier()
@@ -1972,6 +2180,12 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_get_pcap(param)
         elif (action == self.ACTION_ID_TAG_IOC):
             ret_val = self._handle_tag_ioc(param)
+        elif (action == self.ACTION_IMPORT_SESSION_SEARCH):
+            ret_val = self._handle_import_session_search(param)
+        elif (action == self.ACTION_IMPORT_SESSION_UPDATE):
+            ret_val = self._handle_import_session_update(param)
+        elif(action == self.ACTION_THREAT_MODEL_SEARCH):
+            ret_val = self._handle_threat_model_search(param)
 
         return ret_val
 
