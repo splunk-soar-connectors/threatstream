@@ -87,6 +87,9 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_ID_GET_REPORT = "get_report"
     ACTION_ID_DETONATE_URL = "detonate_url"
     ACTION_ID_GET_PCAP = "get_pcap"
+    ACTION_IMPORT_SESSION_SEARCH = "import_session_search"
+    ACTION_IMPORT_SESSION_UPDATE = "import_session_update"
+    ACTION_THREAT_MODEL_SEARCH = "threat_model_search"
 
     def __init__(self):
 
