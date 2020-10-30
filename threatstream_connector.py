@@ -464,7 +464,8 @@ class ThreatstreamConnector(BaseConnector):
 
             action_result.add_data(final_response)
             return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
-                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e))))
+                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE,
+                        "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e))))
 
         action_result.add_data(final_response)
 
@@ -1285,7 +1286,6 @@ class ThreatstreamConnector(BaseConnector):
             error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-
 
     def import_support(self, param, action_result):
 
