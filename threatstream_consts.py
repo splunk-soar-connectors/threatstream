@@ -46,5 +46,12 @@ THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {p
 THREATSTREAM_ERR_ZERO_ALLOWED_INVALID_PARAM = "Please provide zero or a valid positive integer in {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"
-THREARSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
-THREARSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
+THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
+THREATSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
+
+THREATSTREAM_LIMIT = "'limit' action parameter"
+THREATSTREAM_ITEM_ID = "'item_id' action parameter"
+THREATSTREAM_OFFSET = "'offset' action parameter"
+THREATSTREAM_CONFIDENCE = "'confidence' action parameter"
+THREATSTREAM_FIRST_RUN_CONTAINER = "'first_run_container' configuration parameter"
+THREATSTREAM_INVALID_INT = "Please provide a valid integer value in the {param}"
