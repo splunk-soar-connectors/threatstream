@@ -112,7 +112,7 @@ class ThreatstreamConnector(BaseConnector):
         self._is_cloud_instance = config.get("is_cloud_instance")
         self._first_run_limit = config.get('first_run_containers')
 
-        ret_val, self._first_run_limit = self._validate_integer(self, self._first_run_limit, THREATSTREAM_FIRST_RUN_LIMIT)
+        ret_val, self._first_run_limit = self._validate_integer(self, self._first_run_limit, THREATSTREAM_FIRST_RUN_CONTAINER)
         if phantom.is_fail(ret_val):
             return self.get_status()
         self.set_validator('ipv6', self._is_ip)
