@@ -1710,7 +1710,7 @@ class ThreatstreamConnector(BaseConnector):
                 # of the scheduled_polling
                 limit = None
 
-           ret_val, limit = self._validate_integer(action_result, limit, THREATSTREAM_LIMIT)
+            ret_val, limit = self._validate_integer(action_result, limit, THREATSTREAM_LIMIT)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
