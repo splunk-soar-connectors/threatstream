@@ -1953,6 +1953,9 @@ class ThreatstreamConnector(BaseConnector):
             threat_model_msg = ""
             param_list = []
             if tlp:
+                tlp_list = ["red", "amber", "green", "white"]
+                if tlp.lower() not in tlp_list:
+                    return action_result.set_status(phantom.APP_ERROR,"Please provide tlp value from these 4 values : Red,Amber,Green,White")
                 data["tlp"] = tlp
                 param_list.append("tlp")
             if intelligence_source:

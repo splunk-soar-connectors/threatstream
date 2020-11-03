@@ -6605,13 +6605,16 @@
                 "tlp": {
                     "description": "TLP to assign to each tag",
                     "data_type": "string",
-                    "values_list": [
+                    "value_list": [
                         "white",
                         "green",
                         "amber",
                         "red"
                     ],
                     "default": "red",
+                    "contains" : [
+                        "threatstream tlp"
+                    ],
                     "order": 3
                 }
             },
@@ -6654,6 +6657,9 @@
                     "example_values": [
                         "red",
                         "white"
+                    ],
+                    "contains" : [
+                        "threatstream tlp"
                     ]
                 },
                 {
@@ -9043,6 +9049,14 @@
                 "tlp": {
                     "description": "TLP",
                     "data_type": "string",
+                    "value_list": [
+                        "red",
+                        "amber",
+                        "green",
+                        "white"],
+                    "contains" : [
+                        "threatstream tlp"
+                    ],
                     "order": 3
                 },
                 "tags": {
@@ -9328,6 +9342,9 @@
                     "data_type": "string",
                     "example_values": [
                         "white"
+                    ],
+                    "contains" : [
+                        "threatstream tlp"
                     ]
                 },
                 {
