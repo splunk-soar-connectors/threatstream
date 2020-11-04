@@ -122,7 +122,7 @@ class ThreatstreamConnector(BaseConnector):
     def finalize(self):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
-    
+
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         if parameter is not None:
             try:
@@ -697,11 +697,10 @@ class ThreatstreamConnector(BaseConnector):
     def _handle_list_vulnerability(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-            
+
         payload = self._generate_payload(order_by="-created_ts")
         vulnerability = self._paginator(ENDPOINT_VULNERABILITY, action_result, payload=payload, limit=limit)
 
@@ -1314,7 +1313,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
                 (e.g. {\"itype\": \"<indicator_type>\"})")
         else:
-            indicator_type = param['indicator_type'] 
+            indicator_type = param['indicator_type']
             classification = param.get('classification')
             severity = param.get('severity')
             tags = param.get('tags')
@@ -1955,7 +1954,7 @@ class ThreatstreamConnector(BaseConnector):
             if tlp:
                 tlp_list = ["red", "amber", "green", "white"]
                 if tlp.lower() not in tlp_list:
-                    return action_result.set_status(phantom.APP_ERROR,"Please provide tlp value from these 4 values : Red,Amber,Green,White")
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide tlp value from these 4 values : Red,Amber,Green,White")
                 data["tlp"] = tlp
                 param_list.append("tlp")
             if intelligence_source:

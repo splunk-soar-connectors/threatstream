@@ -5487,7 +5487,11 @@
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5574,7 +5578,10 @@
                         "test_domain_tag"
                     ],
                     "column_name": "Tags",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -5667,7 +5674,11 @@
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5741,7 +5752,10 @@
                         "test_url_tag"
                     ],
                     "column_name": "Tags",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.url",
@@ -5846,7 +5860,11 @@
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -5941,7 +5959,10 @@
                         "test_ip_tag"
                     ],
                     "column_name": "Tags",
-                    "column_order": 4
+                    "column_order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -6043,7 +6064,11 @@
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5
+                    "order": 5,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -6130,7 +6155,10 @@
                         "test_file_tag"
                     ],
                     "column_name": "Tags",
-                    "column_order": 5
+                    "column_order": 5,
+                    "contains": [
+                        "threatstream tags"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -6229,7 +6257,11 @@
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5
+                    "order": 5,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
@@ -6316,7 +6348,10 @@
                         "test_email_test"
                     ],
                     "column_name": "Tags",
-                    "column_order": 5
+                    "column_order": 5,
+                    "contains": [
+                        "threatstream tags"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -6600,7 +6635,11 @@
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
                     "required": true,
-                    "order": 2
+                    "order": 2,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "tlp": {
                     "description": "TLP to assign to each tag",
@@ -6612,9 +6651,10 @@
                         "red"
                     ],
                     "default": "red",
-                    "contains" : [
+                    "contains": [
                         "threatstream tlp"
                     ],
+                    "primary": true,
                     "order": 3
                 }
             },
@@ -6649,6 +6689,9 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
+                    ],
+                    "contains": [
+                        "threatstream tags"
                     ]
                 },
                 {
@@ -6658,7 +6701,7 @@
                         "red",
                         "white"
                     ],
-                    "contains" : [
+                    "contains": [
                         "threatstream tlp"
                     ]
                 },
@@ -9024,63 +9067,68 @@
         },
         {
             "action": "import session update",
-            "description": "import session update",
-            "verbose": "import session update",
+            "description": "This action updates the fields of the provided item id",
+            "verbose": "<ul><li>Threat Model To Associate parameter is expecting a ID not a name</li><li>If null is provided in the expire time field than it will suffice the case of 'Never' from the Anamoli UI</li></ul>",
             "type": "investigate",
             "identifier": "import_session_update",
             "read_only": true,
             "parameters": {
                 "item_id": {
-                    "description": "Item ID",
+                    "description": "Item ID to be updated",
                     "data_type": "numeric",
                     "required": true,
                     "order": 0
                 },
                 "ph": {
-                    "description": "Placeholder",
+                    "description": "Placeholder to be updated",
                     "data_type": "ph",
                     "order": 1
                 },
                 "intelligence_source": {
-                    "description": "Intelligence Source",
+                    "description": "Intelligence Source to be updated",
                     "data_type": "string",
                     "order": 2
                 },
                 "tlp": {
-                    "description": "TLP",
+                    "description": "TLP value to be updated",
                     "data_type": "string",
                     "value_list": [
                         "red",
                         "amber",
                         "green",
                         "white"],
-                    "contains" : [
+                    "contains": [
                         "threatstream tlp"
                     ],
+                    "primary": true,
                     "order": 3
                 },
                 "tags": {
-                    "description": "tags",
+                    "description": "Comma seperated list of tags to be updated",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "primary": true
                 },
                 "comment": {
-                    "description": "Comment",
+                    "description": "Comment to be updated",
                     "data_type": "string",
                     "order": 5
                 },
                 "expire_time": {
-                    "description": "Expiration time",
+                    "description": "Expiration time to be updated (Format : YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])",
                     "data_type": "string",
                     "order": 6
                 },
                 "threat_model_type": {
-                    "description": "Threat Model Type",
+                    "description": "Threat Model Type to be updated",
                     "data_type": "string",
                     "order": 7
                 },
                 "threat_model_to_associate": {
-                    "description": "Threat Model To Associate",
+                    "description": "Comma seperated list of Threat Model Associate to be updated",
                     "data_type": "string",
                     "order": 8
                 }
@@ -9343,7 +9391,7 @@
                     "example_values": [
                         "white"
                     ],
-                    "contains" : [
+                    "contains": [
                         "threatstream tlp"
                     ]
                 },
@@ -9502,6 +9550,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Green"
+                    ],
+                    "contains": [
+                        "threatstream tlp"
                     ]
                 },
                 {
@@ -9509,6 +9560,9 @@
                     "data_type": "string",
                     "example_values": [
                         "test_tag_4"
+                    ],
+                    "contains": [
+                        "threatstream tags"
                     ]
                 },
                 {
