@@ -1954,9 +1954,6 @@ class ThreatstreamConnector(BaseConnector):
             threat_model_msg = ""
             param_list = []
             if tlp:
-                tlp_list = ["red", "amber", "green", "white"]
-                if tlp.lower() not in tlp_list:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide tlp value from these 4 values : Red,Amber,Green,White")
                 data["tlp"] = tlp
                 param_list.append("tlp")
             if intelligence_source:
@@ -1974,7 +1971,7 @@ class ThreatstreamConnector(BaseConnector):
                         current_time_utc_date = current_time_utc_date_obj.date()
 
                         if expire_time_utc_date < current_time_utc_date:
-                            return action_result.set_status(phantom.APP_ERROR, "Please provide a date that is greater than the current date")
+                            return action_result.set_status(phantom.APP_ERROR, "Invalid date. Please provide a date that is greater than or equal to the current date")
                     except:
                         pass
                 data["expiration_ts"] = expire_time

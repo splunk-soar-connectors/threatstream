@@ -9092,11 +9092,6 @@
                 "tlp": {
                     "description": "TLP value to be updated",
                     "data_type": "string",
-                    "value_list": [
-                        "red",
-                        "amber",
-                        "green",
-                        "white"],
                     "contains": [
                         "threatstream tlp"
                     ],
