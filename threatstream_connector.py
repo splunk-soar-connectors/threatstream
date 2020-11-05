@@ -21,6 +21,8 @@ import requests
 import datetime
 import ipaddress
 import pythonwhois
+import dateutil.parser
+import pytz
 from ipwhois import IPWhois
 import simplejson as json
 from bs4 import BeautifulSoup
@@ -1963,6 +1965,18 @@ class ThreatstreamConnector(BaseConnector):
             if expire_time:
                 if expire_time == "null":
                     expire_time = None
+                else:
+                    try:
+                        expire_time_date_obj = dateutil.parser.parse(expire_time)
+                        expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
+                        expire_time_utc_date = expire_time_utc_date_obj.date()
+                        current_time_utc_date_obj = datetime.datetime.utcnow().replace(tzinfo=dateutil.tz.tzutc())
+                        current_time_utc_date = current_time_utc_date_obj.date()
+
+                        if expire_time_utc_date < current_time_utc_date:
+                            return action_result.set_status(phantom.APP_ERROR, "Please provide a date that is greater than the current date")
+                    except:
+                        pass
                 data["expiration_ts"] = expire_time
                 param_list.append("expire_time")
             if threat_model_type and threat_model_to_associate:
