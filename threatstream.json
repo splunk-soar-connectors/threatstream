@@ -8576,31 +8576,34 @@
         },
         {
             "action": "import session search",
-            "description": "import session search",
-            "verbose": "import session search",
+            "description": "List all the import sessions",
             "type": "investigate",
             "identifier": "import_session_search",
             "read_only": true,
             "parameters": {
                 "date_modified_gte": {
-                    "description": "Date modified",
+                    "description": "Import sessions with greater than or equal to the provided modified date will be returned",
                     "data_type": "string",
+                    "contains": [
+                        "threatstream date"
+                    ],
+                    "primary": true,
                     "order": 1
                 },
                 "limit": {
-                    "description": "Record limit",
+                    "description": "Total number of import sessions to return",
                     "data_type": "numeric",
                     "order": 2,
                     "default": 1000
                 },
                 "offset": {
-                    "description": "Offset",
+                    "description": "Record offset (used with paging, when returning many results)",
                     "data_type": "numeric",
                     "order": 3,
                     "default": 0
                 },
                 "status_in": {
-                    "description": "Status",
+                    "description": "Status to filter the records",
                     "data_type": "string",
                     "order": 4
                 }
@@ -9035,6 +9038,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.date_modified_gte",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream date"
+                    ],
+                    "example_values": [
+                        "2020-11-05T17:30:00.130822"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.offset",
                     "data_type": "numeric",
                     "example_values": [
@@ -9068,13 +9081,13 @@
         {
             "action": "import session update",
             "description": "This action updates the fields of the provided item id",
-            "verbose": "<ul><li>Threat Model To Associate parameter is expecting a ID not a name</li><li>If null is provided in the expire time field than it will suffice the case of 'Never' from the Anamoli UI</li></ul>",
-            "type": "investigate",
+            "verbose": "If 'null' is provided in the expire time parameter then, expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
+            "type": "genric",
             "identifier": "import_session_update",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "item_id": {
-                    "description": "Item ID to be updated",
+                    "description": "ID of the import session to update",
                     "data_type": "numeric",
                     "required": true,
                     "order": 0
@@ -9085,12 +9098,12 @@
                     "order": 1
                 },
                 "intelligence_source": {
-                    "description": "Intelligence Source to be updated",
+                    "description": "Intelligence Source to update",
                     "data_type": "string",
                     "order": 2
                 },
                 "tlp": {
-                    "description": "TLP value to be updated",
+                    "description": "Traffic Light Protocol value to update",
                     "data_type": "string",
                     "contains": [
                         "threatstream tlp"
@@ -9099,7 +9112,7 @@
                     "order": 3
                 },
                 "tags": {
-                    "description": "Comma seperated list of tags to be updated",
+                    "description": "Comma-separated list of tags to update",
                     "data_type": "string",
                     "order": 4,
                     "contains": [
@@ -9108,22 +9121,26 @@
                     "primary": true
                 },
                 "comment": {
-                    "description": "Comment to be updated",
+                    "description": "Comment to update",
                     "data_type": "string",
                     "order": 5
                 },
                 "expire_time": {
-                    "description": "Expiration time to be updated (Format : YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])",
+                    "description": "Expiration time to update (Format : YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])",
                     "data_type": "string",
+                    "contains": [
+                        "threatstream date"
+                    ],
+                    "primary": true,
                     "order": 6
                 },
                 "threat_model_type": {
-                    "description": "Threat Model Type to be updated",
+                    "description": "Comma-separated list of threat model types to associate",
                     "data_type": "string",
                     "order": 7
                 },
                 "threat_model_to_associate": {
-                    "description": "Comma seperated list of Threat Model Associate to be updated",
+                    "description": "Comma-separated list of threat model IDs to associate",
                     "data_type": "string",
                     "order": 8
                 }
@@ -9580,6 +9597,9 @@
                 {
                     "data_path": "action_result.parameter.expire_time",
                     "data_type": "string",
+                    "contains": [
+                        "threatstream date"
+                    ],
                     "example_values": [
                         "2022-01-03T18:30:00"
                     ]
@@ -9603,32 +9623,35 @@
         },
         {
             "action": "threat model search",
-            "description": "threat model search",
-            "verbose": "threat model search",
+            "description": "List all the threat models",
             "type": "investigate",
             "identifier": "threat_model_search",
             "read_only": true,
             "parameters": {
                 "modified_ts__gte": {
-                    "description": "Modified time stamp",
+                    "description": "Threat models with greater than or equal to the provided modified time stamp will be returned",
                     "data_type": "string",
                     "order": 1
                 },
                 "limit": {
-                    "description": "Record limit",
+                    "description": "Total number of threat models to return",
                     "data_type": "numeric",
                     "order": 2,
                     "default": 1000
                 },
                 "model_type": {
-                    "description": "Model type",
+                    "description": "Model type to filter the records",
                     "data_type": "string",
                     "order": 3,
                     "default": 0
                 },
                 "tags_name": {
-                    "description": "Tag Name",
+                    "description": "Tag name to filter the records",
                     "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "threatstream tags"
+                    ],
                     "order": 4
                 }
             },
@@ -9882,6 +9905,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         681
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags_name",
+                    "data_type": "string",
+                    "contains": [
+                        "threatstream tags"
+                    ],
+                    "example_values": [
+                        "ph_test_tag"
                     ]
                 },
                 {

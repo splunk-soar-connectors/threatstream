@@ -116,7 +116,13 @@
             {% if result.param.tags %}
                 <tr>
                     <td>Tags</td>
-                    <td>{{ result.param.tags }}</td>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tags'], 'value':'{{ result.param.tags }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.tags }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
                 </tr>
             {% endif %}
             {% if result.param.comment %}
@@ -158,7 +164,13 @@
                             {% if data.tags %}
                                 <td>
                                     {% for tag in data.tags %}
-                                        <li class="no-word-wrap"> {{ tag.name }} </li>
+                                        <li class="no-word-wrap">
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tags'], 'value':'{{ tag.name }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ tag.name }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </li>
                                     {% endfor %}
                                 </td>
                             {% else %}
