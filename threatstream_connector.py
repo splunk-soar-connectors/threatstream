@@ -23,6 +23,7 @@ import ipaddress
 import pythonwhois
 import dateutil.parser
 import pytz
+import re
 from ipwhois import IPWhois
 import simplejson as json
 from bs4 import BeautifulSoup
@@ -1964,6 +1965,15 @@ class ThreatstreamConnector(BaseConnector):
                     expire_time = None
                 else:
                     try:
+                        regex = r'^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T|\s{1})(2[0-3]|[01][0-9]):' \
+                                r'([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9])(:)?[0-5][0-9])?$'
+
+                        match_iso8601 = re.compile(regex).match
+
+                        if match_iso8601(expire_time) is None:
+                            # return action_result.set_status(phantom.APP_ERROR, "Please provide a valid date. Format: YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
+                            raise Exception
+
                         expire_time_date_obj = dateutil.parser.parse(expire_time)
                         expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
                         expire_time_utc_date = expire_time_utc_date_obj.date()
