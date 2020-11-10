@@ -160,7 +160,13 @@
                             <td>{{ data.id }}</td>
                             <td>{{ data.threat_type }}</td>
                             <td>{{ data.intelligence_source }}</td>
-                            <td>{{ data.tlp }}</td>
+                            <td>
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tlp'], 'value':'{{ data.tlp }}' }], 0, {{ container.id }}, null, false);">
+                                {{ data.tlp }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
                             {% if data.tags %}
                                 <td>
                                     {% for tag in data.tags %}
@@ -177,7 +183,13 @@
                                 <td>None</td>
                             {% endif %}
                             <td>{{ data.default_comment }}</td>
-                            <td>{{ data.expiration_ts }}</td>
+                            <td>
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream date'], 'value':'{{ data.expiration_ts }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ data.expiration_ts }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
