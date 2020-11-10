@@ -9105,6 +9105,12 @@
                 "tlp": {
                     "description": "Traffic Light Protocol value to update",
                     "data_type": "string",
+                    "value_list": [
+                        "white",
+                        "green",
+                        "amber",
+                        "red"
+                    ],
                     "contains": [
                         "threatstream tlp"
                     ],
