@@ -111,8 +111,8 @@ class ThreatstreamConnector(BaseConnector):
 
         self._base_url = "https://{0}/api".format(self._handle_py_ver_compat_for_input_str(config.get('hostname', 'api.threatstream.com')))
         self._state = self.load_state()
-        self._verify = config.get("verify_server_cert")
-        self._is_cloud_instance = config.get("is_cloud_instance")
+        self._verify = config.get("verify_server_cert", False)
+        self._is_cloud_instance = config.get("is_cloud_instance", False)
         self._first_run_limit = config.get('first_run_containers')
 
         ret_val, self._first_run_limit = self._validate_integer(self, self._first_run_limit, THREATSTREAM_FIRST_RUN_CONTAINER)
@@ -1767,7 +1767,7 @@ class ThreatstreamConnector(BaseConnector):
             self.send_progress("Processing incident and corresponding intelligence artifacts - {} %".format(((i + 1) / len(incidents)) * 100))
             # self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
             # Handle the ingest_only_published_incidents scenario
-            if config.get("ingest_only_published_incidents"):
+            if config.get("ingest_only_published_incidents", False):
                 if "published" != incident.get("publication_status"):
                     self.debug_print("Skipping incident ID: {0} because ingest_only_published_incidents configuration parameter is marked true".format(incident.get("id")))
                     continue
