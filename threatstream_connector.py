@@ -1701,12 +1701,12 @@ class ThreatstreamConnector(BaseConnector):
             if self.is_poll_now():
                 # Manual polling
                 limit = param.get("container_count", 1000)
-                parameter = "container_count"
+                # parameter = "container_count"
             elif self._state.get("first_run", True):
                 # Scheduled polling first run
                 limit = self._first_run_limit
                 self._state["first_run"] = False
-                parameter = "first_run_containers"
+                # parameter = "first_run_containers"
             else:
                 # Poll every new update in the subsequent polls
                 # of the scheduled_polling
@@ -1949,6 +1949,8 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please provide either 'tlp' or 'tags' or 'comment' or 'threat_model_type' and 'threat_model_associate' parameter")
 
         payload = self._generate_payload()
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
 
         if tlp or intelligence_source or expire_time or (threat_model_type and threat_model_to_associate):
             data = {}
@@ -2008,6 +2010,9 @@ class ThreatstreamConnector(BaseConnector):
             endpoint = ENDPOINT_IMPORT_SESSION + "{}/".format(item_id)
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method='patch')
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method='patch')
             if (phantom.is_fail(ret_val)):
                 msg = "{}Error: {}".format("Unable to update {}. ".format(param_list if param_list else ""), action_result.get_message())
                 messages.append(msg)
@@ -2035,6 +2040,10 @@ class ThreatstreamConnector(BaseConnector):
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_TAG_IMPORT_SESSION.format(session_id=item_id),
                                                     payload=payload, headers=None, data=data, method='post')
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_TAG_IMPORT_SESSION.format(session_id=item_id),
+                                                        payload=payload, headers=None, data=data, method='post')
             if (phantom.is_fail(ret_val)):
                 messages.append("Unable to update the tags. Error: {}".format(action_result.get_message()))
             else:
@@ -2046,6 +2055,10 @@ class ThreatstreamConnector(BaseConnector):
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id),
                                                     payload=payload, method='patch')
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id),
+                                                        payload=payload, method='patch')
             if (phantom.is_fail(ret_val)):
                 messages.append("Unable to update the comment. Error: {}".format(action_result.get_message()))
             else:
