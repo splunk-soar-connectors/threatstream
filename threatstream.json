@@ -8649,6 +8649,9 @@
                     "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
+                    "contains": [
+                        "threatstream import session id"
+                    ],
                     "example_values": [
                         875
                     ]
@@ -9090,6 +9093,10 @@
                     "description": "ID of the import session to update",
                     "data_type": "numeric",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "threatstream import session id"
+                    ],
                     "order": 0
                 },
                 "ph": {
@@ -9586,6 +9593,9 @@
                 {
                     "data_path": "action_result.parameter.item_id",
                     "data_type": "numeric",
+                    "contains": [
+                        "threatstream import session id"
+                    ],
                     "example_values": [
                         869
                     ]

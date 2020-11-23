@@ -1977,8 +1977,12 @@ class ThreatstreamConnector(BaseConnector):
                             raise Exception
 
                         expire_time_date_obj = dateutil.parser.parse(expire_time)
-                        expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
+                        try:
+                            expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
+                        except ValueError:
+                            expire_time_utc_date_obj = expire_time_date_obj.replace(tzinfo=dateutil.tz.tzutc())
                         expire_time_utc_date = expire_time_utc_date_obj.date()
+
                         current_time_utc_date_obj = datetime.datetime.utcnow().replace(tzinfo=dateutil.tz.tzutc())
                         current_time_utc_date = current_time_utc_date_obj.date()
 
