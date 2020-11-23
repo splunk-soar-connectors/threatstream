@@ -212,6 +212,7 @@
                     "data_path": "action_result.data.*.is_anonymous",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -219,6 +220,7 @@
                     "data_path": "action_result.data.*.is_editable",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -521,6 +523,7 @@
                     "data_path": "action_result.data.*.is_anonymous",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -528,6 +531,7 @@
                     "data_path": "action_result.data.*.is_editable",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -1121,6 +1125,7 @@
                     "data_path": "action_result.data.*.is_anonymous",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -1128,6 +1133,7 @@
                     "data_path": "action_result.data.*.is_editable",
                     "data_type": "boolean",
                     "example_values": [
+                        true,
                         false
                     ]
                 },
@@ -8588,24 +8594,24 @@
                         "threatstream date"
                     ],
                     "primary": true,
-                    "order": 1
+                    "order": 0
                 },
                 "limit": {
                     "description": "Total number of import sessions to return",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 1,
                     "default": 1000
                 },
                 "offset": {
                     "description": "Record offset (used with paging, when returning many results)",
                     "data_type": "numeric",
-                    "order": 3,
+                    "order": 2,
                     "default": 0
                 },
                 "status_in": {
                     "description": "Status to filter the records",
                     "data_type": "string",
-                    "order": 4
+                    "order": 3
                 }
             },
             "render": {
@@ -8739,7 +8745,7 @@
                     "data_path": "action_result.data.*.approved_by.name",
                     "data_type": "string",
                     "example_values": [
-                        "matt"
+                        "testname"
                     ]
                 },
                 {
@@ -8766,7 +8772,7 @@
                     "data_path": "action_result.data.*.approved_by.email",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -8799,7 +8805,7 @@
                     "data_path": "action_result.data.*.approved_by.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test"
                     ]
                 },
                 {
@@ -8813,7 +8819,7 @@
                     "data_path": "action_result.data.*.approved_by.nickname",
                     "data_type": "string",
                     "example_values": [
-                        "PhantomIntegrationLab"
+                        "TestIntegrationLab"
                     ]
                 },
                 {
@@ -8841,7 +8847,7 @@
                     "data_path": "action_result.data.*.intelligence_source",
                     "data_type": "string",
                     "example_values": [
-                        "https://google.com/test"
+                        "https://test.com/test"
                     ],
                     "contains": [
                         "url"
@@ -8851,7 +8857,7 @@
                     "data_path": "action_result.data.*.email",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -8891,7 +8897,7 @@
                     "data_path": "action_result.data.*.fileName",
                     "data_type": "string",
                     "example_values": [
-                        "https://svlpartner-optic.s3.amazonaws.com/https%3A/google.com?Signature=19pJrM2OyY3wqiKi%2FDwPRThLq%2Bs%3D&Expires=1602227603&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH"
+                        "https://test.com/https%3A/test.com?Signature=19pJrM2OyY3wqiKi%2FDwPRThLq%2Bs%3D&Expires=1602227603&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH"
                     ],
                     "contains": [
                         "url"
@@ -8941,7 +8947,7 @@
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "matt"
+                        "test"
                     ]
                 },
                 {
@@ -8957,17 +8963,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.messages",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.source_confidence_weight",
@@ -8995,7 +8995,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test"
                     ]
                 },
                 {
@@ -9278,7 +9278,7 @@
                     "data_path": "action_result.data.*.email",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -9295,7 +9295,7 @@
                     "data_path": "action_result.data.*.associations.malware.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "TestPhantomMal"
+                        "TestMal"
                     ]
                 },
                 {
@@ -9316,7 +9316,7 @@
                     "data_path": "action_result.data.*.associations.vulnerabilities.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "TestPhantom"
+                        "TestVuln"
                     ]
                 },
                 {
@@ -9358,7 +9358,7 @@
                     "data_path": "action_result.data.*.associations.ttps.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "TestPhantomTTP"
+                        "TestTTP"
                     ]
                 },
                 {
@@ -9438,7 +9438,7 @@
                     "data_path": "action_result.data.*.tags.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "test_tag_ph"
+                        "test_tag"
                     ]
                 },
                 {
@@ -9485,7 +9485,7 @@
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "matt"
+                        "test"
                     ]
                 },
                 {
@@ -9501,17 +9501,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.messages",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.source_confidence_weight",
@@ -9539,7 +9533,7 @@
                     "data_path": "action_result.data.*.organization.name",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test"
                     ]
                 },
                 {
@@ -9647,19 +9641,18 @@
                 "modified_ts__gte": {
                     "description": "Threat models with greater than or equal to the provided modified time stamp will be returned",
                     "data_type": "string",
-                    "order": 1
+                    "order": 0
                 },
                 "limit": {
                     "description": "Total number of threat models to return",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 1,
                     "default": 1000
                 },
                 "model_type": {
                     "description": "Model type to filter the records",
                     "data_type": "string",
-                    "order": 3,
-                    "default": 0
+                    "order": 2
                 },
                 "tags_name": {
                     "description": "Tag name to filter the records",
@@ -9668,7 +9661,7 @@
                     "contains": [
                         "threatstream tags"
                     ],
-                    "order": 4
+                    "order": 3
                 }
             },
             "render": {
@@ -9860,7 +9853,7 @@
                     "data_path": "action_result.data.*.owner_user.email",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
@@ -9870,7 +9863,7 @@
                     "data_path": "action_result.data.*.owner_user.name",
                     "data_type": "string",
                     "example_values": [
-                        "matt"
+                        "test"
                     ]
                 },
                 {
@@ -9891,7 +9884,7 @@
                     "data_path": "action_result.data.*.organization.title",
                     "data_type": "string",
                     "example_values": [
-                        "phantom"
+                        "test"
                     ]
                 },
                 {
@@ -9902,7 +9895,7 @@
                     "data_path": "action_result.data.*.aliases",
                     "data_type": "string",
                     "example_values": [
-                        "ph"
+                        "test"
                     ]
                 },
                 {
@@ -9930,7 +9923,7 @@
                         "threatstream tags"
                     ],
                     "example_values": [
-                        "ph_test_tag"
+                        "test_tag"
                     ]
                 },
                 {
