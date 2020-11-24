@@ -1,13 +1,14 @@
 {
     "appid": "5b4fca40-e1b8-499d-aa57-a2c8e0b1c5e7",
     "name": "ThreatStream",
-    "description": "Integrates a variety of generic, reputation and investigative actions from the Anomali ThreatStream threat intelligence platform",
+    "description": "Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform",
     "publisher": "Splunk",
     "type": "reputation",
     "main_module": "threatstream_connector.py",
     "app_version": "2.0.5",
     "latest_tested_versions": [
-        "Cloud 15-SEPT-2020"
+        "On-premise v4.0 RED",
+        "Cloud 23-Nov-2020"
     ],
     "utctime_updated": "2020-11-23T08:14:58.000000Z",
     "package_name": "phantom_threatstream",
@@ -8581,7 +8582,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "import session search",
+            "action": "list import sessions",
             "description": "List all the import sessions",
             "type": "investigate",
             "identifier": "import_session_search",
@@ -8616,7 +8617,7 @@
             },
             "render": {
                 "width": 12,
-                "title": "Import Session",
+                "title": "Import Sessions",
                 "type": "table",
                 "height": 5
             },
@@ -9082,7 +9083,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "import session update",
+            "action": "update import session",
             "description": "This action updates the fields of the provided item id",
             "verbose": "If 'null' is provided in the expire time parameter then, expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
             "type": "generic",
@@ -9632,7 +9633,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "threat model search",
+            "action": "list threat models",
             "description": "List all the threat models",
             "type": "investigate",
             "identifier": "threat_model_search",
@@ -9666,7 +9667,7 @@
             },
             "render": {
                 "width": 12,
-                "title": "Threat Model",
+                "title": "Threat Models",
                 "type": "table",
                 "height": 5
             },
