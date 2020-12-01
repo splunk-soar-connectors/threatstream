@@ -43,7 +43,7 @@ THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from t
 THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response. Error from the server: {error}"
 THREATSTREAM_SUCCESS_WHOIS_MESSAGE = "Successfully retrieved whois info"
 THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
-THREATSTREAM_ERR_ZERO_ALLOWED_INVALID_PARAM = "Please provide zero or a valid positive integer in {param}"
+THREATSTREAM_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"

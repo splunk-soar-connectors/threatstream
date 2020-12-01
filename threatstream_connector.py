@@ -137,7 +137,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_INT.format(param=key)), None
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param=key)), None
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_NEGATIVE_INT_PARAM.format(param=key)), None
             if not allow_zero and parameter == 0:
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_PARAM.format(param=key)), None
 
@@ -1223,7 +1223,7 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_OFFSET)
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -1701,12 +1701,10 @@ class ThreatstreamConnector(BaseConnector):
             if self.is_poll_now():
                 # Manual polling
                 limit = param.get("container_count", 1000)
-                # parameter = "container_count"
             elif self._state.get("first_run", True):
                 # Scheduled polling first run
                 limit = self._first_run_limit
                 self._state["first_run"] = False
-                # parameter = "first_run_containers"
             else:
                 # Poll every new update in the subsequent polls
                 # of the scheduled_polling
@@ -1973,7 +1971,6 @@ class ThreatstreamConnector(BaseConnector):
                         match_iso8601 = re.compile(regex).match
 
                         if match_iso8601(expire_time) is None:
-                            # return action_result.set_status(phantom.APP_ERROR, "Please provide a valid date. Format: YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]")
                             raise Exception
 
                         expire_time_date_obj = dateutil.parser.parse(expire_time)
@@ -2011,7 +2008,7 @@ class ThreatstreamConnector(BaseConnector):
 
                 threat_model_msg = "Request for association sent successfully. "
 
-            endpoint = ENDPOINT_IMPORT_SESSION + "{}/".format(item_id)
+            endpoint = "{}{}/".format(ENDPOINT_IMPORT_SESSION, item_id)
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method='patch')
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":

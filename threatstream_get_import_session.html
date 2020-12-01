@@ -151,61 +151,61 @@
             {% endif %}
         </table>
         {% for data in result.data %}
-            <div class="results">
-                <h4 class="wf-h4-style">Import Session Info</h4>
+        <div class="results">
+            <h4 class="wf-h4-style">Import Session Info</h4>
 
-                <!--Default View-->
-                <table class="wf-table-horizontal datatable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Threat Type</th>
-                            <th>Intelligence Source</th>
-                            <th>TLP</th>
-                            <th>Tags</th>
-                            <th>Comment</th>
-                            <th>Expiration Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>    
-                        <tr>
-                            <td>{{ data.id }}</td>
-                            <td>{{ data.threat_type }}</td>
-                            <td>{{ data.intelligence_source }}</td>
+            <!--Default View-->
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Threat Type</th>
+                        <th>Intelligence Source</th>
+                        <th>TLP</th>
+                        <th>Tags</th>
+                        <th>Comment</th>
+                        <th>Expiration Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ data.id }}</td>
+                        <td>{{ data.threat_type }}</td>
+                        <td>{{ data.intelligence_source }}</td>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tlp'], 'value':'{{ data.tlp }}' }], 0, {{ container.id }}, null, false);">
+                            {{ data.tlp }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                        {% if data.tags %}
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tlp'], 'value':'{{ data.tlp }}' }], 0, {{ container.id }}, null, false);">
-                                {{ data.tlp }}
+                                {% for tag in data.tags %}
+                                    <li class="no-word-wrap">
+                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tags'], 'value':'{{ tag.name }}' }], 0, {{ container.id }}, null, false);">
+                                            {{ tag.name }}
+                                            &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </td>
+                        {% else %}
+                            <td>None</td>
+                        {% endif %}
+                        <td>{{ data.default_comment }}</td>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream date'], 'value':'{{ data.expiration_ts }}' }], 0, {{ container.id }}, null, false);">
+                                {{ data.expiration_ts }}
                                 &nbsp;
                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                            {% if data.tags %}
-                                <td>
-                                    {% for tag in data.tags %}
-                                        <li class="no-word-wrap">
-                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream tags'], 'value':'{{ tag.name }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ tag.name }}
-                                                &nbsp;
-                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                            </a>
-                                        </li>
-                                    {% endfor %}
-                                </td>
-                            {% else %}
-                                <td>None</td>
-                            {% endif %}
-                            <td>{{ data.default_comment }}</td>
-                            <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream date'], 'value':'{{ data.expiration_ts }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ data.expiration_ts }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         {% endfor %}
     {% endif %}
     {% endfor %} <!-- loop for each result end -->
