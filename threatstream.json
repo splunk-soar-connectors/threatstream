@@ -9085,7 +9085,7 @@
         {
             "action": "update import session",
             "description": "This action updates the fields of the provided item id",
-            "verbose": "If 'null' is provided in the expire time parameter then, expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
+            "verbose": "If 'null' is provided in the expire time parameter, then expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
             "type": "generic",
             "identifier": "import_session_update",
             "read_only": false,
