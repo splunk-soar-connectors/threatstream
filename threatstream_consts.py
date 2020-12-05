@@ -32,6 +32,10 @@ ENDPOINT_FILE_DETONATION = "/v1/submit/new/"
 ENDPOINT_URL_DETONATION = "/v1/submit/new/"
 ENDPOINT_GET_REPORT = '/v1/submit/{report_id}/report/'
 ENDPOINT_ASSOCIATE_INTELLIGENCE = '/v1/incident/{incident}/intelligence/bulk_add/'
+ENDPOINT_IMPORT_SESSION = '/v1/importsession/'
+ENDPOINT_THREAT_MODEL_SEARCH = '/v1/threat_model_search/'
+ENDPOINT_TAG_IMPORT_SESSION = "/v1/importsession/{session_id}/intelligence/tag/"
+ENDPOINT_COMMENT_IMPORT_SESSION = "/v1/importsession/{session_id}/comment/"
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
@@ -39,7 +43,15 @@ THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from t
 THREATSTREAM_ERR_PARSE_REPLY = "Unable to parse whois response. Error from the server: {error}"
 THREATSTREAM_SUCCESS_WHOIS_MESSAGE = "Successfully retrieved whois info"
 THREATSTREAM_ERR_INVALID_PARAM = "Please provide non-zero positive integer in {param}"
+THREATSTREAM_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
 
 WHOIS_NO_DATA = "No Whois Data Available"
-THREARSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
-THREARSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
+THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
+THREATSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
+
+THREATSTREAM_LIMIT = "'limit' action parameter"
+THREATSTREAM_ITEM_ID = "'item_id' action parameter"
+THREATSTREAM_OFFSET = "'offset' action parameter"
+THREATSTREAM_CONFIDENCE = "'confidence' action parameter"
+THREATSTREAM_FIRST_RUN_CONTAINER = "'first_run_container' configuration parameter"
+THREATSTREAM_INVALID_INT = "Please provide a valid integer value in the {param}"
