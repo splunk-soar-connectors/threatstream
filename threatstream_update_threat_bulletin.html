@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: threatstream_get_incident.html
+<!-- File: threatstream_update_threat_bulletin.html
   Copyright (c) 2016-2021 Splunk Inc.
 
   SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
@@ -92,87 +92,53 @@
 
     {% else %}
         <h4 class="wf-h3-style">Info</h4>
-        <table class="wf-table-vertical">
-            <tr>
-                <td>Incident ID</td>
-                <td>
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream incident id'], 'value':'{{ result.param.incident_id }}' }], 0, {{ container.id }}, null, false);">
-                        {{ result.param.incident_id }}
+            <table class="wf-table-vertical">
+                <tr>
+                    {% if result.param.id %}
+                    <td>Threat Bulletin ID</td>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream threatbulletin id'], 'value':'{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.id }}
                         &nbsp;
-                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                    </a>
-                </td>
-            </tr>
-        </table>
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+            </table>
         {% for data in result.data %}
             <div class="results">
-                <h4 class="wf-h4-style">Incident Info</h4>
+                <h4 class="wf-h4-style">Threat Bulletin Info</h4>
 
                 <!--Default View-->
                 <table class="wf-table-horizontal datatable">
                     <thead>
                         <tr>
-                            <th>Incident Name</th>
-                            <th>Organization ID</th>
+                            <th>Threat Bulletin ID</th>
+                            <th>Threat Bulletin Name</th>
+                            <th>Source</th>
+                            <th>Status</th>
+                            <th>Tlp</th>
                             <th>Is Public</th>
                         </tr>
                     </thead>
-                    <tbody>    
+                    <tbody>
                         <tr>
-                            <td>{{ data.name }}</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream organization id'], 'value':'{{ data.organization_id }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ data.organization_id }}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream threatbulletin id'], 'value':'{{ data.id }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ data.id }}
                                     &nbsp;
                                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                 </a>
                             </td>
+                            <td>{{ data.name }}</td>
+                            <td>{{ data.source }}</td>
+                            <td>{{ data.status }}</td>
+                            <td>{{ data.tlp }}</td>
                             <td>{{ data.is_public }}</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
-            <br>
-            <div class="results">
-                <h4 class="wf-h4-style">Intelligence Info</h4>
-
-                <!--Default View-->
-                {% if data.intelligence %}
-                    <table class="wf-table-horizontal datatable">
-                        <thead>
-                            <tr>
-                                <th>Intelligence ID</th>
-                                <th>Intelligence Type</th>
-                                <th>Intelligence Value</th>
-                                <th>Is Public</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for intelligence in data.intelligence %}
-                                <tr>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatstream intelligence id'], 'value':'{{ intelligence.id }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.id }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>{{ intelligence.type }}</td>
-                                    <td>
-                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'domain', 'url', 'md5', 'sha1', 'hash'], 'value':'{{ intelligence.value }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ intelligence.value }}
-                                            &nbsp;
-                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                        </a>
-                                    </td>
-                                    <td>{{ intelligence.is_public }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <h4 class="wf-h4-style">No intelligence associated with this incident</h4>
-                {% endif %}
             </div>
         {% endfor %}
     {% endif %}
