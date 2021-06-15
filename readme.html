@@ -1,34 +1,34 @@
 <!-- File: readme.html
- Copyright (c) 2016-2020 Splunk Inc.
+ Copyright (c) 2016-2021 Splunk Inc.
 
  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
  without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
-<p><b>Prerequisite for [Delete Incident] action</b>
-	<ul>
-		<li>The authenticated user in the app should have appropriate permissions (Organization Admin) for deleting the incidents on the Anomali Threatstream instance for this action to be executed successfully.</li>
-	</ul>
-</p>
-
-<p><b>Behavior for [Whois IP] action</b>
-	<ul>
-		<li>If the action is able to fetch additional whois data for the provided IP then, the action will pass successfully with that additional data.</li>
-		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully without that additional data but with an appropriate message.</li>
-	</ul>
-</p>
-
 <p><b>Playbook Backward Compatibility</b>
 	<ul>
-		<li>New action parameters have been added to the actions given below. Hence, it is requested to the end-user to please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
-		<ul>
-			<li>Create Incident - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import domain observable - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import URL observable - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import IP observable - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import file observable - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import email observable - <b>create_on_cloud</b> parameter has been added</li>
-			<li>Import observables - <b>create_on_cloud</b> parameter has been added</li>
+		<li>New action parameters have been added to the actions given below. Hence, it is requested to the end-user please update their existing playbooks and provide values to these new action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+        <ul>
+            <li><b>For version 3.0.X :</b></li>
+            <ul>
+                <li>Import domain observable - <b>with_approval, allow_unresolved</b> parameters have been added</li>
+                <li>Import URL observable - <b>with_approval</b> parameter has been added</li>
+                <li>Import IP observable - <b>with_approval</b> parameter has been added</li>
+                <li>Import file observable - <b>with_approval</b> parameter has been added</li>
+                <li>Import email observable - <b>with_approval</b> parameter has been added</li>
+                <li>Import observables - <b>with_approval, allow_unresolved</b> parameters have been added</li>
+                <li>List threat models - <b>publication_status</b> parameter has been added</li>
+            </ul>
+            <li><b> For version 2.0.9 : </b></li>
+            <ul>
+                <li>Create Incident - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import domain observable - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import URL observable - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import IP observable - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import file observable - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import email observable - <b>create_on_cloud</b> parameter has been added</li>
+                <li>Import observables - <b>create_on_cloud</b> parameter has been added</li>
+            </ul>
 		</ul>
 	</ul>
 </p>
@@ -39,23 +39,25 @@
 	</ul>
 </p>
 
-<p><b>Confidence action parameter for import observable related actions</b>
+<p><b>Prerequisite for [Delete Incident / Delete Actor / Delete Vulnerability / Delete Rule / Delete Threat Bulletin] actions</b>
 	<ul>
-		<li>For [import file observable] and [import email observable] actions user has to provide the confidence value in [confidence] action parameter</li>
-		<li>For [import domain observable], [import ip observable], and [import url observable] actions ThreatStream automatically gives the confidence value based on some internal logical operations | processes as per the API documentation</li>
-		<li>For [import observable] action user can provide confidence value in 'fields' parameter as {"confidence": &lt;confidence_value&gt;}</li>
-		<ul>
-			<li>For hash and email type of observable, the value of the confidence will be reflected</li>
-			<li>For domain, IP, and URL type of observable, the value of the confidence will be ignored</li>
-		</ul>
+		<li>The authenticated user in the app should have appropriate permissions (Organization Admin) for deleting the incidents/actors/vulnerabilities/rules/threat-bulletins on the Anomali Threatstream instance for these actions to be executed successfully.</li>
 	</ul>
 </p>
 
-<p><b>Domain Reputation</b>
+<p><b>Behavior for [Whois IP] action</b>
+	<ul>
+		<li>If the action can fetch additional whois data for the provided IP then, the action will pass successfully with that additional data.</li>
+		<li>If the action is unable to fetch additional whois data for the provided IP then, the action will pass successfully without that additional data but with an appropriate message.</li>
+	</ul>
+</p>
+
+<p><b>Behavior for Domain Reputation</b>
 	<ul>
 		<li>The action will try to find an intelligence with the same name provided in the [domain] parameter in the Anomali ThreatStream instance. If it is not found, then 'None' will be displayed under the corresponding columns in the output view.</li>
 		<li>If the provided domain is not found as intelligence in the Anomali ThreatStream instance, then the user needs to import a domain observable with the provided domain as input and then try to re-run the [domain reputation] action.</li>
 	</ul>
+</p>
 
 <p><b>On Poll Functionality</b>
 	<ul>
@@ -87,7 +89,30 @@
 	</ul>
 </p>
 
-<br>
+<p><b>Behavior for [Create vulnerability / Update vulnerability / Create actor / Update Actor / Create threat bulletin / Update threat bulletin] actions</b>
+	<ul>
+		<li>Trusted circles are not available locally on On-prem (Hybrid) instance.</li>
+	</ul>
+</p>
+
+<p><b>Behavior for [Create vulnerability / Update vulnerability / Create actor / Update Actor / Create threat bulletin / Update threat bulletin / Create incident / Update incident] actions</b>
+	<ul>
+		<li>The action uses different API endpoints for creating / updating an entity and associating intelligence, attachments, import sessions or comments to the entity.</li>
+		<li>If the action fails to associate the intelligence, attachments, import sessions or comments while creating an entity, the user can associate them by running the Update action with valid inputs.</li>
+	</ul>
+</p>
+
+<p><b>Confidence action parameter for import observable related actions</b>
+	<ul>
+		<li>For [import file observable] and [import email observable] actions user has to provide the confidence value in [confidence] action parameter.</li>
+		<li>For [import domain observable], [import ip observable], and [import url observable] actions ThreatStream automatically gives the confidence value based on some internal logical operations | processes as per the API documentation.</li>
+		<li>For [import observable] action user can provide confidence value in 'fields' parameter as {"confidence": &lt;confidence_value&gt;}.</li>
+		<ul>
+			<li>For hash and email type of observable, the value of the confidence will be reflected.</li>
+			<li>For domain, IP, and URL type of observable, the value of the confidence will be ignored.</li>
+		</ul>
+	</ul>
+</p>
 
 <p><b>Behavior of import_&lt;indicator_type&gt;_observable and the import_observables actions</b>
 	<ul>
@@ -101,6 +126,178 @@
 		<li>It is recommended to add a required time delay between the action blocks which are dependent on the successful import of an observable.</li>
 		<li>To check if the observable was successfully imported, the user can run and check the <b>List Observables</b> action which fetches the observables in the latest first order (based on <b>created_ts</b> time).</li>
 	</ul>
+</p>
+
+<p><b>List of indicator types (itype) for the import_&lt;indicator_type&gt;_observable and the import_observables actions (To be given as input when with_approval parameter is set to False)</b>
+	<ul>
+		<li>actor_ip</li>
+		<li>actor_ipv6</li>
+		<li>adware_domain</li>
+		<li>adware_registry_key</li>
+		<li>anon_proxy</li>
+		<li>anon_proxy_ipv6</li>
+		<li>anon_vpn</li>
+		<li>anon_vpn_ipv6</li>
+		<li>apt_domain</li>
+		<li>apt_email</li>
+		<li>apt_file_name</li>
+		<li>apt_file_path</li>
+		<li>apt_ip</li>
+		<li>apt_ipv6</li>
+		<li>apt_md5</li>
+		<li>apt_mta</li>
+		<li>apt_mutex</li>
+		<li>apt_registry_key</li>
+		<li>apt_service_description</li>
+		<li>apt_service_displayname</li>
+		<li>apt_service_name</li>
+		<li>apt_ssdeep</li>
+		<li>apt_subject</li>
+		<li>apt_ua</li>
+		<li>apt_url</li>
+		<li>bot_ip</li>
+		<li>bot_ipv6</li>
+		<li>brute_ip</li>
+		<li>brute_ipv6</li>
+		<li>c2_domain</li>
+		<li>c2_ip</li>
+		<li>c2_ipv6</li>
+		<li>c2_url</li>
+		<li>comm_proxy_domain</li>
+		<li>comm_proxy_ip</li>
+		<li>compromised_domain</li>
+		<li>compromised_email</li>
+		<li>compromised_ip</li>
+		<li>compromised_ipv6</li>
+		<li>compromised_service_account</li>
+		<li>compromised_url</li>
+		<li>crypto_hash</li>
+		<li>crypto_ip</li>
+		<li>crypto_pool</li>
+		<li>crypto_url</li>
+		<li>crypto_wallet</li>
+		<li>ddos_ip</li>
+		<li>ddos_ipv6</li>
+		<li>disposable_email_domain</li>
+		<li>dyn_dns</li>
+		<li>exfil_domain</li>
+		<li>exfil_ip</li>
+		<li>exfil_ipv6</li>
+		<li>exfil_url</li>
+		<li>exploit_domain</li>
+		<li>exploit_ip</li>
+		<li>exploit_ipv6</li>
+		<li>exploit_url</li>
+		<li>fraud_domain</li>
+		<li>fraud_ip</li>
+		<li>fraud_md5</li>
+		<li>fraud_email</li>
+		<li>fraud_url</li>
+		<li>free_email_domain</li>
+		<li>geolocation_url</li>
+		<li>hack_tool</li>
+		<li>i2p_ip</li>
+		<li>i2p_ipv6</li>
+		<li>ipcheck_url</li>
+		<li>mal_domain</li>
+		<li>mal_email</li>
+		<li>mal_file_name</li>
+		<li>mal_file_path</li>
+		<li>mal_ip</li>
+		<li>mal_ipv6</li>
+		<li>mal_md5</li>
+		<li>mal_mutex</li>
+		<li>mal_registry_key</li>
+		<li>mal_service_description</li>
+		<li>mal_service_displayname</li>
+		<li>mal_service_name</li>
+		<li>mal_ssdeep</li>
+		<li>mal_sslcert_sh1</li>
+		<li>mal_ua</li>
+		<li>mal_url</li>
+		<li>p2pcnc</li>
+		<li>p2pcnc_ipv6</li>
+		<li>parked_domain</li>
+		<li>parked_ip</li>
+		<li>parked_ipv6</li>
+		<li>parked_url</li>
+		<li>pastesite_url</li>
+		<li>phish_domain</li>
+		<li>phish_email</li>
+		<li>phish_ip</li>
+		<li>phish_ipv6</li>
+		<li>phish_md5</li>
+		<li>phish_url</li>
+		<li>proxy_ip</li>
+		<li>proxy_ipv6</li>
+		<li>scan_ip</li>
+		<li>scan_ipv6</li>
+		<li>sinkhole_domain</li>
+		<li>sinkhole_ip</li>
+		<li>sinkhole_ipv6</li>
+		<li>social_media_url</li>
+		<li>spam_domain</li>
+		<li>spam_email</li>
+		<li>spam_ip</li>
+		<li>spam_ipv6</li>
+		<li>spam_mta</li>
+		<li>spam_url</li>
+		<li>speedtest_url</li>
+		<li>ssh_ip</li>
+		<li>ssh_ipv6</li>
+		<li>ssl_cert_serial_number</li>
+		<li>suppress</li>
+		<li>suspicious_domain</li>
+		<li>suspicious_email</li>
+		<li>suspicious_ip</li>
+		<li>suspicious_reg_email</li>
+		<li>suspicious_url</li>
+		<li>tor_ip</li>
+		<li>tor_ipv6</li>
+		<li>torrent_tracker_url</li>
+		<li>vpn_domain</li>
+		<li>vps_ip</li>
+		<li>vps_ipv6</li>
+		<li>whois_bulk_reg_email</li>
+		<li>whois_privacy_domain</li>
+		<li>whois_privacy_email</li>
+	</ul>
+	<b>NOTE:</b> If the input contains any indicator_type value except the ones listed above, the action will behave according to the API behavior.
+</p>
+
+<p><b>List of threat types (threat_type) for the import_&lt;indicator_type&gt;_observable and the import_observables actions (To be given as input when with_approval parameter is set to True)</b>
+	<ul>
+		<li>adware</li>
+		<li>anomalous</li>
+		<li>anonymization</li>
+		<li>apt</li>
+		<li>bot</li>
+		<li>brute</li>
+		<li>c2</li>
+		<li>compromised</li>
+		<li>crypto</li>
+		<li>data_leakage</li>
+		<li>ddos</li>
+		<li>dyn_dns</li>
+		<li>exfil</li>
+		<li>exploit</li>
+		<li>fraud</li>
+		<li>hack_tool</li>
+		<li>i2p</li>
+		<li>informational</li>
+		<li>malware</li>
+		<li>p2p</li>
+		<li>parked</li>
+		<li>phish</li>
+		<li>scan</li>
+		<li>sinkhole</li>
+		<li>spam</li>
+		<li>suppress</li>
+		<li>suspicious</li>
+		<li>tor</li>
+		<li>vps</li>
+	</ul>
+	<b>NOTE:</b> If the input contains any threat_type value except the ones listed above, the action will behave according to the API behavior.
 </p>
 
 <p>
