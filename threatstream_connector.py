@@ -1,5 +1,5 @@
 # File: threatstream_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -8,7 +8,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as phrules
 
 # Local imports
 from threatstream_consts import *
@@ -24,6 +24,7 @@ import pythonwhois
 import dateutil.parser
 import pytz
 import re
+import sys
 from ipwhois import IPWhois
 import simplejson as json
 from bs4 import BeautifulSoup
@@ -39,11 +40,11 @@ except:
 #  the json
 # Note that all of these should be in the "admin"
 #  field
-whois_fields = [ "city",
-                 "country",
-                 "email",
-                 "name",
-                 "organization" ]
+whois_fields = ["city",
+                "country",
+                "email",
+                "name",
+                "organization"]
 
 
 def _json_fallback(obj):
@@ -93,6 +94,25 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_IMPORT_SESSION_SEARCH = "import_session_search"
     ACTION_IMPORT_SESSION_UPDATE = "import_session_update"
     ACTION_THREAT_MODEL_SEARCH = "threat_model_search"
+    ACTION_CREATE_THREAT_BULLETIN = "create_threat_bulletin"
+    ACTION_UPDATE_THREAT_BULLETIN = "update_threat_bulletin"
+    ACTION_DELETE_THREAT_BULLETIN = "delete_threat_bulletin"
+    ACTION_LIST_THREAT_BULLETINS = "list_threat_bulletins"
+    ACTION_LIST_ASSOCIATIONS = "list_associations"
+    ACTION_CREATE_RULE = "create_rule"
+    ACTION_UPDATE_RULE = "update_rule"
+    ACTION_LIST_RULE = "list_rules"
+    ACTION_DELETE_RULE = "delete_rule"
+    ACTION_ADD_ASSOCIATION = "add_association"
+    ACTION_REMOVE_ASSOCIATION = "remove_association"
+    ACTION_LIST_ACTORS = "list_actors"
+    ACTION_LIST_IMPORT = "list_imports"
+    ACTION_CREATE_VULNERABILITY = "create_vulnerability"
+    ACTION_UPDATE_VULNERABILITY = "update_vulnerability"
+    ACTION_DELETE_VULNERABILITY = "delete_vulnerability"
+    ACTION_DELETE_ACTOR = "delete_actor"
+    ACTION_CREATE_ACTOR = "create_actor"
+    ACTION_UPDATE_ACTOR = "update_actor"
 
     def __init__(self):
 
@@ -108,6 +128,13 @@ class ThreatstreamConnector(BaseConnector):
 
     def initialize(self):
         config = self.get_config()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR,
+                                   "Error occurred while getting the Phantom server's Python major version.")
 
         self._base_url = "https://{0}/api".format(self._handle_py_ver_compat_for_input_str(config.get('hostname', 'api.threatstream.com')))
         self._state = self.load_state()
@@ -152,6 +179,14 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {})
         elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_RULE:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted rule"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_THREAT_BULLETIN:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted threat bulletin"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_VULNERABILITY:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted vulnerability"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_ACTOR:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted actor"), {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
@@ -215,7 +250,8 @@ class ThreatstreamConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+                                                   .format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -360,17 +396,9 @@ class ThreatstreamConnector(BaseConnector):
     def _intel_details(self, value, action_result, limit=None):
         """ Use the intelligence endpoint to get general details """
 
-        # strip out scheme because API cannot find
-        # intel with it included
-        if phantom.is_url(value):
-            host = urlsplit(value).netloc
-            value_regexp = r'.*{0}.*'.format(host)
+        payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value, limit=limit)
 
-            payload = self._generate_payload(extend_source="true", type="url", order_by="-created_ts", value__regexp=value_regexp, limit=limit)
-        else:
-            payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value, limit=limit)
-
-        intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload)
+        intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=limit)
 
         if intel_details is None:
             return action_result.get_status()
@@ -436,21 +464,26 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _whois(self, value, action_result, tipe=""):
-        payload = self._generate_payload()
-        whois = ENDPOINT_WHOIS.format(ioc_value=value)
         final_response = dict()
 
-        ret_val, resp_json = self._make_rest_call(action_result, whois, payload)
-        if (phantom.is_fail(ret_val)):
-            return action_result.set_status(phantom.APP_ERROR, "Error making whois request")
+        # This fix for hanging issue of japanese domain
+        if value.endswith("jp"):
+            whois_response = pythonwhois.get_whois(value)
+        else:
+            payload = self._generate_payload()
+            whois = ENDPOINT_WHOIS.format(ioc_value=value)
 
-        if not resp_json.get("data") or (resp_json['data'] == WHOIS_NO_DATA):
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_NO_DATA)
+            ret_val, resp_json = self._make_rest_call(action_result, whois, payload)
+            if (phantom.is_fail(ret_val)):
+                return action_result.set_status(phantom.APP_ERROR, "Error making whois request")
 
-        try:
-            whois_response = pythonwhois.parse.parse_raw_whois([resp_json['data']], True)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_FETCH_REPLY.format(error=str(e)))
+            if not resp_json.get("data") or (resp_json['data'] == WHOIS_NO_DATA):
+                return action_result.set_status(phantom.APP_ERROR, WHOIS_NO_DATA)
+
+            try:
+                whois_response = pythonwhois.parse.parse_raw_whois([resp_json['data']], True)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_FETCH_REPLY.format(error=self._get_error_message_from_exception(e)))
 
         try:
             # Need to work on the json, it contains certain fields that are not
@@ -460,7 +493,7 @@ class ThreatstreamConnector(BaseConnector):
             whois_response = json.loads(whois_response)
             final_response.update(whois_response)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=str(e)))
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_PARSE_REPLY.format(error=self._get_error_message_from_exception(e)))
 
         try:
             if tipe == "ip":
@@ -761,7 +794,7 @@ class ThreatstreamConnector(BaseConnector):
             except ValueError:
                 return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'incident id' parameter"), None
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e))), None
+                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e))), None
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
@@ -780,6 +813,42 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status(), None
 
             endpoint = "{}{}/".format(ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), "intelligence")
+
+            response = self._paginator(endpoint, action_result, payload=payload)
+
+            if response is None:
+                return action_result.get_status(), None
+
+            resp_json.update({"intelligence": response})
+
+        action_result.set_status(phantom.APP_SUCCESS, "")
+
+        return phantom.APP_SUCCESS, resp_json
+
+    def _get_threat_model_support(self, action_result, endpoint):
+
+        ret_val = None
+        resp_json = None
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload)
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+            endpoint = "{}{}/".format(endpoint, "intelligence")
 
             response = self._paginator(endpoint, action_result, payload=payload)
 
@@ -811,7 +880,7 @@ class ThreatstreamConnector(BaseConnector):
         except ValueError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'intelligence id' parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
 
         payload = self._generate_payload(id=intelligence_id)
 
@@ -835,7 +904,7 @@ class ThreatstreamConnector(BaseConnector):
         except ValueError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'vulnerability id' parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
 
         payload = self._generate_payload()
 
@@ -863,7 +932,7 @@ class ThreatstreamConnector(BaseConnector):
         except ValueError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'incident id' parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
 
         payload = self._generate_payload()
 
@@ -899,11 +968,11 @@ class ThreatstreamConnector(BaseConnector):
         cloud_intelligence = data_dict.get("cloud_intelligence")
 
         payload = self._generate_payload()
-        final_creation = False
         intelligence = list()
+        output_message = None
+        is_error = False
 
         if self._is_cloud_instance:
-            final_creation = True
             if cloud_intelligence:
                 data.update({"intelligence": cloud_intelligence})
             payload["remote_api"] = "true"
@@ -916,7 +985,6 @@ class ThreatstreamConnector(BaseConnector):
                 intelligence.append(intel.get("id"))
 
         elif create_on_cloud:
-            final_creation = True
             payload["remote_api"] = "true"
             ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INCIDENT, payload, data=data, method="post")
 
@@ -927,15 +995,19 @@ class ThreatstreamConnector(BaseConnector):
             if not incident_id:
                 return action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID of the created incident on the cloud")
 
+            output_message = THREATSTREAM_SUCCESS_INCIDENT_MESSAGE.format(incident_id)
+
             if cloud_intelligence:
                 intel_data = {"ids": cloud_intelligence}
                 ret_val, response = self._make_rest_call(
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                 if phantom.is_fail(ret_val):
-                    return action_result.get_status()
+                    is_error = True
+                    output_message = "{}. {}. Details: {}"\
+                        .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
 
-                if response.get("ids"):
+                if response and response.get("ids"):
                     intelligence.extend(response.get("ids"))
 
             if local_intelligence:
@@ -945,8 +1017,9 @@ class ThreatstreamConnector(BaseConnector):
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                 if phantom.is_fail(ret_val):
-                    self.debug_print("Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter".format(
-                        ', '.join(local_intelligence)))
+                    is_error = True
+                    output_message = "{}. {}. Details: {}"\
+                        .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
 
                 if response and response.get("local_ids"):
                     intelligence.extend(response.get("local_ids"))
@@ -962,6 +1035,8 @@ class ThreatstreamConnector(BaseConnector):
             if not incident_id:
                 return action_result.set_status(phantom.APP_ERROR, "Error while fetching the incident ID of the created incident on the on-prem")
 
+            output_message = THREATSTREAM_SUCCESS_INCIDENT_MESSAGE.format(incident_id)
+
             intel_data = dict()
 
             if local_intelligence:
@@ -974,37 +1049,41 @@ class ThreatstreamConnector(BaseConnector):
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                 if phantom.is_fail(ret_val):
-                    return action_result.get_status()
+                    is_error = True
+                    output_message = "{}. Error while adding intelligence to the incident. Details: {}".format(output_message, action_result.get_message())
 
-                if response.get("remote_ids"):
+                if response and response.get("remote_ids"):
                     intelligence.extend(response.get("remote_ids"))
 
-                if response.get("ids"):
+                if response and response.get("ids"):
                     intelligence.extend(response.get("ids"))
 
         intel_list = list()
 
         if intelligence:
             msg_intel = list()
-            for i in intelligence:
+            for intel_value in intelligence:
                 intel_id_dict = dict()
-                intel_id_dict["id"] = i
+                intel_id_dict["id"] = intel_value
                 intel_list.append(intel_id_dict)
-                msg_intel.append(str(i))
+                msg_intel.append(str(intel_value))
 
             resp_json["intelligence"] = intel_list
 
             message = "Incident created successfully. Associated intelligence : {}".format(', '.join(msg_intel))
 
-        elif (local_intelligence or cloud_intelligence) and not intelligence:
+        elif (local_intelligence or cloud_intelligence):
             message = "Incident created successfully. None of the intelligence got associated, please provide valid intelligence"
 
         else:
             message = "Incident created successfully"
 
         action_result.add_data(resp_json)
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
         summary = action_result.update_summary({})
-        summary['created_on_cloud'] = final_creation
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_update_incident(self, param):
@@ -1018,7 +1097,7 @@ class ThreatstreamConnector(BaseConnector):
         except ValueError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'incident id' parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
 
         if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields"):
             return action_result.set_status(phantom.APP_ERROR, "Please provide at least one parameter, either 'intelligence' or 'fields' to update the provided incident")
@@ -1034,6 +1113,8 @@ class ThreatstreamConnector(BaseConnector):
         data = data_dict.get("data")
 
         payload = self._generate_payload()
+        output_message = None
+        is_error = False
 
         if self._is_cloud_instance:
             if cloud_intelligence:
@@ -1061,8 +1142,13 @@ class ThreatstreamConnector(BaseConnector):
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                         if phantom.is_fail(ret_val):
-                            self.debug_print("Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter".format(
-                                ', '.join(local_intelligence)))
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}"\
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
                         del intel_data["local_ids"]
                         if resp_json and resp_json.get("local_ids"):
                             intel_ids_list.extend(resp_json.get("local_ids"))
@@ -1074,25 +1160,35 @@ class ThreatstreamConnector(BaseConnector):
                             action_result, ENDPOINT_ASSOCIATE_INTELLIGENCE.format(incident=incident_id), payload, data=intel_data, method="post")
 
                         if phantom.is_fail(ret_val):
-                            return action_result.get_status()
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}"\
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
 
                 if phantom.is_fail(ret_val):
-                    return action_result.get_status()
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. Error while updating the incident. Details: {}".format(output_message, action_result.get_message())
+                    else:
+                        output_message = "{}. Details: {}".format("Error while updating the incident", action_result.get_message())
 
-                if resp_json.get("ids"):
+                if resp_json and resp_json.get("ids"):
                     intel_ids_list.extend(resp_json.get("ids"))
-                if resp_json.get("remote_ids"):
+                if resp_json and resp_json.get("remote_ids"):
                     intel_ids_list.extend(resp_json.get("remote_ids"))
 
             if intel_ids_list:
                 msg_intel = list()
-                for i in intel_ids_list:
-                    msg_intel.append(str(i))
+                for intel_value in intel_ids_list:
+                    msg_intel.append(str(intel_value))
 
                 message = "Associated intelligence : {}".format(', '.join(msg_intel))
 
-            elif (local_intelligence or cloud_intelligence) and not intel_ids_list:
-                message = "None of the intelligence got associated, please provide valid intelligence"
+            elif (local_intelligence or cloud_intelligence):
+                message = THREATSTREAM_ERR_INVALID_INTELLIGENCE
 
             else:
                 message = None
@@ -1116,14 +1212,17 @@ class ThreatstreamConnector(BaseConnector):
         intel_ids_list = list(set(intel_ids_list))
 
         if intel_ids_list:
-            for i in intel_ids_list:
+            for intel_value in intel_ids_list:
                 intel_id_dict = dict()
-                intel_id_dict["id"] = i
+                intel_id_dict["id"] = intel_value
                 intel_list.append(intel_id_dict)
 
             resp_json["intelligence"] = intel_list
 
         action_result.add_data(resp_json)
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
         if message:
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident. {}".format(message))
         else:
@@ -1161,6 +1260,26 @@ class ThreatstreamConnector(BaseConnector):
         if self.get_action_identifier() == 'update_incident':
 
             ret_val, resp_json = self._get_incident_support(action_result, param)
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            for intell in resp_json.get("intelligence", []):
+                associated_intell.append(int(intell.get("id")))
+
+        if self.get_action_identifier() in ['update_actor', 'update_vulnerability']:
+
+            ret_val, _id = self._validate_integer(action_result, param.get('id'), THREATSTREAM_ID)
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            if self.get_action_identifier() == "update_actor":
+                endpoint = ENDPOINT_SINGLE_ACTOR.format(actor_id=_id)
+            else:
+                endpoint = ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=_id)
+
+            ret_val, resp_json = self._get_threat_model_support(action_result, endpoint)
 
             if phantom.is_fail(ret_val):
                 return None
@@ -1276,26 +1395,43 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
         create_on_cloud = param.get("create_on_cloud", False)
-        final_creation = False
+        with_approval = param.get("with_approval", False)
 
         if self._is_cloud_instance or create_on_cloud:
-            final_creation = True
             payload["remote_api"] = "true"
 
         if action_name == self.ACTION_ID_IMPORT_IOC:
-            if param["observable_type"] == "ip":
-                ob_type = "srcip"
-            elif param["observable_type"] == "hash":
-                ob_type = "md5"
-            else:
-                ob_type = param["observable_type"]
-
             value = param["value"]
-
-            data = {
-                    "objects": [
-                        {ob_type: value, "classification": param["classification"]}
-                    ]
+            if not with_approval:
+                key = "itype"
+                endpoint = ENDPOINT_IMPORT_IOC
+                method = "patch"
+                use_json = True
+                if param["observable_type"] == "ip":
+                    ob_type = "srcip"
+                elif param["observable_type"] == "hash":
+                    ob_type = "md5"
+                else:
+                    ob_type = param["observable_type"]
+                data = {
+                        "objects": [
+                            {
+                                ob_type: value, "classification": param["classification"]
+                            }
+                        ]
+                    }
+                if ob_type == "domain":
+                    data.update({"meta": {
+                        "allow_unresolved": param.get('allow_unresolved', False)
+                    }})
+            else:
+                key = "threat_type"
+                endpoint = ENDPOINT_IMPORT_APPROVAL_IOC
+                method = "post"
+                use_json = False
+                data = {
+                    'datatext': value,
+                    "classification": param["classification"]
                 }
 
             if param.get("fields", None):
@@ -1306,77 +1442,138 @@ class ThreatstreamConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. \
                         Please ensure that provided input is in valid JSON format".format(error_msg))
 
-                if "itype" in fields:
-                    data["objects"][0].update(fields)
+                if not isinstance(fields, dict):
+                    return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
+
+                if with_approval and "confidence" not in fields:
+                    return action_result.set_status(phantom.APP_ERROR, "Providing 'confidence' in fields parameter is mandatory for importing an observable with approval")
+
+                if key in fields:
+                    if not with_approval:
+                        data["objects"][0].update(fields)
+                    else:
+                        data.update(fields)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
-                    (e.g. {\"itype\": \"<indicator_type>\"})")
-                #        , "itype": "actor_ip", "detail": "dionea,smbd,port-445,Windows-XP,DSL", "confidence": 50, "severity": "high"}
+                    return action_result.set_status(phantom.APP_ERROR, "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                                (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Providing 'itype' in fields parameter is mandatory for importing an observable \
-                (e.g. {\"itype\": \"<indicator_type>\"})")
+                return action_result.set_status(phantom.APP_ERROR, "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                            (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
+
         else:
+            ret_val, confidence = self._validate_integer(action_result, param.get('confidence', 100), THREATSTREAM_INVALID_CONFIDENCE)
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_CONFIDENCE)
             indicator_type = param['indicator_type']
             classification = param.get('classification')
             severity = param.get('severity')
             tags = param.get('tags')
 
-            ret_val, confidence = self._validate_integer(action_result, param.get('confidence', None), THREATSTREAM_INVALID_CONFIDENCE)
-            if phantom.is_fail(ret_val):
-                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_CONFIDENCE)
-            if confidence:
-                confidence = int(confidence)
+            if not with_approval:
+                endpoint = ENDPOINT_IMPORT_IOC
+                method = "patch"
+                use_json = True
+                data = {}
+                object_dict = {"itype": indicator_type}
 
-            object_dict = {"itype": indicator_type}
+                if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
+                    value = param['email']
+                    object_dict.update({"email": value})
 
-            if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
-                value = param['email']
-                object_dict.update({"email": value})
+                if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
+                    value = param['file_hash']
+                    object_dict.update({"md5": value})
 
-            if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
-                value = param['file_hash']
-                object_dict.update({"md5": value})
+                if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
+                    value = param['ip_address']
+                    object_dict.update({"srcip": value})
 
-            if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
-                value = param['ip_address']
-                object_dict.update({"srcip": value})
+                if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
+                    value = param['url']
+                    object_dict.update({"url": value})
 
-            if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
-                value = param['url']
-                object_dict.update({"url": value})
+                if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
+                    value = param['domain']
+                    object_dict.update({"domain": value})
+                    data = {
+                        "meta": {
+                                "allow_unresolved": param.get('allow_unresolved', False)
+                            }
+                    }
 
-            if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
-                value = param['domain']
-                object_dict.update({"domain": value})
+                if confidence:
+                    object_dict.update({"confidence": confidence})
 
-            if confidence:
-                object_dict.update({"confidence": confidence})
+                if severity:
+                    object_dict.update({"severity": severity})
 
-            if severity:
-                object_dict.update({"severity": severity})
+                if classification:
+                    object_dict.update({"classification": classification})
 
-            if classification:
-                object_dict.update({"classification": classification})
+                if tags:
+                    tag = [x.strip() for x in tags.split(',')]
+                    tag = list(filter(None, tag))
 
-            if tags:
-                tag = [x.strip() for x in tags.split(',')]
-                tag = list(filter(None, tag))
+                    object_dict.update({"tags": tag})
 
-                object_dict.update({"tags": tag})
+                data.update({
+                        "objects": [
+                            object_dict
+                        ]
+                    })
 
-            data = {
-                    "objects": [
-                        object_dict
-                    ]
+            else:
+                endpoint = ENDPOINT_IMPORT_APPROVAL_IOC
+                method = "post"
+                use_json = False
+                data = {
+                    "classification": classification
                 }
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_IMPORT_IOC, payload=payload, data=data, method="patch")
+                if confidence:
+                    data.update({"confidence": confidence})
+
+                if action_name == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
+                    value = param['email']
+
+                if action_name == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
+                    value = param['file_hash']
+
+                if action_name == self.ACTION_ID_IMPORT_IP_OBSERVABLES:
+                    value = param['ip_address']
+
+                if action_name == self.ACTION_ID_IMPORT_URL_OBSERVABLES:
+                    value = param['url']
+
+                if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
+                    value = param['domain']
+
+                data.update({"datatext": value})
+                data.update({"threat_type": indicator_type})
+
+                if severity:
+                    data.update({"severity": severity})
+
+                if tags:
+                    tag = [x.strip() for x in tags.split(',')]
+                    tag = list(filter(None, tag))
+                    tags_to_insert = list()
+                    for value in tag:
+                        temp_tag = dict()
+                        temp_tag.update({"name": value})
+                        tags_to_insert.append(temp_tag)
+                    data.update({"tags": json.dumps(tags_to_insert)})
+
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload=payload, data=data, method=method, use_json=use_json)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        if with_approval:
+            action_result.add_data(resp_json)
+
         summary = action_result.update_summary({})
-        summary['created_on_cloud'] = final_creation
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully sent the request for importing the observable")
 
@@ -1424,7 +1621,7 @@ class ThreatstreamConnector(BaseConnector):
         except ValueError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'intelligence id' parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
 
         org_id = config.get("organization_id", None)
         if org_id is None:
@@ -1499,40 +1696,41 @@ class ThreatstreamConnector(BaseConnector):
         vault_id = self._handle_py_ver_compat_for_input_str(param.get('vault_id'))
 
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_id)
-        except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the file info. Error: {}".format(error_msg))
+            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            vault_info = list(vault_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid"), None
 
         if not vault_info:
             return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'".format(param.get('vault_id')))
 
-        for item in vault_info:
-            vault_path = item.get('path')
-            if vault_path is None:
-                return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
-            try:
-                vault_file = open(vault_path, "rb")
-            except Exception as e:
-                error_msg = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
+        vault_path = vault_info.get('path')
+        if vault_path is None:
+            return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
+        try:
+            vault_file = open(vault_path, "rb")
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_msg))
 
-            payload = self._generate_payload()
+        payload = self._generate_payload()
 
-            files = {
-                "file": vault_file
-            }
-            data = {
-                "report_radio-platform": param.get('platform', 'ALL'),
-                "report_radio-file": vault_path,
-                "report_radio-classification": param.get('classification')
-            }
+        files = {
+            "file": vault_file
+        }
+        data = {
+            "report_radio-platform": param.get('platform', 'ALL'),
+            "report_radio-file": vault_path,
+            "report_radio-classification": param.get('classification')
+        }
 
-            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_FILE_DETONATION, payload, data=data, method="post", files=files, use_json=False)
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
-            action_result.add_data(resp_json)
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_FILE_DETONATION, payload, data=data, method="post", files=files, use_json=False)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
 
     def _handle_detonate_url(self, param):
 
@@ -1555,13 +1753,9 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         payload = self._generate_payload()
-        if param and param.get("id"):
-            try:
-                report_id = int(param["id"])
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid interger in 'id' parameter")
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(str(e)))
+        ret_val, report_id = self._validate_integer(action_result, param["id"], THREATSTREAM_REPORT_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         endpoint = ENDPOINT_GET_REPORT.format(report_id=report_id)
 
@@ -1597,8 +1791,8 @@ class ThreatstreamConnector(BaseConnector):
 
         # Creating temporary directory and file
         try:
-            if hasattr(Vault, 'get_vault_tmp_dir'):
-                temp_dir = Vault.get_vault_tmp_dir()
+            if hasattr(phrules, 'get_vault_tmp_dir'):
+                temp_dir = phrules.get_vault_tmp_dir()
             else:
                 temp_dir = "/opt/phantom/vault/tmp/"
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
@@ -1611,7 +1805,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error while writing to temporary file", e), None
 
         # Adding pcap to vault
-        vault_ret_dict = Vault.add_attachment(file_path, container_id, filename)
+        vault_ret_dict = phrules.vault_add(container_id, file_path, filename)
 
         # Removing temporary directory created to download file
         try:
@@ -1620,16 +1814,16 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Unable to remove temporary directory", e), None
 
         # Updating data with vault details
-        if vault_ret_dict['succeeded']:
+        if vault_ret_dict[0]:
             vault_details = {
-                phantom.APP_JSON_VAULT_ID: vault_ret_dict[phantom.APP_JSON_HASH],
+                phantom.APP_JSON_VAULT_ID: vault_ret_dict[2],
                 'file_name': filename
             }
             return phantom.APP_SUCCESS, vault_details
 
         # Error while adding report to vault
         self.debug_print('Error adding file to vault:', vault_ret_dict)
-        action_result.append_to_message('. {}'.format(vault_ret_dict['message']))
+        action_result.append_to_message('. {}'.format(vault_ret_dict[1]))
 
         # Set the action_result status to error, the handler function will most probably return as is
         return phantom.APP_ERROR, None
@@ -1715,7 +1909,8 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the number of containers to be ingested. Error: {0}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the number of containers to be ingested. Error: {0}"
+                                            .format(self._get_error_message_from_exception(e)))
 
         if start_ingestion_time:
             payload = self._generate_payload(order_by="modified_ts", modified_ts__gte=start_ingestion_time)
@@ -1803,11 +1998,11 @@ class ThreatstreamConnector(BaseConnector):
                     item['tags_formatted'] = tags_dict
 
                 artifact['cef'] = item
-                artifact['cef_types'] = {'id': [ "threatstream intelligence id" ],
-                        'owner_organization_id': [ "threatstream organization id" ],
-                        'ip': [ "ip" ],
-                        'value': [ "ip", "domain", "url", "email", "md5", "sha1", "hash" ]
-                                }
+                artifact['cef_types'] = {'id': ["threatstream intelligence id"],
+                                         'owner_organization_id': ["threatstream organization id"],
+                                         'ip': ["ip"],
+                                         'value': ["ip", "domain", "url", "email", "md5", "sha1", "hash"]
+                                         }
                 artifacts_list.append(artifact)
 
             artifact = {"label": "artifact",
@@ -1832,7 +2027,7 @@ class ThreatstreamConnector(BaseConnector):
                 resp_json['tags_v2_formatted'] = tags_dict
 
             artifact['cef'] = resp_json
-            artifact['cef_types'] = {'id': [ "threatstream incident id" ], 'organization_id': [ "threatstream organization id" ]}
+            artifact['cef_types'] = {'id': ["threatstream incident id"], 'organization_id': ["threatstream organization id"]}
             artifacts_list.append(artifact)
 
             existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), self._handle_py_ver_compat_for_input_str(resp_json.get("name")))
@@ -2040,11 +2235,11 @@ class ThreatstreamConnector(BaseConnector):
             data[THREATSTREAM_JSON_TAGS] = final_tags
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_TAG_IMPORT_SESSION.format(session_id=item_id),
-                                                    payload=payload, headers=None, data=data, method='post')
+                                                      payload=payload, headers=None, data=data, method='post')
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
                 payload["remote_api"] = "true"
                 ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_TAG_IMPORT_SESSION.format(session_id=item_id),
-                                                        payload=payload, headers=None, data=data, method='post')
+                                                          payload=payload, headers=None, data=data, method='post')
             if (phantom.is_fail(ret_val)):
                 messages.append("Unable to update the tags. Error: {}".format(action_result.get_message()))
             else:
@@ -2055,11 +2250,11 @@ class ThreatstreamConnector(BaseConnector):
             payload["default_comment"] = comment
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id),
-                                                    payload=payload, method='patch')
+                                                      payload=payload, method='patch')
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
                 payload["remote_api"] = "true"
                 ret_val, resp_json = self._make_rest_call(action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id),
-                                                        payload=payload, method='patch')
+                                                          payload=payload, method='patch')
             if (phantom.is_fail(ret_val)):
                 messages.append("Unable to update the comment. Error: {}".format(action_result.get_message()))
             else:
@@ -2096,6 +2291,9 @@ class ThreatstreamConnector(BaseConnector):
         if param.get("tags_name"):
             payload["tags.name"] = param.get("tags_name")
 
+        if param.get("publication_status"):
+            payload["publication_status"] = param.get("publication_status")
+
         threat_models = self._paginator(ENDPOINT_THREAT_MODEL_SEARCH, action_result, limit=limit, payload=payload)
 
         if threat_models is None:
@@ -2120,6 +2318,1587 @@ class ThreatstreamConnector(BaseConnector):
         summary['threat_models_returned'] = action_result.get_data_size()
 
         return phantom.APP_SUCCESS
+
+    def _build_threatbulletin_data(self, param, data):
+        source = param.get('source')
+        tags = param.get('tags')
+        tlp = param.get('tlp')
+        assignee_user_id = param.get('assignee_user_id')
+        body = param.get('body')
+        circles = param.get('circles')
+
+        if source:
+            data.update({"source": source})
+
+        if tags:
+            tag = [x.strip() for x in tags.split(',')]
+            tag = list(filter(None, tag))
+            tags_to_insert = list()
+            for value in tag:
+                temp_tag = dict()
+                temp_tag.update({"name": value})
+                tags_to_insert.append(temp_tag)
+            data.update({"tags_v2": tags_to_insert})
+
+        if tlp:
+            data.update({"tlp": tlp})
+
+        if assignee_user_id:
+            data.update({"assignee_user_id": assignee_user_id})
+
+        if body:
+            data.update({"body": body})
+
+        if circles:
+            circle_data = circles.strip().split(",")
+            circle = list()
+            for x in circle_data:
+                if x.strip():
+                    try:
+                        circle.append(int(x.strip()))
+                    except:
+                        pass
+            data.update({"circles": circle})
+
+        return data
+
+    def _handle_create_threat_bulletin(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        comments = param.get('comments')
+        if comments:
+            comments = comments.encode("utf-8")
+        import_sessions = param.get("import_sessions")
+        attachments = param.get('attachments')
+        create_on_cloud = param.get("create_on_cloud", False)
+        local_intelligence = param.get("local_intelligence")
+        cloud_intelligence = param.get("cloud_intelligence")
+
+        if local_intelligence:
+            local_intelligence = self._create_intelligence(action_result, local_intelligence)
+            if local_intelligence is None:
+                return local_intelligence
+
+        if cloud_intelligence:
+            cloud_intelligence = self._create_intelligence(action_result, cloud_intelligence)
+            if cloud_intelligence is None:
+                return cloud_intelligence
+
+        data = {
+                "name": param["name"],
+                "is_public": param.get("is_public", False),
+                "is_anonymous": param.get("is_anonymous", False),
+                "status": param.get('status', "new"),
+                "body_content_type": param.get('body_content_type', "markdown")
+               }
+
+        data = self._build_threatbulletin_data(param, data)
+
+        if import_sessions:
+            import_session_data = import_sessions.strip().split(",")
+            session_data = [x.strip() for x in import_session_data if x.strip()]
+            import_sessions = ','.join(session_data)
+
+        payload = self._generate_payload()
+        intelligence = list()
+        output_message = None
+        is_error = False
+
+        if create_on_cloud or self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_THREAT_BULLETIN, payload, data=data, method="post")
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            threat_bulletin_id = resp_json.get("id")
+            if not threat_bulletin_id:
+                return action_result.set_status(phantom.APP_ERROR, "Error while fetching the threat bulletin ID of the created threat bulletin on the cloud")
+
+            output_message = THREATSTREAM_SUCCESS_THREATBULLETIN_MESSAGE.format(threat_bulletin_id)
+
+            if cloud_intelligence:
+                intel_data = {"ids": cloud_intelligence}
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    output_message = "{}. {}. Details: {}"\
+                        .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+
+                if response and response.get("ids"):
+                    intelligence.extend(response.get("ids"))
+
+            if local_intelligence and create_on_cloud:
+                del payload["remote_api"]
+                intel_data = {"local_ids": local_intelligence}
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    output_message = "{}. {}. Details: {}"\
+                        .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+
+                if response and response.get("local_ids"):
+                    intelligence.extend(response.get("local_ids"))
+
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_THREAT_BULLETIN, payload, data=data, method="post")
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            threat_bulletin_id = resp_json.get("id")
+            if not threat_bulletin_id:
+                return action_result.set_status(phantom.APP_ERROR, "Error while fetching the threat bulletin ID of the created threat bulletin on the on-prem")
+
+            output_message = THREATSTREAM_SUCCESS_THREATBULLETIN_MESSAGE.format(threat_bulletin_id)
+
+            intel_data = dict()
+
+            if local_intelligence:
+                intel_data["ids"] = local_intelligence
+            if cloud_intelligence:
+                intel_data["remote_ids"] = cloud_intelligence
+
+            if intel_data:
+                ret_val, response = self._make_rest_call(
+                            action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    output_message = "{}. Error while adding intelligence to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+
+                if response and response.get("remote_ids"):
+                    intelligence.extend(response.get("remote_ids"))
+
+                if response and response.get("ids"):
+                    intelligence.extend(response.get("ids"))
+
+        intel_list = list()
+
+        if intelligence:
+            msg_intel = list()
+            for intel_value in intelligence:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = intel_value
+                intel_list.append(intel_id_dict)
+                msg_intel.append(str(intel_value))
+
+            resp_json["intelligence"] = intel_list
+
+            message = "Threat bulletin created successfully. Associated intelligence : {}".format(', '.join(msg_intel))
+
+        elif (local_intelligence or cloud_intelligence):
+            message = "Threat bulletin created successfully. None of the intelligence got associated, please provide valid intelligence"
+
+        else:
+            message = "Threat bulletin created successfully"
+
+        if attachments:
+            ret_val, resp_json = self._add_threat_bulletin_attachment(action_result, attachments, threat_bulletin_id, payload, resp_json)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                output_message = "{}. Error while adding attachments to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+
+        if import_sessions:
+            ret_val, resp_json = self._add_threat_bulletin_sessions(action_result, import_sessions, threat_bulletin_id, payload, resp_json)
+
+            if phantom.is_fail(ret_val):
+                is_error = True
+                output_message = "{}. Error while adding import sessions to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+
+        if comments:
+            ret_val, response = self.add_comment(action_result, comments, "tipreport", threat_bulletin_id, payload)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                output_message = "{}. Error while adding comments to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+
+            if not phantom.is_fail(ret_val):
+                if resp_json['comments']:
+                    resp_json['comments'].append(response)
+                else:
+                    resp_json.update({"comments": response})
+
+        action_result.add_data(resp_json)
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
+        summary = action_result.update_summary({})
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_update_threat_bulletin(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        threat_bulletin_id = param.get('id')
+        status = param.get("status")
+        comments = param.get('comments')
+        if comments:
+            comments = comments.encode("utf-8")
+        import_sessions = param.get('import_sessions')
+        attachments = param.get('attachments')
+        local_intelligence = param.get("local_intelligence")
+        cloud_intelligence = param.get("cloud_intelligence")
+
+        if local_intelligence:
+            local_intelligence = self._create_intelligence(action_result, local_intelligence)
+            if local_intelligence is None:
+                return local_intelligence
+
+        if cloud_intelligence:
+            cloud_intelligence = self._create_intelligence(action_result, cloud_intelligence)
+            if cloud_intelligence is None:
+                return cloud_intelligence
+
+        data = {
+                "is_public": param.get("is_public", False),
+                "is_anonymous": param.get("is_anonymous", False)
+               }
+
+        data = self._build_threatbulletin_data(param, data)
+
+        if status:
+            data.update({"status": status})
+
+        if import_sessions:
+            import_session_data = import_sessions.strip().split(",")
+            session_data = [x.strip() for x in import_session_data if x.strip()]
+            import_sessions = ','.join(session_data)
+
+        payload = self._generate_payload()
+        intel_ids_list = list()
+        associated_intell = list()
+        message = None
+        output_message = None
+        is_error = False
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload)
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload)
+            del payload['remote_api']
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        for intell in resp_json.get("intelligence", []):
+            associated_intell.append(int(intell.get("id")))
+
+        if self._is_cloud_instance:
+            if cloud_intelligence:
+                data.update({"intelligence": cloud_intelligence})
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload, data=data, method="patch")
+        else:
+
+            if local_intelligence or cloud_intelligence:
+                intel_data = dict()
+                if local_intelligence:
+                    intel_data["ids"] = local_intelligence
+
+                if cloud_intelligence:
+                    intel_data["remote_ids"] = cloud_intelligence
+
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload,
+                                                          data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                    intel_data = dict()
+                    if local_intelligence:
+                        intel_data["local_ids"] = local_intelligence
+
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload, data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val):
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}"\
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+                        del intel_data["local_ids"]
+                        if resp_json and resp_json.get("local_ids"):
+                            intel_ids_list.extend(resp_json.get("local_ids"))
+
+                    if cloud_intelligence:
+                        intel_data["ids"] = cloud_intelligence
+                        payload["remote_api"] = "true"
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE.format(id=threat_bulletin_id), payload, data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val):
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}"\
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. Error while updating the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+                    else:
+                        output_message = "Error while updating the threat bulletin. Details: {}".format(action_result.get_message())
+
+                if resp_json and resp_json.get("ids"):
+                    intel_ids_list.extend(resp_json.get("ids"))
+                if resp_json and resp_json.get("remote_ids"):
+                    intel_ids_list.extend(resp_json.get("remote_ids"))
+
+            if intel_ids_list:
+                msg_intel = list()
+                for intel_value in intel_ids_list:
+                    msg_intel.append(str(intel_value))
+
+                message = "Associated intelligence : {}".format(', '.join(msg_intel))
+
+            elif (local_intelligence or cloud_intelligence):
+                message = THREATSTREAM_ERR_INVALID_INTELLIGENCE
+
+            else:
+                message = None
+
+            if associated_intell:
+                intel_ids_list.extend(associated_intell)
+
+            # Update the incident in all cases with data or with empty data to get the latest intelligence values associated with it
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload, data=data, method="patch")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload, data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        intel_list = list()
+
+        intel_ids_list = list(set(intel_ids_list))
+
+        if intel_ids_list:
+            for intel_value in intel_ids_list:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = intel_value
+                intel_list.append(intel_id_dict)
+
+            resp_json["intelligence"] = intel_list
+
+        if attachments:
+            ret_val, resp_json = self._add_threat_bulletin_attachment(action_result, attachments, threat_bulletin_id, payload, resp_json)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                if output_message:
+                    output_message = "{}. Error while updating attachments to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+                else:
+                    output_message = "Error while updating attachments to the threat bulletin. Details: {}".format(action_result.get_message())
+
+        if import_sessions:
+            ret_val, resp_json = self._add_threat_bulletin_sessions(action_result, import_sessions, threat_bulletin_id, payload, resp_json)
+
+            if phantom.is_fail(ret_val):
+                is_error = True
+                if output_message:
+                    output_message = "{}. Error while updating import sessions to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+                else:
+                    output_message = "Error while updating import sessions to the threat bulletin. Details: {}".format(action_result.get_message())
+
+        if comments:
+            ret_val, response = self.add_comment(action_result, comments, "tipreport", threat_bulletin_id, payload)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                if output_message:
+                    output_message = "{}. Error while updating comments to the threat bulletin. Details: {}".format(output_message, action_result.get_message())
+                else:
+                    output_message = "Error while updating comments to the threat bulletin. Details: {}".format(action_result.get_message())
+
+            if not phantom.is_fail(ret_val):
+                if resp_json['comments']:
+                    resp_json['comments'].append(response)
+                else:
+                    resp_json.update({"comments": response})
+
+        action_result.add_data(resp_json)
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
+        if message:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated threat bulletin. {}".format(message))
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated threat bulletin")
+
+    def _handle_delete_threat_bulletin(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, threat_bulletin_id = self._validate_integer(action_result, param["threat_bulletin_id"], THREATSTREAM_THREAT_BULLETIN_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload,
+                                                      method="delete")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload,
+                                                      method="delete")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload,
+                                                          method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted threat bulletin")
+
+    def _handle_list_threat_bulletins(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if param.get("name"):
+            payload["name"] = param["name"]
+
+        if param.get("status"):
+            payload["status"] = param["status"]
+
+        if param.get("source"):
+            payload["source"] = param["source"]
+
+        if param.get("tlp"):
+            payload["tlp"] = param["tlp"]
+
+        if param.get("is_public") in ["true", "false"]:
+            payload["is_public"] = param["is_public"]
+
+        if param.get("assignee_user_id", None):
+            payload["assignee_user_id"] = param["assignee_user_id"]
+
+        threat_bulletins = self._paginator(ENDPOINT_THREAT_BULLETIN, action_result, payload=payload, limit=limit)
+
+        if threat_bulletins is None:
+            return action_result.get_status()
+
+        for bulletin in threat_bulletins:
+            action_result.add_data(bulletin)
+
+        summary = action_result.update_summary({})
+        summary['threat_bulletins_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_associations(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            associations = self._paginator(
+                ENDPOINT_FETCH_ENTITIES.format(entity_type=param.get('entity_type'), id=param.get('entity_id'), associated_entity_type=param.get('associated_entity_type')),
+                action_result, payload=payload, limit=limit)
+        else:
+            associations = self._paginator(
+                ENDPOINT_FETCH_ENTITIES.format(entity_type=param.get('entity_type'), id=param.get('entity_id'), associated_entity_type=param.get('associated_entity_type')),
+                action_result, payload=payload, limit=limit)
+
+            if "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                associations = self._paginator(
+                    ENDPOINT_FETCH_ENTITIES.format(entity_type=param.get('entity_type'), id=param.get('entity_id'), associated_entity_type=param.get('associated_entity_type')),
+                    action_result, payload=payload, limit=limit)
+
+        if associations is None:
+            return action_result.get_status()
+
+        for association in associations:
+            action_result.add_data(association)
+
+        summary = action_result.update_summary({})
+        summary['associations_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_association(self, param, endpoint):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        entity_type = param['entity_type']
+        entity_id = param['entity_id']
+        ass_entity_type = param['associated_entity_type']
+
+        local_ids = param.get("local_ids")
+        remote_ids = param.get("remote_ids")
+
+        if not local_ids and not remote_ids:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_LOCAL_REMOTE_ID)
+
+        if local_ids:
+            local_ids = self._create_intelligence(action_result, local_ids)
+            if local_ids is None:
+                return local_ids
+
+        if remote_ids:
+            remote_ids = self._create_intelligence(action_result, remote_ids)
+            if remote_ids is None:
+                return remote_ids
+
+        payload = self._generate_payload()
+        intel_ids_list = list()
+        message = None
+        data = {}
+
+        if self._is_cloud_instance:
+            if remote_ids:
+                data.update({"ids": remote_ids})
+                ret_val, resp_json = self._make_rest_call(
+                    action_result, endpoint.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type=ass_entity_type),
+                    payload, data=data, method="post")
+
+                if phantom.is_fail(ret_val) and "Status Code: 405" in action_result.get_message():
+                    return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_API_INVALID_VALUE)
+
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+                if resp_json.get("ids"):
+                    intel_ids_list.extend(resp_json.get("ids"))
+        else:
+
+            if local_ids or remote_ids:
+                intel_data = dict()
+                if local_ids:
+                    intel_data["ids"] = local_ids
+
+                if remote_ids:
+                    intel_data["remote_ids"] = remote_ids
+
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type=ass_entity_type),
+                                                          payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val) and "Status Code: 405" in action_result.get_message():
+                    return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_API_INVALID_VALUE)
+
+                if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                    intel_data = dict()
+                    if local_ids:
+                        intel_data["local_ids"] = local_ids
+
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, endpoint.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type=ass_entity_type),
+                            payload, data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val) and "Status Code: 405" in action_result.get_message():
+                            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_API_INVALID_VALUE)
+
+                        if phantom.is_fail(ret_val):
+                            self.debug_print(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(
+                                ', '.join(local_ids)))
+                        del intel_data["local_ids"]
+                        if resp_json and resp_json.get("local_ids"):
+                            intel_ids_list.extend(resp_json.get("local_ids"))
+
+                    if remote_ids:
+                        intel_data["ids"] = remote_ids
+                        payload["remote_api"] = "true"
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, endpoint.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type=ass_entity_type),
+                            payload, data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val) and "Status Code: 405" in action_result.get_message():
+                            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_API_INVALID_VALUE)
+
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
+
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+                if resp_json.get("ids"):
+                    intel_ids_list.extend(resp_json.get("ids"))
+                if resp_json.get("remote_ids"):
+                    intel_ids_list.extend(resp_json.get("remote_ids"))
+
+        if intel_ids_list:
+            msg_intel = list()
+            for intel_value in intel_ids_list:
+                msg_intel.append(str(intel_value))
+
+            message = "Modified entities : {}".format(', '.join(msg_intel))
+
+        elif (local_ids or remote_ids) and not intel_ids_list:
+            message = "None of the entities got modified, please provide valid entities"
+
+        else:
+            message = None
+
+        if intel_ids_list:
+            action_result.add_data(msg_intel)
+        else:
+            action_result.add_data(list())
+
+        if message == "None of the entities got modified, please provide valid entities":
+            return action_result.set_status(phantom.APP_SUCCESS, "{}. Please check for the non-modified ids as they would be already associated or invalid".format(message))
+        elif message:
+            return action_result.set_status(phantom.APP_SUCCESS,
+                                            "Successfully updated associations. {}. Please check for the non-modified ids as they would be already associated or invalid".format(
+                                                message))
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated associations")
+
+    def _handle_add_association(self, param):
+
+        endpoint = ENDPOINT_ADD_ASSOCIATION
+        return self._handle_association(param, endpoint)
+
+    def _handle_remove_association(self, param):
+
+        endpoint = ENDPOINT_REMOVE_ASSOCIATION
+        return self._handle_association(param, endpoint)
+
+    def _build_data_rule_action(self, action_result, data, param):
+        # Preparing data dictionary
+        if param.get("fields"):
+            try:
+                fields = ast.literal_eval(param["fields"])
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                action_result.set_status(
+                    phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON_WITH_PARAM.format(error_msg))
+                return None
+
+            if not isinstance(fields, dict):
+                action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
+                return None
+
+            resp_json = None
+            if self.get_action_identifier() == self.ACTION_UPDATE_RULE:
+                ret_val, resp_json = self._get_rule_support(action_result, param)
+
+                if phantom.is_fail(ret_val):
+                    return None
+
+            validation_list = ["tags", "match_impacts", "actors", "campaigns", "incidents", "malware", "signatures",
+                               "tips", "ttps", "vulnerabilities", "keywords"]
+
+            for list_value in validation_list:
+                fields_value = fields.get(list_value, '')
+                if fields_value and not isinstance(fields_value, list):
+                    action_result.set_status(phantom.APP_ERROR,
+                                             THREATSTREAM_ERR_INVALID_FIELD_PARAM_VALUE.format(fields_value))
+                    return None
+
+                if fields_value and self.get_action_identifier() == self.ACTION_UPDATE_RULE:
+                    try:
+                        existing_value_list = resp_json.get(list_value, [])
+
+                        # In case of str, append values and remove duplicates values
+                        if list_value in ["keywords", "match_impacts"]:
+                            existing_value = existing_value_list
+                            existing_value.extend(fields_value)
+                            existing_value = list(set(existing_value))
+                        elif list_value == "tags":
+                            existing_value_list.extend(fields_value)
+                            existing_value = []
+                            for i in range(0, len(existing_value_list)):
+                                if existing_value_list[i] not in existing_value_list[i + 1:]:
+                                    existing_value.append(existing_value_list[i])
+                        else:
+                            # In case of dict, get id from dict and remove duplicates
+                            existing_value = [int(value.get('id')) for value in existing_value_list]
+                            existing_value.extend(fields_value)
+                            existing_value = list(set(existing_value))
+
+                        fields[list_value] = existing_value
+                    except Exception as e:
+                        action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
+                        return None
+
+            data.update(fields)
+
+        return data
+
+    def _get_rule_support(self, action_result, param=None, payload=None, rule_id=None):
+
+        if payload and payload.get("remote_api") is not None:
+            del payload["remote_api"]
+
+        if not payload:
+            payload = self._generate_payload()
+
+        if param:
+            rule_id = param['rule_id']
+
+        ret_val, rule_id = self._validate_integer(action_result, rule_id, THREATSTREAM_RULE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload)
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+        action_result.set_status(phantom.APP_SUCCESS)
+
+        return phantom.APP_SUCCESS, resp_json
+
+    def _handle_create_rule(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        create_on_cloud = param.get("create_on_cloud", False)
+
+        try:
+            keywords = ast.literal_eval(param["keywords"])
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        if not isinstance(keywords, list):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM)
+
+        data = {
+            "name": param["name"],
+            "keywords": keywords,
+            "keyword": ",".join(keywords),
+            "match_observables": False,
+            "match_reportedfiles": False,
+            "match_signatures": False,
+            "match_tips": False,
+            "match_vulnerabilities": False
+        }
+
+        data = self._build_data_rule_action(action_result, data, param)
+
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance or create_on_cloud:
+            payload["remote_api"] = "true"
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_CREATE_RULE, payload, data=data,
+                                                  method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        rule_id = resp_json.get("id")
+
+        if not rule_id:
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_RULE_ID_NOT_FOUND)
+
+        # get call to retrieve actual json to display
+        ret_val, resp_json = self._get_rule_support(action_result, payload=payload, rule_id=rule_id)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        message = "Rule is created successfully."
+
+        action_result.add_data(resp_json)
+        summary = action_result.update_summary({})
+        summary['id'] = rule_id
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_update_rule(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, rule_id = self._validate_integer(action_result, param["rule_id"], THREATSTREAM_RULE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        data = self._build_data_rule_action(action_result, data={}, param=param)
+
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_RULE.format(rule_id=rule_id),
+                                                      payload, data=data, method="patch")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_RULE.format(rule_id=rule_id),
+                                                      payload, data=data, method="patch")
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_SINGLE_RULE.format(rule_id=rule_id),
+                                                          payload, data=data, method="patch")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # get call to retrieve actual json to display
+        ret_val, resp_json = self._get_rule_support(action_result, payload=payload, rule_id=rule_id)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        message = "Successfully updated rule"
+        summary = action_result.update_summary({})
+        summary['id'] = rule_id
+        summary['message'] = message
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_list_rules(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload(order_by="-created_ts")
+
+        rules = self._paginator(ENDPOINT_LIST_RULES, action_result, payload=payload, limit=limit)
+
+        if rules is None:
+            return action_result.get_status()
+
+        for rule in rules:
+            action_result.add_data(rule)
+
+        summary = action_result.update_summary({})
+        summary['rules_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_delete_rule(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, rule_id = self._validate_integer(action_result, param["rule_id"], THREATSTREAM_RULE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload,
+                                                      method="delete")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload,
+                                                      method="delete")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_SINGLE_RULE.format(rule_id=rule_id), payload,
+                                                          method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted rule")
+
+    def _handle_list_actors(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload(order_by="-created_ts")
+
+        actors = self._paginator(ENDPOINT_LIST_ACTORS, action_result, payload=payload, limit=limit)
+
+        if actors is None:
+            return action_result.get_status()
+
+        for actor in actors:
+            action_result.add_data(actor)
+
+        summary = action_result.update_summary({})
+        summary['actors_returned'] = action_result.get_data_size()
+
+    def _handle_delete_actor(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, actor_id = self._validate_integer(action_result, param["actor_id"], THREATSTREAM_ACTOR_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), payload,
+                                                      method="delete")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), payload,
+                                                      method="delete")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), payload,
+                                                          method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted actor")
+
+    def _handle_list_import(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        payload['limit'] = limit
+
+        if param.get("status"):
+            status_map = {
+                "Approved": "approved",
+                "Ready To Review": "done",
+                "Errors": "errors",
+                "Rejected": "deleted",
+                "Processing": "processing,approving,rejecting"
+            }
+
+            status = param["status"]
+
+            payload["status"] = status_map[status]
+
+        if param.get("list_from_remote"):
+            payload["remote_api"] = "true"
+
+        returned_imports = self._paginator(ENDPOINT_IMPORT, action_result, payload=payload, limit=limit)
+
+        if returned_imports is None:
+            return action_result.get_status()
+
+        reversed_status_map = {
+            "approved": "Approved",
+            "done": "Ready To Review",
+            "errors": "Errors",
+            "deleted": "Rejected"
+        }
+
+        for imports in returned_imports:
+            status = imports.get("status")
+            if status in reversed_status_map:
+                imports["status"] = reversed_status_map[status]
+            else:
+                imports["status"] = "Processing"
+
+        for imports in returned_imports:
+            action_result.add_data(imports)
+
+        summary = action_result.update_summary({})
+        summary['import_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _validate_data(self, action_result, data):
+        validation_list = ['circles', 'aliases', 'campaigns', 'incidents', 'vulnerability', 'signatures', 'tags', 'ttps', 'victims']
+
+        for list_value in validation_list:
+            fields_value = data.get(list_value, '')
+            if fields_value and not isinstance(fields_value, list):
+                action_result.set_status(phantom.APP_ERROR,
+                                         THREATSTREAM_ERR_INVALID_FIELD_PARAM_VALUE.format(list_value))
+                return None
+        return data
+
+    def add_attachment(self, action_result, attachment, entity_type, entity_id, payload, resp_json):
+        try:
+            file_id = self._handle_py_ver_compat_for_input_str(attachment)
+            _, _, file_info = phrules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), resp_json
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))), resp_json
+
+        use_json = False
+        file_data = dict()
+        files = {
+            "attachment": (file_info.get('name'), open(file_info.get('path'), 'rb'), 'application/octet-stream')
+        }
+        file_data.update({"filename": file_info.get('name'),
+                          "title": file_info.get('name'),
+                          "r_type": "A"})
+
+        ret_val, response = self._make_rest_call(action_result, ENDPOINT_ADD_ATTACHMENT.format(entity_type=entity_type, entity_id=entity_id), payload=payload,
+                                                 files=files, data=file_data, method="post", use_json=use_json)
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, response = self._make_rest_call(action_result,
+                                                     ENDPOINT_ADD_ATTACHMENT.format(entity_type=entity_type, entity_id=entity_id), payload=payload,
+                                                     files=files, data=file_data, method="post", use_json=use_json)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), resp_json
+
+        resp_json.update({"attachments": response})
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Attachment created successfully"), resp_json
+
+    def _add_threat_bulletin_sessions(self, action_result, import_sessions, threat_bulletin_id, payload, resp_json):
+        payload.update({"ids": import_sessions, "operation": "add"})
+        ret_val, response = self._make_rest_call(action_result, ENDPOINT_IMPORT_SESSIONS_THREAT_BULLETIN.format(id=threat_bulletin_id), payload=payload,
+                                                method="patch", use_json=False)
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, response = self._make_rest_call(action_result, ENDPOINT_IMPORT_SESSIONS_THREAT_BULLETIN.format(id=threat_bulletin_id), payload=payload,
+                                                    method="patch", use_json=False)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), resp_json
+
+        resp_json.update({"import_sessions": response["ids"]})
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Import sessions attached successfully"), resp_json
+
+    def _add_threat_bulletin_attachment(self, action_result, attachments, threat_bulletin_id, payload, resp_json):
+        try:
+            file_id = self._handle_py_ver_compat_for_input_str(attachments)
+            _, _, file_info = phrules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), resp_json
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))), resp_json
+
+        use_json = False
+        file_data = dict()
+        files = {
+            "attachment": (file_info.get('name'), open(file_info.get('path'), 'rb'), 'application/octet-stream')
+        }
+        file_data.update({"filename": file_info.get('name')})
+
+        ret_val, response = self._make_rest_call(action_result, ENDPOINT_ATTACHMENT_THREAT_BULLETIN.format(id=threat_bulletin_id), payload=payload,
+                                                 files=files, data=file_data, method="post", use_json=use_json)
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, response = self._make_rest_call(action_result, ENDPOINT_ATTACHMENT_THREAT_BULLETIN.format(id=threat_bulletin_id), payload=payload,
+                                                     files=files, data=file_data, method="post", use_json=use_json)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), resp_json
+
+        resp_json.update({"attachments": response})
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Attachment attached successfully"), resp_json
+
+    def add_comment(self, action_result, comment, entity_type, entity_id, payload):
+        ret_val, response = self._make_rest_call(action_result, ENDPOINT_ADD_COMMENT.format(entity_type=entity_type,
+                                                                                            entity_id=entity_id),
+                                                 payload=payload,
+                                                 data=comment, method="post", use_json=False)
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, response = self._make_rest_call(action_result, ENDPOINT_ADD_COMMENT.format(entity_type=entity_type,
+                                                                                                entity_id=entity_id),
+                                                     payload=payload,
+                                                     data=comment, method="post", use_json=False)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Comments added successfully"), response
+
+    def _get_request_threat_model(self, action_result, payload=None, entity_type=None, entity_id=None):
+        if payload and payload.get("remote_api") is not None:
+            del payload["remote_api"]
+
+        if not payload:
+            payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_GET_SINGLE_THREAT_MODEL.format(entity_type=entity_type, entity_id=entity_id), payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_GET_SINGLE_THREAT_MODEL.format(entity_type=entity_type, entity_id=entity_id), payload)
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_GET_SINGLE_THREAT_MODEL.format(entity_type=entity_type, entity_id=entity_id), payload)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+        action_result.set_status(phantom.APP_SUCCESS, "")
+
+        return phantom.APP_SUCCESS, resp_json
+
+    def _create_and_get_threat_model(self, action_result, endpoint, payload, data, entity_type):
+        ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), "", ""
+
+        entity_id = resp_json.get("id")
+
+        # get call to display result in data
+        ret_val, resp_json = self._get_request_threat_model(action_result, payload, entity_type, entity_id)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), "", ""
+
+        return ret_val, resp_json, entity_id
+
+    def _create_threat_model(self, action_result, param, endpoint, entity_type):
+        create_on_cloud = param.get("create_on_cloud", False)
+
+        data = {
+            "name": param["name"],
+            "is_public": param.get("is_public", False),
+            "publication_status": "new"
+        }
+
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        local_intelligence = data_dict.get("local_intelligence")
+        cloud_intelligence = data_dict.get("cloud_intelligence")
+        attachment = param.get("attachment")
+        comment = param.get("comment")
+
+        payload = self._generate_payload()
+        intelligence = list()
+        is_error = False
+
+        if self._is_cloud_instance:
+            if cloud_intelligence:
+                data.update({"intelligence": cloud_intelligence})
+            payload["remote_api"] = "true"
+
+            ret_val, resp_json, entity_id = self._create_and_get_threat_model(action_result, endpoint, payload, data, entity_type)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            for intel in resp_json.get("intelligence", []):
+                intelligence.append(intel.get("id"))
+
+            output_message = THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE.format(entity_type, entity_id)
+
+        elif create_on_cloud:
+            payload["remote_api"] = "true"
+
+            ret_val, resp_json, entity_id = self._create_and_get_threat_model(action_result, endpoint, payload, data, entity_type)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            if not entity_id:
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Error while fetching the {key} ID of the created {key} on the cloud".format(key=entity_type))
+
+            output_message = THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE.format(entity_type, entity_id)
+
+            if cloud_intelligence:
+                intel_data = {"ids": cloud_intelligence}
+                ret_val, response = self._make_rest_call(
+                    action_result, ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id,
+                                                                   associated_entity_type="intelligence"), payload,
+                    data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. {}. Details: {}" \
+                            .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+                    else:
+                        output_message = "{}. Details: {}".format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+
+                if response and response.get("ids"):
+                    intelligence.extend(response.get("ids"))
+
+            if local_intelligence:
+                del payload["remote_api"]
+                intel_data = {"local_ids": local_intelligence}
+                ret_val, response = self._make_rest_call(
+                    action_result, ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type="intelligence"), payload,
+                    data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. {}. Details: {}"\
+                            .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+                    else:
+                        output_message = "{}. Details: {}" \
+                            .format(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)), action_result.get_message())
+
+                if response and response.get("local_ids"):
+                    intelligence.extend(response.get("local_ids"))
+
+        else:
+            ret_val, resp_json, entity_id = self._create_and_get_threat_model(action_result, endpoint, payload, data, entity_type)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            if not entity_id:
+                return action_result.set_status(phantom.APP_ERROR, "Error while fetching the {key} ID of the created {key} on the on-prem".format(key=entity_type))
+
+            output_message = THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE.format(entity_type, entity_id)
+
+            intel_data = dict()
+
+            if local_intelligence:
+                intel_data["ids"] = local_intelligence
+            if cloud_intelligence:
+                intel_data["remote_ids"] = cloud_intelligence
+
+            if intel_data:
+                ret_val, response = self._make_rest_call(action_result,
+                                                         ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type="intelligence"),
+                                                         payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. Error while adding intelligence. Details: {}".format(output_message, action_result.get_message())
+                    else:
+                        output_message = "Error while adding intelligence. Details: {}".format(action_result.get_message())
+
+                if response and response.get("remote_ids"):
+                    intelligence.extend(response.get("remote_ids"))
+
+                if response and response.get("ids"):
+                    intelligence.extend(response.get("ids"))
+
+        intel_list = list()
+
+        if intelligence:
+            msg_intel = list()
+            for intel in intelligence:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = intel
+                intel_list.append(intel_id_dict)
+                msg_intel.append(str(intel))
+
+            resp_json["intelligence"] = intel_list
+
+            message = "{} created successfully. Associated intelligence : {}".format(entity_type.capitalize(), ', '.join(msg_intel))
+
+        elif (local_intelligence or cloud_intelligence) and not intelligence:
+            message = "{} created successfully. {}".format(entity_type.capitalize(), THREATSTREAM_ERR_INVALID_INTELLIGENCE)
+        else:
+            message = "{} created successfully".format(entity_type.capitalize())
+
+        if attachment:
+            ret_val, resp_json = self.add_attachment(action_result, attachment, entity_type, entity_id, payload, resp_json)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                output_message = "{}. Error while adding attachments. Details: {}".format(output_message, action_result.get_message())
+
+        if comment:
+            ret_val, resp_json_comment = self.add_comment(action_result, comment.encode('utf-8'), entity_type, entity_id, payload)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                output_message = "{}. Error while adding comments. Details: {}".format(output_message, action_result.get_message())
+            else:
+                resp_json["comment"] = resp_json_comment
+
+        action_result.add_data(resp_json)
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
+        summary = action_result.update_summary({})
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):
+
+        if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields") and not param.get("attachment") and not param.get("comment"):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL.format(entity_type))
+
+        data = {}
+        intel_ids_list = list()
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        local_intelligence = data_dict.get("local_intelligence")
+        cloud_intelligence = data_dict.get("cloud_intelligence")
+        attachment = param.get("attachment")
+        comment = param.get("comment")
+        if comment:
+            comment = comment.encode('utf-8')
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+        is_error = False
+        output_message = None
+        message = None
+
+        if self._is_cloud_instance:
+            if cloud_intelligence:
+                data.update({"intelligence": cloud_intelligence})
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method="patch")
+        else:
+            if local_intelligence or cloud_intelligence:
+                intel_data = dict()
+                if local_intelligence:
+                    intel_data["ids"] = local_intelligence
+
+                if cloud_intelligence:
+                    intel_data["remote_ids"] = cloud_intelligence
+
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type="intelligence"),
+                                                          payload, data=intel_data, method="post")
+
+                if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                    intel_data = dict()
+                    if local_intelligence:
+                        intel_data["local_ids"] = local_intelligence
+
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type="intelligence"), payload,
+                            data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val):
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}" \
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+
+                        del intel_data["local_ids"]
+                        if resp_json and resp_json.get("local_ids"):
+                            intel_ids_list.extend(resp_json.get("local_ids"))
+
+                    if cloud_intelligence:
+                        intel_data["ids"] = cloud_intelligence
+                        payload["remote_api"] = "true"
+                        ret_val, resp_json = self._make_rest_call(
+                            action_result, ENDPOINT_ADD_ASSOCIATION.format(entity_type=entity_type, entity_id=entity_id, associated_entity_type="intelligence"), payload,
+                            data=intel_data, method="post")
+
+                        if phantom.is_fail(ret_val):
+                            is_error = True
+                            if output_message:
+                                output_message = "{}. {}. Details: {}" \
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)), action_result.get_message())
+                            else:
+                                output_message = "{}. Details: {}".format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)),
+                                                                          action_result.get_message())
+
+                if phantom.is_fail(ret_val):
+                    is_error = True
+                    if output_message:
+                        output_message = "{}. Error while updating intelligence. Details: {}".format(output_message, action_result.get_message())
+                    else:
+                        output_message = "Error while updating intelligence. Details: {}".format(action_result.get_message())
+
+                if resp_json and resp_json.get("ids"):
+                    intel_ids_list.extend(resp_json.get("ids"))
+                if resp_json and resp_json.get("remote_ids"):
+                    intel_ids_list.extend(resp_json.get("remote_ids"))
+
+            if intel_ids_list:
+                msg_intel = list()
+                for intel_value in intel_ids_list:
+                    msg_intel.append(str(intel_value))
+
+                message = "Associated intelligence : {}".format(', '.join(msg_intel))
+
+            elif (local_intelligence or cloud_intelligence) and not intel_ids_list:
+                message = THREATSTREAM_ERR_INVALID_INTELLIGENCE
+            else:
+                message = None
+
+            associated_intelligence = data_dict.get("associated_intelligence")
+            if associated_intelligence:
+                intel_ids_list.extend(associated_intelligence)
+
+            # Update the threat model in all cases with data or with empty data to get the latest intelligence values associated with it
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method="patch")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        intel_list = list()
+
+        intel_ids_list = list(set(intel_ids_list))
+
+        if intel_ids_list:
+            for intel_value in intel_ids_list:
+                intel_id_dict = dict()
+                intel_id_dict["id"] = intel_value
+                intel_list.append(intel_id_dict)
+
+            resp_json["intelligence"] = intel_list
+
+        # get call to display information in data
+        ret_val, resp_json = self._get_request_threat_model(action_result, payload, entity_type, entity_id)
+        if phantom.is_fail(ret_val):
+            is_error = True
+            if output_message:
+                output_message = "{}. Error while getting threat model. Details: {}".format(output_message, action_result.get_message())
+            else:
+                output_message = "Error while getting threat model. Details: {}".format(action_result.get_message())
+
+        if attachment:
+            ret_val, resp_json = self.add_attachment(action_result, attachment, entity_type, entity_id, payload, resp_json)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                if output_message:
+                    output_message = "{}. Error while adding attachments. Details: {}".format(output_message, action_result.get_message())
+                else:
+                    output_message = "Error while adding attachments. Details: {}".format(action_result.get_message())
+
+        if comment:
+            ret_val, response = self.add_comment(action_result, comment, entity_type, entity_id, payload)
+            if phantom.is_fail(ret_val):
+                is_error = True
+                if output_message:
+                    output_message = "{}. Error while adding comments. Details: {}".format(output_message, action_result.get_message())
+                else:
+                    output_message = "Error while adding comments. Details: {}".format(action_result.get_message())
+            else:
+                resp_json.update({"comments": response})
+
+        action_result.add_data(resp_json)
+
+        if is_error:
+            return action_result.set_status(phantom.APP_ERROR, output_message)
+
+        if message:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated {}. {}".format(entity_type, message))
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated {}".format(entity_type))
+
+    def _handle_create_vulnerability(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self._create_threat_model(action_result, param, ENDPOINT_VULNERABILITY, "vulnerability")
+        return action_result.get_status()
+
+    def _handle_update_vulnerability(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, vulnerability_id = self._validate_integer(action_result, param["id"], "Please provide a valid interger in 'id' parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        self._update_threat_model(action_result, param, ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=vulnerability_id), "vulnerability", vulnerability_id)
+        return action_result.get_status()
+
+    def _handle_delete_vulnerability(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, vulnerability_id = self._validate_integer(action_result, param["vulnerability_id"],
+                                                           THREATSTREAM_VULNERABILITY_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        if self._is_cloud_instance:
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=vulnerability_id),
+                                                      payload,
+                                                      method="delete")
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result,
+                                                      ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=vulnerability_id),
+                                                      payload,
+                                                      method="delete")
+
+            if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+                payload["remote_api"] = "true"
+                ret_val, resp_json = self._make_rest_call(action_result,
+                                                          ENDPOINT_SINGLE_VULNERABILITY.format(vul_id=vulnerability_id),
+                                                          payload,
+                                                          method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted vulnerability")
+
+    def _handle_create_actor(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        self._create_threat_model(action_result, param, ENDPOINT_ACTOR, "actor")
+        return action_result.get_status()
+
+    def _handle_update_actor(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, actor_id = self._validate_integer(action_result, param["id"], "Please provide a valid interger in 'id' parameter")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        self._update_threat_model(action_result, param, ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), "actor", actor_id)
+        return action_result.get_status()
 
     def handle_action(self, param):
 
@@ -2194,6 +3973,44 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_import_session_update(param)
         elif(action == self.ACTION_THREAT_MODEL_SEARCH):
             ret_val = self._handle_threat_model_search(param)
+        elif(action == self.ACTION_CREATE_THREAT_BULLETIN):
+            ret_val = self._handle_create_threat_bulletin(param)
+        elif(action == self.ACTION_UPDATE_THREAT_BULLETIN):
+            ret_val = self._handle_update_threat_bulletin(param)
+        elif(action == self.ACTION_DELETE_THREAT_BULLETIN):
+            ret_val = self._handle_delete_threat_bulletin(param)
+        elif(action == self.ACTION_LIST_THREAT_BULLETINS):
+            ret_val = self._handle_list_threat_bulletins(param)
+        elif(action == self.ACTION_LIST_ASSOCIATIONS):
+            ret_val = self._handle_list_associations(param)
+        elif (action == self.ACTION_CREATE_RULE):
+            ret_val = self._handle_create_rule(param)
+        elif (action == self.ACTION_UPDATE_RULE):
+            ret_val = self._handle_update_rule(param)
+        elif (action == self.ACTION_LIST_RULE):
+            ret_val = self._handle_list_rules(param)
+        elif (action == self.ACTION_DELETE_RULE):
+            ret_val = self._handle_delete_rule(param)
+        elif (action == self.ACTION_ADD_ASSOCIATION):
+            ret_val = self._handle_add_association(param)
+        elif (action == self.ACTION_REMOVE_ASSOCIATION):
+            ret_val = self._handle_remove_association(param)
+        elif (action == self.ACTION_LIST_ACTORS):
+            ret_val = self._handle_list_actors(param)
+        elif (action == self.ACTION_LIST_IMPORT):
+            ret_val = self._handle_list_import(param)
+        elif (action == self.ACTION_CREATE_VULNERABILITY):
+            ret_val = self._handle_create_vulnerability(param)
+        elif (action == self.ACTION_UPDATE_VULNERABILITY):
+            ret_val = self._handle_update_vulnerability(param)
+        elif (action == self.ACTION_DELETE_VULNERABILITY):
+            ret_val = self._handle_delete_vulnerability(param)
+        elif (action == self.ACTION_DELETE_ACTOR):
+            ret_val = self._handle_delete_actor(param)
+        elif (action == self.ACTION_CREATE_ACTOR):
+            ret_val = self._handle_create_actor(param)
+        elif (action == self.ACTION_UPDATE_ACTOR):
+            ret_val = self._handle_update_actor(param)
 
         return ret_val
 
@@ -2201,7 +4018,6 @@ class ThreatstreamConnector(BaseConnector):
 if __name__ == '__main__':
 
     # Imports
-    import sys
     import pudb
 
     # Breakpoint at runtime

@@ -1,5 +1,5 @@
 # File: threatstream_view.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -110,5 +110,23 @@ def display_view(provides, all_app_runs, context):
 
     if provides == "import session update":
         ret_val = 'threatstream_get_import_session.html'
+
+    if provides in ["add association", "remove association"]:
+        ret_val = 'threatstream_display_associations.html'
+
+    if provides in ["update rule", "create rule"]:
+        ret_val = 'threatstream_display_rule.html'
+
+    if provides == "list associations":
+        ret_val = 'threatstream_list_associations.html'
+
+    if provides in ["create actor", "update actor"]:
+        ret_val = "threatstream_display_actor.html"
+
+    if provides in ["create vulnerability", "update vulnerability"]:
+        ret_val = "threatstream_display_vulnerability.html"
+
+    if provides == "update threat bulletin":
+        ret_val = "threatstream_update_threat_bulletin.html"
 
     return ret_val
