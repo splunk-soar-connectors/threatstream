@@ -1475,6 +1475,7 @@ class ThreatstreamConnector(BaseConnector):
             classification = param.get('classification')
             severity = param.get('severity')
             tags = param.get('tags')
+            source = param.get('source')
 
             if not with_approval:
                 endpoint = ENDPOINT_IMPORT_IOC
@@ -1516,6 +1517,9 @@ class ThreatstreamConnector(BaseConnector):
 
                 if classification:
                     object_dict.update({"classification": classification})
+
+                if source:
+                    object_dict.update({"source": source})
 
                 if tags:
                     tag = [x.strip() for x in tags.split(',')]

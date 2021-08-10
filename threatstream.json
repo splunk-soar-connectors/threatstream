@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.1.1",
+    "app_version": "3.2.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, July 2021"
@@ -6177,10 +6177,15 @@
                     "order": 1,
                     "required": true
                 },
+                "source": {
+                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -6196,12 +6201,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6210,17 +6215,17 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "allow_unresolved": {
                     "description": "Unresolved domains will be imported if set to true",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -6248,6 +6253,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.create_on_cloud",
@@ -6406,10 +6418,15 @@
                     "order": 1,
                     "required": true
                 },
+                "source": {
+                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -6425,12 +6442,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6439,12 +6456,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 }
             },
             "output": [
@@ -6454,6 +6471,13 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
                     ]
                 },
                 {
@@ -6592,10 +6616,15 @@
                     "order": 1,
                     "required": true
                 },
+                "source": {
+                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -6611,12 +6640,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6625,12 +6654,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 }
             },
             "output": [
@@ -6650,6 +6679,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.create_on_cloud",
@@ -6781,16 +6817,21 @@
                     "order": 1,
                     "required": true
                 },
+                "source": {
+                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "confidence": {
                     "description": "Confidence level",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 3,
                     "required": true
                 },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "value_list": [
                         "public",
                         "private"
@@ -6806,12 +6847,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
+                    "order": 6,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6820,12 +6861,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -6845,6 +6886,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.confidence",
@@ -7007,16 +7055,21 @@
                     "order": 1,
                     "required": true
                 },
+                "source": {
+                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "confidence": {
                     "description": "Confidence level",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 3,
                     "required": true
                 },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "value_list": [
                         "public",
                         "private"
@@ -7032,12 +7085,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
+                    "order": 6,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -7046,12 +7099,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -7071,6 +7124,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.confidence",
