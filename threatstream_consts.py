@@ -40,6 +40,7 @@ ENDPOINT_COMMENT_IMPORT_SESSION = "/v1/importsession/{session_id}/comment/"
 ENDPOINT_THREAT_BULLETIN = "/v1/tipreport/"
 ENDPOINT_ATTACHMENT_THREAT_BULLETIN = "/v1/tipreport/{id}/attachment/"
 ENDPOINT_UPDATE_THREAT_BULLETIN = "/v1/tipreport/{id}/"
+ENDPOINT_UPDATE_OBSERVABLE = "/v2/intelligence/{id}/"
 ENDPOINT_IMPORT_SESSIONS_THREAT_BULLETIN = "/v1/tipreport/{id}/update_import_sessions/"
 ENDPOINT_FETCH_ENTITIES = "/v1/{entity_type}/{id}/{associated_entity_type}/"
 ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE = '/v1/tipreport/{id}/intelligence/bulk_add/'
@@ -80,6 +81,7 @@ THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM = "Please enter the value of keywords pa
 THREATSTREAM_ERR_RULE_ID_NOT_FOUND = "Error while fetching the rule ID of the created rule"
 THREATSTREAM_ERR_MISSING_LOCAL_REMOTE_ID = "Please provide either local_ids or remote_ids param"
 THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', 'attachment', 'comment' or 'fields' to update the provided {}"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', 'confidence', 'tlp', 'severity', 'status', 'expiration_date' or 'fields' to update the provided observable"
 
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"

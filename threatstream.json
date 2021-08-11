@@ -24134,6 +24134,164 @@
                 "height": 5
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "update observable",
+            "description": "Update an observable in ThreatStream",
+            "type": "generic",
+            "identifier": "update_observable",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID of the observable",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "primary": true
+                },
+                "indicator_type": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "confidence": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "tlp": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "severity": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 4,
+                    "value_list": [
+                        "low",
+                        "medium",
+                        "high",
+                        "very-high"
+                    ]
+                },
+                "status": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "expiration_date": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "263745273"
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "mal_email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        43
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "false positive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.expiration_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-11T07:00:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully updated observable"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 10,
+                "title": "Threat Bulletin Info"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }

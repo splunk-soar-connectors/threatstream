@@ -113,6 +113,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_DELETE_ACTOR = "delete_actor"
     ACTION_CREATE_ACTOR = "create_actor"
     ACTION_UPDATE_ACTOR = "update_actor"
+    ACTION_UPDATE_OBSERVABLE = "update_observable"
 
     def __init__(self):
 
@@ -3911,6 +3912,71 @@ class ThreatstreamConnector(BaseConnector):
         self._update_threat_model(action_result, param, ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), "actor", actor_id)
         return action_result.get_status()
 
+    def _handle_update_observable(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, observable_id = self._validate_integer(action_result, param["id"], THREATSTREAM_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        itype = param.get("indicator_type")
+        status = param.get("status")
+        tlp = param.get("tlp")
+        severity = param.get("severity")
+        confidence = param.get("confidence")
+        expiration_date = param.get("expiration_date")
+        data = dict()
+        payload = self._generate_payload()
+
+        fields = None
+
+        if param.get("fields", None):
+            try:
+                fields = ast.literal_eval(param.get("fields"))
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
+
+            if not isinstance(fields, dict):
+                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary. Please ensure that provided input is in valid JSON dictionary format")
+
+            data.update(fields)
+
+        if not (itype or status or tlp or severity or confidence or expiration_date or fields):
+            return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE)
+
+        if itype:
+            data.update({"itype": itype})
+
+        if status:
+            data.update({"status": status})
+
+        if tlp:
+            data.update({"tlp": tlp})
+
+        if severity:
+            data.update({"severity": severity})
+
+        if confidence:
+            data.update({"confidence": confidence})
+
+        if expiration_date:
+            data.update({"expiration_ts": expiration_date})
+
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_OBSERVABLE.format(id=observable_id), payload, data=data, method="patch")
+
+        if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message():
+            payload["remote_api"] = "true"
+            ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_UPDATE_OBSERVABLE.format(id=observable_id), payload, data=data, method="patch")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated observable")
+
     def handle_action(self, param):
 
         action = self.get_action_identifier()
@@ -4022,6 +4088,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_create_actor(param)
         elif (action == self.ACTION_UPDATE_ACTOR):
             ret_val = self._handle_update_actor(param)
+        elif (action == self.ACTION_UPDATE_OBSERVABLE):
+            ret_val = self._handle_update_observable(param)
 
         return ret_val
 
