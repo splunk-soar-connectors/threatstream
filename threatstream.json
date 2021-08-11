@@ -24153,22 +24153,22 @@
                     "primary": true
                 },
                 "indicator_type": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Indicator type to give the observable",
                     "data_type": "string",
                     "order": 1
                 },
                 "confidence": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Confidence to give the observable",
                     "data_type": "numeric",
                     "order": 2
                 },
                 "tlp": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Tlp to give the observable",
                     "data_type": "string",
                     "order": 3
                 },
                 "severity": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Severity to give the observable",
                     "data_type": "string",
                     "order": 4,
                     "value_list": [
@@ -24179,12 +24179,12 @@
                     ]
                 },
                 "status": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Status to give the observable",
                     "data_type": "string",
                     "order": 5
                 },
                 "expiration_date": {
-                    "description": "JSON formatted string of fields to include with the observable",
+                    "description": "Expiration timestamp to give the observable (in UTC format)",
                     "data_type": "string",
                     "order": 6
                 },
@@ -24252,7 +24252,7 @@
                     "data_path": "action_result.parameter.expiration_date",
                     "data_type": "string",
                     "example_values": [
-                        "2021-08-11T07:00:00.000Z"
+                        "2021-11-09T14:55:06.097Z"
                     ]
                 },
                 {
