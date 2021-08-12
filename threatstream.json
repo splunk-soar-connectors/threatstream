@@ -24289,7 +24289,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         255050731
-                    ]
+                    ],
+                    "column_order": 0,
+                    "column_name": "Observable ID"
                 },
                 {
                     "data_path": "action_result.data.*.ip",
@@ -24297,24 +24299,20 @@
                 },
                 {
                     "data_path": "action_result.data.*.asn",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.org",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.tlp",
                     "data_type": "string",
                     "example_values": [
                         "green"
-                    ]
+                    ],
+                    "column_order": 5,
+                    "column_name": "Tlp"
                 },
                 {
                     "data_path": "action_result.data.*.meta.next",
@@ -24336,7 +24334,9 @@
                     "data_type": "string",
                     "example_values": [
                         "medium"
-                    ]
+                    ],
+                    "column_order": 6,
+                    "column_name": "Severity"
                 },
                 {
                     "data_path": "action_result.data.*.rdns",
@@ -24403,7 +24403,9 @@
                     "data_type": "string",
                     "example_values": [
                         "apt_email"
-                    ]
+                    ],
+                    "column_order": 2,
+                    "column_name": "Indicator Type"
                 },
                 {
                     "data_path": "action_result.data.*.value",
@@ -24413,13 +24415,15 @@
                     ],
                     "contains": [
                         "email"
-                    ]
+                    ],
+                    "column_order": 1,
+                    "column_name": "Value"
                 },
                 {
                     "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
-                        "qa.threatstream.com"
+                        "test.source.com"
                     ]
                 },
                 {
@@ -24427,7 +24431,9 @@
                     "data_type": "string",
                     "example_values": [
                         "active"
-                    ]
+                    ],
+                    "column_order": 3,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "action_result.data.*.country",
@@ -24471,7 +24477,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         37
-                    ]
+                    ],
+                    "column_order": 4,
+                    "column_name": "Confidence"
                 },
                 {
                     "data_path": "action_result.data.*.created_by",
@@ -24521,17 +24529,16 @@
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.expiration_ts",
                     "data_type": "string",
                     "example_values": [
                         "2022-11-09T14:55:06.097Z"
-                    ]
+                    ],
+                    "column_order": 7,
+                    "column_name": "Expired Timestamp"
                 },
                 {
                     "data_path": "action_result.data.*.import_source",
