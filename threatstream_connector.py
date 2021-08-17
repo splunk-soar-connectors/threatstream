@@ -1741,7 +1741,7 @@ class ThreatstreamConnector(BaseConnector):
         # If use_premium_sandbox=="True" force it to be "true"
         if param.get("use_vmray_sandbox", None):
             data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
-            if data["use_vmray_sandbox"] == True or data["use_vmray_sandbox"] == "True":
+            if data["use_vmray_sandbox"]:
                 #  API Note for report_radio-platform:
                 # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
                 del data["report_radio-platform"]
@@ -1781,14 +1781,11 @@ class ThreatstreamConnector(BaseConnector):
         # If use_premium_sandbox=="True" force it to be "true"
         if param.get("use_premium_sandbox", None):
             data["use_premium_sandbox"] = param.get("use_premium_sandbox")
-            if (
-                data["use_premium_sandbox"] == True
-                or data["use_premium_sandbox"] == "True"
-            ):
+            if data["use_premium_sandbox"]:
                 data["use_premium_sandbox"] = "true"
         if param.get("use_vmray_sandbox", None):
             data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
-            if data["use_vmray_sandbox"] == True or data["use_vmray_sandbox"] == "True":
+            if data["use_vmray_sandbox"]:
                 #  API Note for report_radio-platform:
                 # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
                 del data["report_radio-platform"]

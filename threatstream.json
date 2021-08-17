@@ -7792,19 +7792,16 @@
                     "order": 2
                 },
                 "use_premium_sandbox": {
-                    "required": false,
                     "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "use_vmray_sandbox": {
-                    "required": false,
                     "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "vmray_max_jobs": {
-                    "required": false,
                     "description": "Specify the number of detonations you want VMRay to perform for the submission.",
                     "data_type": "numeric",
                     "order": 5
@@ -8072,19 +8069,16 @@
                     "order": 2
                 },
                 "use_premium_sandbox": {
-                    "required": false,
                     "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "use_vmray_sandbox": {
-                    "required": false,
                     "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "vmray_max_jobs": {
-                    "required": false,
                     "description": "Specify the number of detonations you want VMRay to perform for the submission.",
                     "data_type": "numeric",
                     "order": 5
