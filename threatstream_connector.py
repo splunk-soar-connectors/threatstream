@@ -525,19 +525,19 @@ class ThreatstreamConnector(BaseConnector):
     def _retrieve_ip_domain(self, value, ioc_type, action_result, limit=None, extend_source=False):
         """ Retrieve all the information needed for domains or IPs """
         ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         ret_val = self._pdns(value, ioc_type, action_result)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         ret_val = self._insight(value, ioc_type, action_result)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         ret_val = self._external_references(value, action_result)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         return phantom.APP_SUCCESS
@@ -546,15 +546,15 @@ class ThreatstreamConnector(BaseConnector):
         """ Retrieve all the information needed for email or md5 hashes """
 
         ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         ret_val = self._insight(value, ioc_type, action_result)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         ret_val = self._external_references(value, action_result)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         return phantom.APP_SUCCESS
@@ -599,7 +599,7 @@ class ThreatstreamConnector(BaseConnector):
             ioc_type = "sha512"
 
         ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on File")
 
@@ -617,7 +617,7 @@ class ThreatstreamConnector(BaseConnector):
 
         ioc_type = "domain"
         ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Domain")
 
@@ -632,7 +632,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
 
         ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on IP")
 
@@ -646,7 +646,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
 
         ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on URL")
@@ -664,7 +664,7 @@ class ThreatstreamConnector(BaseConnector):
 
         ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
 
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Email")
@@ -673,7 +673,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
         ret_val = self._whois(value, action_result, tipe="domain")
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
         return action_result.get_status()
 
@@ -681,7 +681,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
         ret_val = self._whois(value, action_result, tipe="ip")
-        if (not ret_val):
+        if not ret_val:
             return action_result.get_status()
         return action_result.get_status()
 
@@ -1737,6 +1737,29 @@ class ThreatstreamConnector(BaseConnector):
             "report_radio-file": vault_path,
             "report_radio-classification": param.get('classification')
         }
+        # Note: "True" will not be accepted by the Anomali side
+        # If use_premium_sandbox=="True" force it to be "true"
+        if param.get("use_vmray_sandbox", None):
+            data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
+            if data["use_vmray_sandbox"] == True or data["use_vmray_sandbox"] == "True":
+                #  API Note for report_radio-platform:
+                # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
+                del data["report_radio-platform"]
+                data["use_vmray_sandbox"] = "true"
+        if param.get("vmray_max_jobs", None):
+            data["vmray_max_jobs"] = param.get("vmray_max_jobs")
+        data = self._build_data_detonate_actions(action_result, data, param)
+        if data is None:
+            return action_result.get_status()
+        ret_val, resp_json = self._make_rest_call(
+            action_result,
+            ENDPOINT_FILE_DETONATION,
+            payload,
+            data=data,
+            method="post",
+            files=files,
+            use_json=False,
+        )
 
         ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_FILE_DETONATION, payload, data=data, method="post", files=files, use_json=False)
         if (phantom.is_fail(ret_val)):
@@ -1754,6 +1777,35 @@ class ThreatstreamConnector(BaseConnector):
             "report_radio-url": param.get('url'),
             "report_radio-classification": param.get('classification')
         }
+        # Note: "True" will not be accepted by the Anomali side
+        # If use_premium_sandbox=="True" force it to be "true"
+        if param.get("use_premium_sandbox", None):
+            data["use_premium_sandbox"] = param.get("use_premium_sandbox")
+            if (
+                data["use_premium_sandbox"] == True
+                or data["use_premium_sandbox"] == "True"
+            ):
+                data["use_premium_sandbox"] = "true"
+        if param.get("use_vmray_sandbox", None):
+            data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
+            if data["use_vmray_sandbox"] == True or data["use_vmray_sandbox"] == "True":
+                #  API Note for report_radio-platform:
+                # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
+                del data["report_radio-platform"]
+                data["use_vmray_sandbox"] = "true"
+        if param.get("vmray_max_jobs", None):
+            data["vmray_max_jobs"] = param.get("vmray_max_jobs")
+        data = self._build_data_detonate_actions(action_result, data, param)
+        if data is None:
+            return action_result.get_status()
+        ret_val, resp_json = self._make_rest_call(
+            action_result,
+            ENDPOINT_URL_DETONATION,
+            payload,
+            data=data,
+            method="post",
+            use_json=False,
+        )
 
         ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_URL_DETONATION, payload, data=data, method="post", use_json=False)
         if (phantom.is_fail(ret_val)):
@@ -1981,7 +2033,7 @@ class ThreatstreamConnector(BaseConnector):
 
             ret_val, resp_json = self._get_incident_support(action_result, incident_id=incident["id"])
 
-            if (not ret_val):
+            if not ret_val:
                 return action_result.get_status()
 
             # Create the list of artifacts to be created
@@ -2074,7 +2126,7 @@ class ThreatstreamConnector(BaseConnector):
 
             ret_val, message, _ = self.save_artifacts(artifacts_list)
 
-            if (not ret_val):
+            if not ret_val:
                 self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(
                                                     resp_json.get("id"), message))

@@ -7790,6 +7790,29 @@
                     "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 2
+                },
+                "use_premium_sandbox": {
+                    "required": false,
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "use_vmray_sandbox": {
+                    "required": false,
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "vmray_max_jobs": {
+                    "required": false,
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission.",
+                    "data_type": "numeric",
+                    "order": 5
+                },
+                "fields": {
+                    "description": "JSON formatted string of additional fields to be included in the detonate file action. e.g. {\"file_has_password\":\"true\",\"file_password\":\"abc123\"}. Please check the API doc to find more information on other valid fields.",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "output": [
@@ -7826,6 +7849,36 @@
                     "column_order": 0,
                     "example_values": [
                         "dd88508cda7bcfc71ffdbc0e26afe97d3fb9a0b6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_premium_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_vmray_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vmray_max_jobs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"file_has_password\":\"true\",\"file_password\":\"abc123\",\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"],\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {
@@ -8017,6 +8070,29 @@
                     "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 2
+                },
+                "use_premium_sandbox": {
+                    "required": false,
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "use_vmray_sandbox": {
+                    "required": false,
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "vmray_max_jobs": {
+                    "required": false,
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission.",
+                    "data_type": "numeric",
+                    "order": 5
+                },
+                "fields": {
+                    "description": "JSON formatted string of additional fields to be included in the detonate url action. e.g. {\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"]}. Please check the API doc to find more infomation on other valid fileds",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "output": [
@@ -8050,6 +8126,36 @@
                     ],
                     "contains": [
                         "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_premium_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_vmray_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vmray_max_jobs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"],\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {
