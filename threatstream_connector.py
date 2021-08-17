@@ -1701,6 +1701,28 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved detonation report")
 
+    def _build_data_detonate_actions(self, action_result, data, param):
+        # Preparing data dictionary
+        self.save_progress("[-] _build_data_detonate_actions....")
+        if param.get("fields"):
+            try:
+                fields = ast.literal_eval(param["fields"])
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_ERR_INVALID_JSON_WITH_PARAM.format(error_msg),
+                )
+                return None
+
+            if not isinstance(fields, dict):
+                action_result.set_status(
+                    phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON
+                )
+                return None
+            data.update(fields)
+        return data
+
     def _handle_detonate_file(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1739,6 +1761,11 @@ class ThreatstreamConnector(BaseConnector):
         }
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
+        if param.get("use_premium_sandbox", None):
+            data["use_premium_sandbox"] = param.get("use_premium_sandbox")
+            if data["use_premium_sandbox"]:
+                data["use_premium_sandbox"] = "true"
+
         if param.get("use_vmray_sandbox", None):
             data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
             if data["use_vmray_sandbox"]:
@@ -1746,11 +1773,15 @@ class ThreatstreamConnector(BaseConnector):
                 # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
                 del data["report_radio-platform"]
                 data["use_vmray_sandbox"] = "true"
+
         if param.get("vmray_max_jobs", None):
             data["vmray_max_jobs"] = param.get("vmray_max_jobs")
+
         data = self._build_data_detonate_actions(action_result, data, param)
+
         if data is None:
             return action_result.get_status()
+
         ret_val, resp_json = self._make_rest_call(
             action_result,
             ENDPOINT_FILE_DETONATION,
