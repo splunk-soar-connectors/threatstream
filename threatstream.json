@@ -10606,7 +10606,7 @@
         {
             "action": "update import session",
             "description": "This action updates the fields of the provided item id",
-            "verbose": "If 'null' is provided in the expire time parameter, then expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
+            "verbose": "If \"null\" is provided in the expire time parameter, then expiration time will be set to \"9999-12-31T00:00:00\".</li></ul>",
             "type": "generic",
             "identifier": "import_session_update",
             "read_only": false,
@@ -11856,7 +11856,7 @@
         {
             "action": "create threat bulletin",
             "description": "Create a threat bulletin in ThreatStream",
-            "verbose": "<ul><li>Circles parameter will only be applicable when a threat bulletin will be created on the cloud.</li><li>If the body_content_type parameter is not provided, then the default value (markdown) will be considered as the value of the body_content_type parameter. Once created, body_content_type cannot be modified</li></ul>",
+            "verbose": "<ul><li>Circles parameter will only be applicable when a threat bulletin will be created on the cloud.</li><li>If the body_content_type parameter is not provided, then the default value (markdown) will be considered as the value of the body_content_type parameter. Once created, body_content_type cannot be modified.</li></ul>",
             "type": "generic",
             "identifier": "create_threat_bulletin",
             "read_only": false,

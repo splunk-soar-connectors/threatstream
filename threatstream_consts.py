@@ -81,7 +81,8 @@ THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM = "Please enter the value of keywords pa
 THREATSTREAM_ERR_RULE_ID_NOT_FOUND = "Error while fetching the rule ID of the created rule"
 THREATSTREAM_ERR_MISSING_LOCAL_REMOTE_ID = "Please provide either local_ids or remote_ids param"
 THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', 'attachment', 'comment' or 'fields' to update the provided {}"
-THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', 'confidence', 'tlp', 'severity', 'status', 'expiration_date' or 'fields' to update the provided observable"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', 'confidence', 'tlp', 'severity', 'status', 'expiration_date' or \
+    'fields' to update the provided observable"
 
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"

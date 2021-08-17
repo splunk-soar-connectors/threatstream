@@ -769,7 +769,7 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload(order_by="-created_ts")
 
         if param.get("intel_value", None):
-            payload["value"] = param["intel_value"]
+            payload["value"] = param.get("intel_value")
             incidents = self._paginator(ENDPOINT_INCIDENT_WITH_VALUE, action_result, payload=payload, limit=limit)
         else:
             incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
@@ -2841,22 +2841,22 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload()
 
         if param.get("name"):
-            payload["name"] = param["name"]
+            payload["name"] = param.get("name")
 
         if param.get("status"):
-            payload["status"] = param["status"]
+            payload["status"] = param.get("status")
 
         if param.get("source"):
-            payload["source"] = param["source"]
+            payload["source"] = param.get("source")
 
         if param.get("tlp"):
-            payload["tlp"] = param["tlp"]
+            payload["tlp"] = param.get("tlp")
 
         if param.get("is_public") in ["true", "false"]:
-            payload["is_public"] = param["is_public"]
+            payload["is_public"] = param.get("is_public")
 
         if param.get("assignee_user_id", None):
-            payload["assignee_user_id"] = param["assignee_user_id"]
+            payload["assignee_user_id"] = param.get("assignee_user_id")
 
         threat_bulletins = self._paginator(ENDPOINT_THREAT_BULLETIN, action_result, payload=payload, limit=limit)
 
