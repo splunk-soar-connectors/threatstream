@@ -8,9 +8,9 @@
     "app_version": "3.2.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, July 2021"
+        "Cloud, October 2021"
     ],
-    "utctime_updated": "2021-07-23T06:15:06.000000Z",
+    "utctime_updated": "2021-11-02T05:46:58.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
@@ -7769,8 +7769,8 @@
             "read_only": false,
             "parameters": {
                 "platform": {
-                    "default": "ALL",
-                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
+                    "default": "WINDOWS7",
+                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform",
                     "data_type": "string",
                     "order": 1
                 },
@@ -7832,7 +7832,7 @@
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
                     "example_values": [
-                        "ALL"
+                        "WINDOWS7"
                     ]
                 },
                 {
@@ -8047,8 +8047,8 @@
             "read_only": false,
             "parameters": {
                 "platform": {
-                    "default": "ALL",
-                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
+                    "default": "WINDOWS7",
+                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform",
                     "data_type": "string",
                     "order": 1
                 },
@@ -8109,7 +8109,7 @@
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
                     "example_values": [
-                        "ALL"
+                        "WINDOWS7"
                     ]
                 },
                 {

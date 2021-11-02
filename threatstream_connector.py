@@ -1094,7 +1094,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_incident(self, param):
+    def _handle_update_incident(self, param):  # noqa
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val = None
@@ -1398,7 +1398,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
-    def import_support(self, param, action_result):
+    def import_support(self, param, action_result):  # noqa
 
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
@@ -1755,7 +1755,7 @@ class ThreatstreamConnector(BaseConnector):
             "file": vault_file
         }
         data = {
-            "report_radio-platform": param.get('platform', 'ALL'),
+            "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-file": vault_path,
             "report_radio-classification": param.get('classification')
         }
@@ -1804,7 +1804,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
         data = {
-            "report_radio-platform": param.get('platform', 'ALL'),
+            "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-url": param.get('url'),
             "report_radio-classification": param.get('classification')
         }
@@ -1963,7 +1963,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return container_id
 
-    def _handle_on_poll(self, param):
+    def _handle_on_poll(self, param):  # noqa
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
 
@@ -2204,7 +2204,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _handle_import_session_update(self, param):
+    def _handle_import_session_update(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2454,7 +2454,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return data
 
-    def _handle_create_threat_bulletin(self, param):
+    def _handle_create_threat_bulletin(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         comments = param.get('comments')
@@ -2622,7 +2622,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_threat_bulletin(self, param):
+    def _handle_update_threat_bulletin(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2936,7 +2936,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_association(self, param, endpoint):
+    def _handle_association(self, param, endpoint):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3587,7 +3587,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return ret_val, resp_json, entity_id
 
-    def _create_threat_model(self, action_result, param, endpoint, entity_type):
+    def _create_threat_model(self, action_result, param, endpoint, entity_type):  # noqa
         create_on_cloud = param.get("create_on_cloud", False)
 
         data = {
@@ -3752,7 +3752,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):
+    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):  # noqa
 
         if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields") and not param.get("attachment") and not param.get("comment"):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL.format(entity_type))
