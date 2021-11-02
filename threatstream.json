@@ -5,10 +5,10 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.1.1",
+    "app_version": "3.1.2",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, July 2021"
+        "Cloud, October 2021"
     ],
     "utctime_updated": "2021-07-23T06:15:06.000000Z",
     "package_name": "phantom_threatstream",
@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
@@ -7709,8 +7709,8 @@
             "read_only": false,
             "parameters": {
                 "platform": {
-                    "default": "ALL",
-                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
+                    "default": "WINDOWS7",
+                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform",
                     "data_type": "string",
                     "order": 1
                 },
@@ -7752,7 +7752,7 @@
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
                     "example_values": [
-                        "ALL"
+                        "WINDOWS7"
                     ]
                 },
                 {
@@ -7937,8 +7937,8 @@
             "read_only": false,
             "parameters": {
                 "platform": {
-                    "default": "ALL",
-                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'ALL' which will run the detonation on all platforms",
+                    "default": "WINDOWS7",
+                    "description": "Which platform to run the detonation on - Ex: WINDOWS10x64. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform",
                     "data_type": "string",
                     "order": 1
                 },
@@ -7979,7 +7979,7 @@
                     "data_path": "action_result.parameter.platform",
                     "data_type": "string",
                     "example_values": [
-                        "ALL"
+                        "WINDOWS7"
                     ]
                 },
                 {
@@ -10440,7 +10440,7 @@
         {
             "action": "update import session",
             "description": "This action updates the fields of the provided item id",
-            "verbose": "If 'null' is provided in the expire time parameter, then expiration time will be set to '9999-12-31T00:00:00'</li></ul>",
+            "verbose": "If 'null' is provided in the expire time parameter, then expiration time will be set to '9999-12-31T00:00:00'.</li></ul>",
             "type": "generic",
             "identifier": "import_session_update",
             "read_only": false,
@@ -11690,7 +11690,7 @@
         {
             "action": "create threat bulletin",
             "description": "Create a threat bulletin in ThreatStream",
-            "verbose": "<ul><li>Circles parameter will only be applicable when a threat bulletin will be created on the cloud.</li><li>If the body_content_type parameter is not provided, then the default value (markdown) will be considered as the value of the body_content_type parameter. Once created, body_content_type cannot be modified</li></ul>",
+            "verbose": "<ul><li>Circles parameter will only be applicable when a threat bulletin will be created on the cloud.</li><li>If the body_content_type parameter is not provided, then the default value (markdown) will be considered as the value of the body_content_type parameter. Once created, body_content_type cannot be modified.</li></ul>",
             "type": "generic",
             "identifier": "create_threat_bulletin",
             "read_only": false,
