@@ -113,6 +113,11 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_DELETE_ACTOR = "delete_actor"
     ACTION_CREATE_ACTOR = "create_actor"
     ACTION_UPDATE_ACTOR = "update_actor"
+    ACTION_CREATE_INVESTIGATION = 'create_investigation'
+    ACTION_LIST_INVESTIGATIONS = 'list_investigations'
+    ACTION_GET_INVESTIGATION = 'get_investigation'
+    ACTION_UPDATE_INVESTIGATION = 'update_investigation'
+    ACTION_DELETE_INVESTIGATION = 'delete_investigation'
 
     def __init__(self):
 
@@ -179,6 +184,8 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {})
         elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_INVESTIGATION:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted investigation"), {})
         elif status_code == 204 and action == self.ACTION_DELETE_RULE:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted rule"), {})
         elif status_code == 204 and action == self.ACTION_DELETE_THREAT_BULLETIN:
@@ -3907,6 +3914,157 @@ class ThreatstreamConnector(BaseConnector):
         self._update_threat_model(action_result, param, ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), "actor", actor_id)
         return action_result.get_status()
 
+    def _handle_create_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        name = param['name']
+        priority = param['priority']
+
+        create_on_cloud = param.get('create_on_cloud', False)
+
+        data = {
+            'name': name,
+            'priority': priority
+        }
+
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+        if self._is_cloud_instance or create_on_cloud:
+            payload['remote_api'] = 'true'
+
+        ret_val, resp_json = self._make_rest_call(
+            action_result, ENDPOINT_INVESTIGATION, payload, data=data, method='post')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        summary = action_result.update_summary({})
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully created investigation')
+
+    def _handle_list_investigations(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        investigations = self._paginator(ENDPOINT_INVESTIGATION, action_result, limit=limit, payload=payload)
+        if investigations is None:
+            return action_result.get_status()
+
+        for investigation in investigations:
+            action_result.add_data(investigation)
+
+        summary = action_result.update_summary({})
+        summary['investigations_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved investigation')
+
+    def _handle_update_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        data_dict = self._build_data(param, {}, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated investigation')
+
+    def _handle_delete_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val):
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully deleted investigation')
+
     def handle_action(self, param):  # noqa
 
         action = self.get_action_identifier()
@@ -4018,6 +4176,16 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_create_actor(param)
         elif (action == self.ACTION_UPDATE_ACTOR):
             ret_val = self._handle_update_actor(param)
+        elif (action == self.ACTION_CREATE_INVESTIGATION):
+            ret_val = self._handle_create_investigation(param)
+        elif (action == self.ACTION_LIST_INVESTIGATIONS):
+            ret_val = self._handle_list_investigations(param)
+        elif (action == self.ACTION_GET_INVESTIGATION):
+            ret_val = self._handle_get_investigation(param)
+        elif (action == self.ACTION_UPDATE_INVESTIGATION):
+            ret_val = self._handle_update_investigation(param)
+        elif (action == self.ACTION_DELETE_INVESTIGATION):
+            ret_val = self._handle_delete_investigation(param)
 
         return ret_val
 
