@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.1.3",
+    "app_version": "3.2.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, October 2021"
@@ -24074,6 +24074,1390 @@
                 "height": 5
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "create investigation",
+            "read_only": false,
+            "description": "Create an investigation in ThreatStream",
+            "parameters": {
+                "name": {
+                    "required": true,
+                    "order": 0,
+                    "data_type": "string",
+                    "description": "Name to give the investigation"
+                },
+                "priority": {
+                    "required": true,
+                    "value_list": [
+                        "very low",
+                        "low",
+                        "medium",
+                        "high",
+                        "very high"
+                    ],
+                    "description": "Priority assigned to the investigation.",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the investigation",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "create_on_cloud": {
+                    "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
+                    "data_type": "boolean",
+                    "order": 3
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Create investigation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.create_on_cloud",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "example_values": [
+                        "{\"tlp\": \"red\"}"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "example_values": [
+                        "new_investigation"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.priority",
+                    "example_values": [
+                        "low"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.candidate_session",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.circles",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "example_values": [
+                        "2020-05-28T00:39:25.453003"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "example_values": [
+                        "<p>this is a low priority investigation</p>"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.elements",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.graph_content",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "investigation ID",
+                    "data_path": "action_result.data.*.id",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.import_sessions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.investigation_attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "example_values": [
+                        false
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "example_values": [
+                        "2020-05-21T18:53:11.233187"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Investigation Name",
+                    "data_path": "action_result.data.*.name",
+                    "example_values": [
+                        "Blank Investigation Two"
+                    ],
+                    "data_type": "string",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.id",
+                    "example_values": [
+                        "2342"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org_id",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Priority",
+                    "data_path": "action_result.data.*.priority",
+                    "example_values": [
+                        "low"
+                    ],
+                    "data_type": "string",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.avatar_s3_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.can_share_intelligence",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.email",
+                    "example_values": [
+                        "user@phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.id",
+                    "example_values": [
+                        "6941"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_active",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_readonly",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.must_change_password",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.name",
+                    "example_values": [
+                        ""
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.nickname",
+                    "example_values": [
+                        "EAlezeb"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.id",
+                    "example_values": [
+                        "2324"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.resource_uri",
+                    "example_values": [
+                        "/api/v1/user/6941/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "example_values": [
+                        6941
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "example_values": [
+                        "/api/v1/investigation/56198/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_type",
+                    "example_values": [
+                        "user"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "example_values": [
+                        "unassigned"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.tasks",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tips",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "example_values": [
+                        "red"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.workgroups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully created investigation"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ],
+            "identifier": "create_investigation",
+            "type": "generic"
+        },
+        {
+            "action": "list investigations",
+            "identifier": "list_investigations",
+            "type": "investigate",
+            "read_only": true,
+            "description": "List investigations present in ThreatStream",
+            "parameters": {
+                "limit": {
+                    "default": 1000,
+                    "description": "Total number of investigations to return",
+                    "data_type": "numeric",
+                    "order": 0
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "List Investigations"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "example_values": [
+                        1000
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "Assignee",
+                    "data_path": "action_result.data.*.assignee",
+                    "data_type": "string",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "example_values": [
+                        "2020-05-28T23:47:44.391824"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.elements",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "Investigation ID",
+                    "data_path": "action_result.data.*.id",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric",
+                    "column_order": 0
+                },
+                {
+                    "column_name": "Is Public",
+                    "data_path": "action_result.data.*.is_public",
+                    "example_values": [
+                        false
+                    ],
+                    "data_type": "boolean",
+                    "column_order": 5
+                },
+                {
+                    "column_name": "Last Modification Date",
+                    "data_path": "action_result.data.*.modified_ts",
+                    "example_values": [
+                        "2020-05-28T23:47:44.391824"
+                    ],
+                    "data_type": "string",
+                    "column_order": 6
+                },
+                {
+                    "column_name": "Investigation Name",
+                    "data_path": "action_result.data.*.name",
+                    "example_values": [
+                        "Blank Investigation Two"
+                    ],
+                    "data_type": "string",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.id",
+                    "example_values": [
+                        "2342"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org_id",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Priority",
+                    "data_path": "action_result.data.*.priority",
+                    "example_values": [
+                        "low"
+                    ],
+                    "data_type": "string",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.avatar_s3_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.can_share_intelligence",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.email",
+                    "example_values": [
+                        "user@phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.id",
+                    "example_values": [
+                        "6941"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_active",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_readonly",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.must_change_password",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.name",
+                    "example_values": [
+                        ""
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.nickname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.id",
+                    "example_values": [
+                        "2324"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.resource_uri",
+                    "example_values": [
+                        "/api/v1/user/6941/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "example_values": [
+                        6941
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "example_values": [
+                        "/api/v1/investigation/56953/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_type",
+                    "example_values": [
+                        "user"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Status",
+                    "data_path": "action_result.data.*.status",
+                    "example_values": [
+                        "unassigned"
+                    ],
+                    "data_type": "string",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "example_values": [
+                        "red"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.workgroups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.investigations_returned",
+                    "example_values": [
+                        1000
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Investigations returned: 1000"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "get investigation",
+            "identifier": "get_investigation",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Retrieve investigation present in Threatstream by ID",
+            "parameters": {
+                "investigation_id": {
+                    "order": 0,
+                    "required": true,
+                    "description": "ID of the investigation to retrieve",
+                    "data_type": "numeric",
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Get Investigation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Investigation ID",
+                    "data_path": "action_result.parameter.investigation_id",
+                    "example_values": [
+                        "56198"
+                    ],
+                    "data_type": "numeric",
+                    "column_order": 0
+                },
+                {
+                    "column_name": "Assignee",
+                    "data_path": "action_result.data.*.assignee",
+                    "data_type": "string",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.candidate_session",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.circles",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "example_values": [
+                        "2020-05-21T18:53:11.233187"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "example_values": [
+                        "<p>this is a low priority investigation</p>"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.elements",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.graph_content",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.import_sessions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.investigation_attachments",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Is Public",
+                    "data_path": "action_result.data.*.is_public",
+                    "example_values": [
+                        false
+                    ],
+                    "data_type": "boolean",
+                    "column_order": 5
+                },
+                {
+                    "column_name": "Last Modification Date",
+                    "data_path": "action_result.data.*.modified_ts",
+                    "example_values": [
+                        "2020-05-21T18:53:11.233187"
+                    ],
+                    "data_type": "string",
+                    "column_order": 6
+                },
+                {
+                    "column_name": "Investigation Name",
+                    "data_path": "action_result.data.*.name",
+                    "example_values": [
+                        "Blank Investigation Two"
+                    ],
+                    "data_type": "string",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.id",
+                    "example_values": [
+                        "2342"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org_id",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Priority",
+                    "data_path": "action_result.data.*.priority",
+                    "example_values": [
+                        "low"
+                    ],
+                    "data_type": "string",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.avatar_s3_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.can_share_intelligence",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.email",
+                    "example_values": [
+                        "user@phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.id",
+                    "example_values": [
+                        "6941"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_active",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_readonly",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.must_change_password",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.name",
+                    "example_values": [
+                        ""
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.nickname",
+                    "example_values": [
+                        "EAlezeb"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.id",
+                    "example_values": [
+                        "2324"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.resource_uri",
+                    "example_values": [
+                        "/api/v1/user/6941/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "example_values": [
+                        6941
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "example_values": [
+                        "/api/v1/investigation/56198/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_type",
+                    "example_values": [
+                        "user"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Status",
+                    "data_path": "action_result.data.*.status",
+                    "example_values": [
+                        "unassigned"
+                    ],
+                    "data_type": "string",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.tasks",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tips",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "example_values": [
+                        "red"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.workgroups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully retrieved investigation"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "update investigation",
+            "identifier": "update_investigation",
+            "type": "generic",
+            "read_only": false,
+            "description": "Update an investigation in ThreatStream",
+            "parameters": {
+                "investigation_id": {
+                    "order": 0,
+                    "required": true,
+                    "description": "ID of the investigation to update",
+                    "data_type": "numeric",
+                    "primary": true
+                },
+                "fields": {
+                    "required": true,
+                    "description": "JSON formatted string of fields to include with the investigation",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Update investigation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.investigation_id",
+                    "example_values": [
+                        "56198"
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "example_values": [
+                        "{\"tlp\": \"red\"}"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.candidate_session",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.circles",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "example_values": [
+                        "2020-05-28T00:39:25.453003"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "example_values": [
+                        "<p>this is a low priority investigation</p>"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.elements",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.graph_content",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "investigation ID",
+                    "data_path": "action_result.data.*.id",
+                    "example_values": [
+                        0
+                    ],
+                    "data_type": "numeric",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.import_sessions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.investigation_attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "example_values": [
+                        false
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "example_values": [
+                        "2020-05-21T18:53:11.233187"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Investigation Name",
+                    "data_path": "action_result.data.*.name",
+                    "example_values": [
+                        "Blank Investigation Two"
+                    ],
+                    "data_type": "string",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.id",
+                    "example_values": [
+                        "2342"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner_org_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "example_values": [
+                        "low"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.avatar_s3_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.can_share_intelligence",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.email",
+                    "example_values": [
+                        "user@phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.id",
+                    "example_values": [
+                        "6941"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_active",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.is_readonly",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.must_change_password",
+                    "example_values": [
+                        true
+                    ],
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.name",
+                    "example_values": [
+                        ""
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.nickname",
+                    "example_values": [
+                        "EAlezeb"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.id",
+                    "example_values": [
+                        "2324"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.name",
+                    "example_values": [
+                        "phantom.us"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.organization.resource_uri",
+                    "example_values": [
+                        "/api/v1/userorganization/2342/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter.resource_uri",
+                    "example_values": [
+                        "/api/v1/user/6941/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reporter_id",
+                    "example_values": [
+                        6941
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "example_values": [
+                        "/api/v1/investigation/56198/"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_type",
+                    "example_values": [
+                        "user"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "example_values": [
+                        "unassigned"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.tasks",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tips",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "example_values": [
+                        "red"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.workgroups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully updated investigation"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "delete investigation",
+            "identifier": "delete_investigation",
+            "type": "generic",
+            "read_only": false,
+            "description": "Delete investigation in ThreatStream by ID number",
+            "parameters": {
+                "investigation_id": {
+                    "order": 0,
+                    "required": true,
+                    "description": "ID number of investigation to delete",
+                    "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "id"
+                    ]
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Delete investigation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "column_order": 0,
+                    "data_path": "action_result.parameter.investigation_id",
+                    "example_values": [
+                        56911
+                    ],
+                    "contains": [
+                        "id"
+                    ],
+                    "data_type": "numeric",
+                    "column_name": "investigation ID"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully deleted investigation"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                }
+            ]
         }
     ]
 }
