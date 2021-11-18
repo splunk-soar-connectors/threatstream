@@ -58,6 +58,8 @@ ENDPOINT_ADD_COMMENT = "/v1/{entity_type}/{entity_id}/comment/"
 ENDPOINT_GET_SINGLE_THREAT_MODEL = "/v1/{entity_type}/{entity_id}/"
 ENDPOINT_SINGLE_ACTOR = "/v1/actor/{actor_id}/"
 ENDPOINT_IMPORT = '/v1/import'
+ENDPOINT_INVESTIGATION = '/v1/investigation/'
+ENDPOINT_SINGLE_INVESTIGATION = '/v1/investigation/{}/'
 
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
@@ -93,6 +95,7 @@ THREATSTREAM_ITEM_ID = "'item_id' action parameter"
 THREATSTREAM_REPORT_ID = "'report_id' action parameter"
 THREATSTREAM_THREAT_BULLETIN_ID = "'threat_bulletin_id' action parameter"
 THREATSTREAM_VULNERABILITY_ID = "'vulnerability_id' action parameter"
+THREATSTREAM_INVESTIGATION_ID = "'investigation_id' action parameter"
 THREATSTREAM_OFFSET = "'offset' action parameter"
 THREATSTREAM_CONFIDENCE = "'confidence' action parameter"
 THREATSTREAM_FIRST_RUN_CONTAINER = "'first_run_container' configuration parameter"
