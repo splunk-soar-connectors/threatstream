@@ -5,10 +5,10 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.2.2",
+    "app_version": "3.2.3",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, October 2021"
+        "Cloud, November 2021"
     ],
     "utctime_updated": "2021-11-18T23:21:24.000000Z",
     "package_name": "phantom_threatstream",
@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.0.0",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
