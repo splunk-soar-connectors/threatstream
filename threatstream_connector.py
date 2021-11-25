@@ -113,6 +113,11 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_DELETE_ACTOR = "delete_actor"
     ACTION_CREATE_ACTOR = "create_actor"
     ACTION_UPDATE_ACTOR = "update_actor"
+    ACTION_CREATE_INVESTIGATION = 'create_investigation'
+    ACTION_LIST_INVESTIGATIONS = 'list_investigations'
+    ACTION_GET_INVESTIGATION = 'get_investigation'
+    ACTION_UPDATE_INVESTIGATION = 'update_investigation'
+    ACTION_DELETE_INVESTIGATION = 'delete_investigation'
 
     def __init__(self):
 
@@ -179,6 +184,8 @@ class ThreatstreamConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, {})
         elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
+        elif status_code == 204 and action == self.ACTION_DELETE_INVESTIGATION:
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted investigation"), {})
         elif status_code == 204 and action == self.ACTION_DELETE_RULE:
             return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted rule"), {})
         elif status_code == 204 and action == self.ACTION_DELETE_THREAT_BULLETIN:
@@ -393,10 +400,10 @@ class ThreatstreamConnector(BaseConnector):
 
         return payload
 
-    def _intel_details(self, value, action_result, limit=None):
+    def _intel_details(self, value, action_result, limit=None, extend_source=False):
         """ Use the intelligence endpoint to get general details """
 
-        payload = self._generate_payload(extend_source="true", order_by="-created_ts", value=value, limit=limit)
+        payload = self._generate_payload(extend_source=extend_source, order_by="-created_ts", value=value, limit=limit)
 
         intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=limit)
 
@@ -432,7 +439,7 @@ class ThreatstreamConnector(BaseConnector):
     def _insight(self, value, ioc_type, action_result):
 
         # Validate input
-        if ioc_type not in [ "ip", "domain", "email", "md5", "sha1", "sha256" ]:
+        if ioc_type not in [ "ip", "domain", "email", "md5", "sha1", "sha256", "sha512" ]:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
 
         payload = self._generate_payload(type=ioc_type, value=value)
@@ -521,9 +528,9 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, THREATSTREAM_SUCCESS_WHOIS_MESSAGE)
 
-    def _retrieve_ip_domain(self, value, ioc_type, action_result, limit=None):
+    def _retrieve_ip_domain(self, value, ioc_type, action_result, limit=None, extend_source=False):
         """ Retrieve all the information needed for domains or IPs """
-        ret_val = self._intel_details(value, action_result, limit=limit)
+        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
 
@@ -541,10 +548,10 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _retrieve_email_md5(self, value, ioc_type, action_result, limit=None):
+    def _retrieve_email_md5(self, value, ioc_type, action_result, limit=None, extend_source=False):
         """ Retrieve all the information needed for email or md5 hashes """
 
-        ret_val = self._intel_details(value, action_result, limit=limit)
+        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
 
@@ -580,6 +587,7 @@ class ThreatstreamConnector(BaseConnector):
     def _file_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_HASH]
+        extend_source = param.get("extend_source", False)
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
@@ -589,12 +597,14 @@ class ThreatstreamConnector(BaseConnector):
 
         if phantom.is_md5(value):
             ioc_type = "md5"
-        if phantom.is_sha1(value):
+        elif phantom.is_sha1(value):
             ioc_type = "sha1"
-        if phantom.is_sha256(value):
+        elif phantom.is_sha256(value):
             ioc_type = "sha256"
+        elif phantom.is_sha512(value):
+            ioc_type = "sha512"
 
-        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit)
+        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on File")
@@ -602,6 +612,7 @@ class ThreatstreamConnector(BaseConnector):
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
+        extend_source = param.get("extend_source", False)
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
@@ -611,7 +622,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
 
         ioc_type = "domain"
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit)
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Domain")
@@ -619,13 +630,14 @@ class ThreatstreamConnector(BaseConnector):
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
+        extend_source = param.get("extend_source", False)
         ioc_type = "ip"
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit)
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on IP")
@@ -633,12 +645,13 @@ class ThreatstreamConnector(BaseConnector):
     def _url_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_URL])
+        extend_source = param.get("extend_source", False)
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._intel_details(value, action_result, limit=limit)
+        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
 
@@ -648,13 +661,14 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_EMAIL])
+        extend_source = param.get("extend_source", False)
         ioc_type = "email"
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit)
+        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
 
         if (not ret_val):
             return action_result.get_status()
@@ -761,7 +775,7 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload(order_by="-created_ts")
 
         if param.get("intel_value", None):
-            payload["value"] = param["intel_value"]
+            payload["value"] = param.get("intel_value")
             incidents = self._paginator(ENDPOINT_INCIDENT_WITH_VALUE, action_result, payload=payload, limit=limit)
         else:
             incidents = self._paginator(ENDPOINT_INCIDENT, action_result, payload=payload, limit=limit)
@@ -1086,7 +1100,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_incident(self, param):
+    def _handle_update_incident(self, param):  # noqa
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val = None
@@ -1390,7 +1404,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
-    def import_support(self, param, action_result):
+    def import_support(self, param, action_result):  # noqa
 
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
@@ -1721,7 +1735,7 @@ class ThreatstreamConnector(BaseConnector):
             "file": vault_file
         }
         data = {
-            "report_radio-platform": param.get('platform', 'ALL'),
+            "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-file": vault_path,
             "report_radio-classification": param.get('classification')
         }
@@ -1738,7 +1752,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload()
         data = {
-            "report_radio-platform": param.get('platform', 'ALL'),
+            "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-url": param.get('url'),
             "report_radio-classification": param.get('classification')
         }
@@ -1871,7 +1885,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return container_id
 
-    def _handle_on_poll(self, param):
+    def _handle_on_poll(self, param):  # noqa
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
 
@@ -2112,7 +2126,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _handle_import_session_update(self, param):
+    def _handle_import_session_update(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2362,7 +2376,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return data
 
-    def _handle_create_threat_bulletin(self, param):
+    def _handle_create_threat_bulletin(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         comments = param.get('comments')
@@ -2530,7 +2544,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_threat_bulletin(self, param):
+    def _handle_update_threat_bulletin(self, param):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2777,22 +2791,22 @@ class ThreatstreamConnector(BaseConnector):
         payload = self._generate_payload()
 
         if param.get("name"):
-            payload["name"] = param["name"]
+            payload["name"] = param.get("name")
 
         if param.get("status"):
-            payload["status"] = param["status"]
+            payload["status"] = param.get("status")
 
         if param.get("source"):
-            payload["source"] = param["source"]
+            payload["source"] = param.get("source")
 
         if param.get("tlp"):
             payload["tlp"] = param["tlp"]
 
         if param.get("is_public") in ["true", "false"]:
-            payload["is_public"] = param["is_public"]
+            payload["is_public"] = param.get("is_public")
 
         if param.get("assignee_user_id", None):
-            payload["assignee_user_id"] = param["assignee_user_id"]
+            payload["assignee_user_id"] = param.get("assignee_user_id")
 
         threat_bulletins = self._paginator(ENDPOINT_THREAT_BULLETIN, action_result, payload=payload, limit=limit)
 
@@ -2844,7 +2858,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_association(self, param, endpoint):
+    def _handle_association(self, param, endpoint):  # noqa
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3495,7 +3509,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return ret_val, resp_json, entity_id
 
-    def _create_threat_model(self, action_result, param, endpoint, entity_type):
+    def _create_threat_model(self, action_result, param, endpoint, entity_type):  # noqa
         create_on_cloud = param.get("create_on_cloud", False)
 
         data = {
@@ -3660,7 +3674,7 @@ class ThreatstreamConnector(BaseConnector):
         summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):
+    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):  # noqa
 
         if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields") and not param.get("attachment") and not param.get("comment"):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL.format(entity_type))
@@ -3900,7 +3914,158 @@ class ThreatstreamConnector(BaseConnector):
         self._update_threat_model(action_result, param, ENDPOINT_SINGLE_ACTOR.format(actor_id=actor_id), "actor", actor_id)
         return action_result.get_status()
 
-    def handle_action(self, param):
+    def _handle_create_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        name = param['name']
+        priority = param['priority']
+
+        create_on_cloud = param.get('create_on_cloud', False)
+
+        data = {
+            'name': name,
+            'priority': priority
+        }
+
+        data_dict = self._build_data(param, data, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+        if self._is_cloud_instance or create_on_cloud:
+            payload['remote_api'] = 'true'
+
+        ret_val, resp_json = self._make_rest_call(
+            action_result, ENDPOINT_INVESTIGATION, payload, data=data, method='post')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        summary = action_result.update_summary({})
+        summary['created_on_cloud'] = create_on_cloud or self._is_cloud_instance
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully created investigation')
+
+    def _handle_list_investigations(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        investigations = self._paginator(ENDPOINT_INVESTIGATION, action_result, limit=limit, payload=payload)
+        if investigations is None:
+            return action_result.get_status()
+
+        for investigation in investigations:
+            action_result.add_data(investigation)
+
+        summary = action_result.update_summary({})
+        summary['investigations_returned'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        payload = self._generate_payload()
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='get')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved investigation')
+
+    def _handle_update_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        data_dict = self._build_data(param, {}, action_result)
+        if data_dict is None:
+            return action_result.get_status()
+
+        data = data_dict.get("data")
+        data = self._validate_data(action_result, data)
+        if data is None:
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, data=data, method='patch')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated investigation')
+
+    def _handle_delete_investigation(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, investigation_id = self._validate_integer(
+            action_result, param['investigation_id'], THREATSTREAM_INVESTIGATION_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        payload = self._generate_payload()
+
+        endpoint = ENDPOINT_SINGLE_INVESTIGATION.format(investigation_id)
+
+        if self._is_cloud_instance:
+            payload['remote_api'] = 'true'
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+        else:
+            ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+
+            # Retry with remote api
+            if phantom.is_fail(ret_val):
+                payload['remote_api'] = 'true'
+                ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method='delete')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully deleted investigation')
+
+    def handle_action(self, param):  # noqa
 
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
@@ -4011,6 +4176,16 @@ class ThreatstreamConnector(BaseConnector):
             ret_val = self._handle_create_actor(param)
         elif (action == self.ACTION_UPDATE_ACTOR):
             ret_val = self._handle_update_actor(param)
+        elif (action == self.ACTION_CREATE_INVESTIGATION):
+            ret_val = self._handle_create_investigation(param)
+        elif (action == self.ACTION_LIST_INVESTIGATIONS):
+            ret_val = self._handle_list_investigations(param)
+        elif (action == self.ACTION_GET_INVESTIGATION):
+            ret_val = self._handle_get_investigation(param)
+        elif (action == self.ACTION_UPDATE_INVESTIGATION):
+            ret_val = self._handle_update_investigation(param)
+        elif (action == self.ACTION_DELETE_INVESTIGATION):
+            ret_val = self._handle_delete_investigation(param)
 
         return ret_val
 
