@@ -24238,6 +24238,7 @@
         {
             "action": "update observable",
             "description": "Update an observable in ThreatStream",
+            "verbose": "If any of the indicator_type, confidence, tlp, severity, status, or expiration_date parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
             "type": "generic",
             "identifier": "update_observable",
             "read_only": false,
