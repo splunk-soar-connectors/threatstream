@@ -4022,11 +4022,11 @@ class ThreatstreamConnector(BaseConnector):
                 fields = ast.literal_eval(param.get("fields"))
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
-                action_result.set_status(
+                return action_result.set_status(
                     phantom.APP_ERROR, "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
 
             if not isinstance(fields, dict):
-                action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary. Please ensure that provided input is in valid JSON dictionary format")
+                return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary. Please ensure that provided input is in valid JSON dictionary format")
 
             data.update(fields)
 
