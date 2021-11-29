@@ -4030,7 +4030,7 @@ class ThreatstreamConnector(BaseConnector):
 
             data.update(fields)
 
-        if not (itype or status or tlp or severity or confidence or expiration_date or fields):
+        if not (itype or status or tlp or severity or (confidence == 0 or confidence) or expiration_date or fields):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE)
 
         if itype:
@@ -4045,7 +4045,7 @@ class ThreatstreamConnector(BaseConnector):
         if severity:
             data.update({"severity": severity})
 
-        if confidence:
+        if confidence or confidence == 0:
             data.update({"confidence": confidence})
 
         if expiration_date:
