@@ -1435,7 +1435,7 @@ class ThreatstreamConnector(BaseConnector):
                             }
                         ]
                     }
-                if ob_type == "domain":
+                if ob_type in ["domain", "url"]:
                     data.update({"meta": {
                         "allow_unresolved": param.get('allow_unresolved', False)
                     }})
@@ -1511,6 +1511,8 @@ class ThreatstreamConnector(BaseConnector):
                 if action_name == self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES:
                     value = param['domain']
                     object_dict.update({"domain": value})
+
+                if action_name in [self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES, self.ACTION_ID_IMPORT_URL_OBSERVABLES]:
                     data = {
                         "meta": {
                                 "allow_unresolved": param.get('allow_unresolved', False)

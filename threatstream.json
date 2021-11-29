@@ -6462,6 +6462,11 @@
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
                     "order": 7
+                },
+                "allow_unresolved": {
+                    "description": "Unresolved urls will be imported if set to true",
+                    "data_type": "boolean",
+                    "order": 8
                 }
             },
             "output": [
@@ -6471,6 +6476,14 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.allow_unresolved",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
