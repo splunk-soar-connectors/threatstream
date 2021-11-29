@@ -24517,9 +24517,6 @@
                     "example_values": [
                         "55test@test.com"
                     ],
-                    "contains": [
-                        "email"
-                    ],
                     "column_order": 1,
                     "column_name": "Value"
                 },
