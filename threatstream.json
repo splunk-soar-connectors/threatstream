@@ -6619,7 +6619,8 @@
                     "order": 0,
                     "required": true,
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "primary": true
                 },
@@ -6725,7 +6726,8 @@
                         "122.122.122.122"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "column_name": "IP Address",
                     "column_order": 0
