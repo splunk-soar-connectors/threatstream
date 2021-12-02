@@ -469,7 +469,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -495,6 +495,21 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "pdns": {
+                    "description": "If enabled, Fetch pdns",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "insights": {
+                    "description": "If enabled, Fetch insights",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "external_references": {
+                    "description": "If enabled, Fetch external references",
+                    "data_type": "boolean",
+                    "order": 5
                 }
             },
             "output": [
@@ -523,6 +538,30 @@
                 },
                 {
                     "data_path": "action_result.parameter.extend_source",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.pdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.insights",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_references",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -793,7 +832,7 @@
         {
             "action": "ip reputation",
             "description": "Get information about a given IP",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -819,6 +858,21 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "pdns": {
+                    "description": "If enabled, Fetch pdns",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "insights": {
+                    "description": "If enabled, Fetch insights",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "external_references": {
+                    "description": "If enabled, Fetch external references",
+                    "data_type": "boolean",
+                    "order": 5
                 }
             },
             "output": [
@@ -850,6 +904,30 @@
                 },
                 {
                     "data_path": "action_result.parameter.extend_source",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.pdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.insights",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_references",
                     "data_type": "boolean",
                     "example_values": [
                         true,
