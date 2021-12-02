@@ -24247,12 +24247,15 @@
                 },
                 {
                     "column_name": "investigation ID",
+                    "column_order": 0,
                     "data_path": "action_result.data.*.id",
                     "example_values": [
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -24308,7 +24311,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "column_name": "Priority",
@@ -24335,14 +24341,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
+                    "data_type": "string",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24384,7 +24396,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -24398,28 +24413,40 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.resource_uri",
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -24551,7 +24578,10 @@
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "investigation id"
+                    ]
                 },
                 {
                     "column_name": "Is Public",
@@ -24585,7 +24615,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -24630,14 +24663,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24676,7 +24715,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -24697,21 +24739,30 @@
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56953/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -24786,7 +24837,10 @@
                     "required": true,
                     "description": "ID of the investigation to retrieve",
                     "data_type": "numeric",
-                    "primary": true
+                    "primary": true,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 }
             },
             "versions": "EQ(*)",
@@ -24812,7 +24866,10 @@
                         "56198"
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "column_name": "Assignee",
@@ -24862,7 +24919,10 @@
                     "example_values": [
                         0
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -24904,7 +24964,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -24918,11 +24981,17 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "column_name": "Priority",
@@ -24949,14 +25018,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24998,7 +25073,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -25026,14 +25104,20 @@
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -25113,7 +25197,10 @@
                     "required": true,
                     "description": "ID of the investigation to update",
                     "data_type": "numeric",
-                    "primary": true
+                    "primary": true,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 "fields": {
                     "required": true,
@@ -25143,7 +25230,10 @@
                     "example_values": [
                         "56198"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.fields",
@@ -25200,7 +25290,10 @@
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -25238,7 +25331,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -25252,11 +25348,17 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.priority",
@@ -25281,14 +25383,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -25330,7 +25438,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -25351,21 +25462,30 @@
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -25445,7 +25565,7 @@
                     "data_type": "numeric",
                     "primary": true,
                     "contains": [
-                        "id"
+                        "threatstream investigation id"
                     ]
                 }
             },
@@ -25471,11 +25591,11 @@
                     "example_values": [
                         56911
                     ],
-                    "contains": [
-                        "id"
-                    ],
                     "data_type": "numeric",
-                    "column_name": "investigation ID"
+                    "column_name": "investigation ID",
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
