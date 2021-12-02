@@ -7891,7 +7891,7 @@
                     "data_path": "action_result.parameter.fields",
                     "data_type": "string",
                     "example_values": [
-                        "{\"file_has_password\":\"true\",\"file_password\":\"abc123\",\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"],\"trusted_circles\":\"13\"}"
+                        "{\"file_has_password\":\"true\",\"file_password\":\"abc123\",\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\",\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {
@@ -8100,7 +8100,7 @@
                     "order": 5
                 },
                 "fields": {
-                    "description": "JSON formatted string of additional fields to be included in the detonate url action. e.g. {\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"]}. Please check the API doc to find more infomation on other valid fileds",
+                    "description": "JSON formatted string of additional fields to be included in the detonate url action. e.g. {\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\"}. Please check the API doc to find more infomation on other valid fields",
                     "data_type": "string",
                     "order": 6
                 }
@@ -8165,7 +8165,7 @@
                     "data_path": "action_result.parameter.fields",
                     "data_type": "string",
                     "example_values": [
-                        "{\"import_indicators\":\"true\",\"report_radio-notes\":[\"Credential-Exposure\",\"compromised_email\"],\"trusted_circles\":\"13\"}"
+                        "{\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\",\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {

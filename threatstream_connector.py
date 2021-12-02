@@ -1798,10 +1798,9 @@ class ThreatstreamConnector(BaseConnector):
             data=data,
             method="post",
             files=files,
-            use_json=False,
+            use_json=False
         )
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_FILE_DETONATION, payload, data=data, method="post", files=files, use_json=False)
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
         action_result.add_data(resp_json)
@@ -1841,10 +1840,9 @@ class ThreatstreamConnector(BaseConnector):
             payload,
             data=data,
             method="post",
-            use_json=False,
+            use_json=False
         )
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_URL_DETONATION, payload, data=data, method="post", use_json=False)
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
         action_result.add_data(resp_json)
