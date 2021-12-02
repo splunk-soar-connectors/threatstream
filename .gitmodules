@@ -1,8 +1,0 @@
-[submodule "ipwhois"]
-	ignore = dirty
-	path = ipwhois
-	url = git@cd.splunkdev.com:phantom-external/python-ipwhois.git
-[submodule "dnspython"]
-	ignore = dirty
-	path = dnspython
-	url = git@cd.splunkdev.com:phantom-external/dnspython.git
