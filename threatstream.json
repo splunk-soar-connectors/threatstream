@@ -497,17 +497,17 @@
                     "order": 2
                 },
                 "pdns": {
-                    "description": "If enabled, Fetch pdns",
+                    "description": "If enabled, pdns will also be fetched",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "insights": {
-                    "description": "If enabled, Fetch insights",
+                    "description": "If enabled, insights will also be fetched",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "external_references": {
-                    "description": "If enabled, Fetch external references",
+                    "description": "If enabled, external references will also be fetched",
                     "data_type": "boolean",
                     "order": 5
                 }
@@ -860,17 +860,17 @@
                     "order": 2
                 },
                 "pdns": {
-                    "description": "If enabled, Fetch pdns",
+                    "description": "If enabled, pdns will also be fetched",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "insights": {
-                    "description": "If enabled, Fetch insights",
+                    "description": "If enabled, insights will also be fetched",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "external_references": {
-                    "description": "If enabled, Fetch external references",
+                    "description": "If enabled, external references will also be fetched",
                     "data_type": "boolean",
                     "order": 5
                 }
