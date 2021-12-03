@@ -78,8 +78,10 @@ THREATSTREAM_ERR_INVALID_PARAM = "Please provide a non-zero positive integer in 
 THREATSTREAM_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
 THREATSTREAM_ERR_API_INVALID_VALUE = "Please provide valid values in entity_type and associated_entity_type parameters"
 THREATSTREAM_ERR_INVALID_INTELLIGENCE = "None of the intelligence got associated, please provide valid intelligence"
-THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE = "Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter"
-THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE = "Error occurred while associating remote IDs: {}. Please provide valid remote IDs in 'cloud intelligence' parameter"
+THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE = "Error occurred while associating local IDs: {}. \
+    Please provide valid local IDs in 'local intelligence' parameter"
+THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE = "Error occurred while associating remote IDs: {}. \
+    Please provide valid remote IDs in 'cloud intelligence' parameter"
 THREATSTREAM_SUCCESS_THREATBULLETIN_MESSAGE = "Successfully created threat bulletin with id: {}"
 THREATSTREAM_SUCCESS_INCIDENT_MESSAGE = "Successfully created incident with id: {}"
 THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE = "Successfully created {} with id: {}"
@@ -90,9 +92,10 @@ THREATSTREAM_ERR_INVALID_FIELD_PARAM_VALUE = "Please enter the value of the key,
 THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM = "Please enter the value of keywords parameter in form of list"
 THREATSTREAM_ERR_RULE_ID_NOT_FOUND = "Error while fetching the rule ID of the created rule"
 THREATSTREAM_ERR_MISSING_LOCAL_REMOTE_ID = "Please provide either local_ids or remote_ids param"
-THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', 'attachment', 'comment' or 'fields' to update the provided {}"
-THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', 'confidence', 'tlp', 'severity', 'status', 'expiration_date' or \
-    'fields' to update the provided observable"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', \
+    'attachment', 'comment' or 'fields' to update the provided {}"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', \
+    'confidence', 'tlp', 'severity', 'status', 'expiration_date' or 'fields' to update the provided observable"
 
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
