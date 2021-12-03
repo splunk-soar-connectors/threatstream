@@ -2135,11 +2135,13 @@ class ThreatstreamConnector(BaseConnector):
 
                     for i, tag in enumerate(tags):
                         try:
-                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                                key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, basestring) else value) for key, value in tag.items())
+                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key,
+                            self._handle_py_ver_compat_for_input_str(value) if isinstance(value,
+                            basestring) else value) for key, value in tag.items())
                         except:
-                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                                key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, str) else value) for key, value in list(tag.items()))
+                            tags_dict['tag_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key,
+                            self._handle_py_ver_compat_for_input_str(value) if isinstance(value,
+                            str) else value) for key, value in list(tag.items()))
 
                     item['tags_formatted'] = tags_dict
 
@@ -2164,11 +2166,13 @@ class ThreatstreamConnector(BaseConnector):
 
                 for i, tag in enumerate(tags):
                     try:
-                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                            key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, basestring) else value) for key, value in tag.items())
+                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key,
+                        self._handle_py_ver_compat_for_input_str(value) if isinstance(value,
+                        basestring) else value) for key, value in tag.items())
                     except:
-                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(
-                            key, self._handle_py_ver_compat_for_input_str(value) if isinstance(value, str) else value) for key, value in list(tag.items()))
+                        tags_dict['tag_v2_{}'.format(i + 1)] = '    ||    '.join('{} : {}'.format(key,
+                        self._handle_py_ver_compat_for_input_str(value) if isinstance(value,
+                        str) else value) for key, value in list(tag.items()))
 
                 resp_json['tags_v2_formatted'] = tags_dict
 
@@ -3856,7 +3860,7 @@ class ThreatstreamConnector(BaseConnector):
     def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):  # noqa
 
         if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and \
-            not param.get("fields") and not param.get("attachment") and not param.get("comment"):
+                not param.get("fields") and not param.get("attachment") and not param.get("comment"):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL.format(entity_type))
 
         data = {}
