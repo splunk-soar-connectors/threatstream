@@ -2093,8 +2093,9 @@ class ThreatstreamConnector(BaseConnector):
                 if incident.get("organization_id") == int(org_id):
                     incidents.append(incident)
                 else:
-                    self.debug_print("Skipping incident ID: {0} due organization ID: {1} being different than the configuration parameter organization_id: {2}".format(
-                                incident.get("id"), incident.get("organization_id"), org_id))
+                    self.debug_print("Skipping incident ID: {0} due organization ID: {1} \
+                        being different than the configuration parameter organization_id: {2}"
+                        .format(incident.get("id"), incident.get("organization_id"), org_id))
 
         self.save_progress("Fetched {0} incidents in the oldest first order based on modified_ts time.".format(len(incidents)))
         self.save_progress("Started incident and intelligence artifacts creation...")
