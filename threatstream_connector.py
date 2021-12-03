@@ -15,30 +15,29 @@
 #
 #
 # Phantom imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-import phantom.rules as phrules
-
-# Local imports
-from threatstream_consts import *
-
 import ast
-import os
-import uuid
-import shutil
-import requests
 import datetime
 import ipaddress
-import pythonwhois
-import dateutil.parser
-import pytz
+import os
 import re
+import shutil
 import sys
-from ipwhois import IPWhois
+import uuid
+
+import dateutil.parser
+import phantom.app as phantom
+import phantom.rules as phrules
+import pytz
+import requests
 import simplejson as json
-from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
+from bs4 import BeautifulSoup, UnicodeDammit
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+import pythonwhois
+from ipwhois import IPWhois
+# Local imports
+from threatstream_consts import *
 
 try:
     from urlparse import urlsplit
