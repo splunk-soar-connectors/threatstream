@@ -1807,6 +1807,9 @@ class ThreatstreamConnector(BaseConnector):
             "report_radio-file": vault_path,
             "report_radio-classification": param.get('classification')
         }
+        if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
+            return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
+                selected simultaneously for detonation. Please select one of them.")
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
         if param.get("use_premium_sandbox", None):
@@ -1822,8 +1825,12 @@ class ThreatstreamConnector(BaseConnector):
                 del data["report_radio-platform"]
                 data["use_vmray_sandbox"] = "true"
 
-        if param.get("vmray_max_jobs", None):
-            data["vmray_max_jobs"] = param.get("vmray_max_jobs")
+        if param.get("vmray_max_jobs", None) or param.get("vmray_max_jobs", None) == 0:
+            ret_val, vmray_max_jobs = self._validate_integer(action_result, param.get("vmray_max_jobs"), THREATSTREAM_VMRAY_MAX_JOBS)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            if vmray_max_jobs:
+                data["vmray_max_jobs"] = vmray_max_jobs
 
         data = self._build_data_detonate_actions(action_result, data, param)
 
@@ -1855,12 +1862,18 @@ class ThreatstreamConnector(BaseConnector):
             "report_radio-url": param.get('url'),
             "report_radio-classification": param.get('classification')
         }
+
+        if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
+            return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
+                selected simultaneously for detonation. Please select one of them.")
+
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
         if param.get("use_premium_sandbox", None):
             data["use_premium_sandbox"] = param.get("use_premium_sandbox")
             if data["use_premium_sandbox"]:
                 data["use_premium_sandbox"] = "true"
+
         if param.get("use_vmray_sandbox", None):
             data["use_vmray_sandbox"] = param.get("use_vmray_sandbox")
             if data["use_vmray_sandbox"]:
@@ -1868,11 +1881,19 @@ class ThreatstreamConnector(BaseConnector):
                 # This attribute is required for Cuckoo and Joe Sandbox detonations. Do not specify this value for VMRay detonations.
                 del data["report_radio-platform"]
                 data["use_vmray_sandbox"] = "true"
-        if param.get("vmray_max_jobs", None):
-            data["vmray_max_jobs"] = param.get("vmray_max_jobs")
+
+        if param.get("vmray_max_jobs", None) or param.get("vmray_max_jobs", None) == 0:
+            ret_val, vmray_max_jobs = self._validate_integer(action_result, param.get("vmray_max_jobs"), THREATSTREAM_VMRAY_MAX_JOBS)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            if vmray_max_jobs:
+                data["vmray_max_jobs"] = vmray_max_jobs
+
         data = self._build_data_detonate_actions(action_result, data, param)
+
         if data is None:
             return action_result.get_status()
+
         ret_val, resp_json = self._make_rest_call(
             action_result,
             ENDPOINT_URL_DETONATION,

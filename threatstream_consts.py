@@ -103,6 +103,7 @@ THREATSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0
 
 THREATSTREAM_LIMIT = "'limit' action parameter"
 THREATSTREAM_ITEM_ID = "'item_id' action parameter"
+THREATSTREAM_VMRAY_MAX_JOBS = "'vmray_max_jobs' action parameter"
 THREATSTREAM_REPORT_ID = "'report_id' action parameter"
 THREATSTREAM_THREAT_BULLETIN_ID = "'threat_bulletin_id' action parameter"
 THREATSTREAM_VULNERABILITY_ID = "'vulnerability_id' action parameter"
