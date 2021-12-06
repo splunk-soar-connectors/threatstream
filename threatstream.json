@@ -7333,7 +7333,7 @@
         {
             "action": "import observables",
             "description": "Import observables into ThreatStream",
-            "verbose": "<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}) whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - {\"threat_type\": \"&lt;threat_type&gt;\"}).</li><li>The \"allow_unresolved\" parameter will be passed in the API call if the \"value\" parameter is set to \"domain\" and \"with_approval\" parameter is set to \"False\".</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li><li>If both the \"itype\" and \"threat_type\" values are passed in the \"fields\" parameter when \"with_approval\" is set to \"True\", the action will behave according to the API behavior.</li></ul>",
+            "verbose": "<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}) whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - {\"threat_type\": \"&lt;threat_type&gt;\"}).</li><li>The \"allow_unresolved\" parameter will be passed in the API call if the \"value\" parameter is set to \"domain\" or \"url\" and \"with_approval\" parameter is set to \"False\".</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li><li>If both the \"itype\" and \"threat_type\" values are passed in the \"fields\" parameter when \"with_approval\" is set to \"True\", the action will behave according to the API behavior.</li></ul>",
             "type": "generic",
             "identifier": "import_observables",
             "read_only": false,
@@ -7828,6 +7828,7 @@
         {
             "action": "detonate file",
             "description": "Detonate file in ThreatStream",
+            "verbose": "If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
             "type": "generic",
             "identifier": "detonate_file",
             "read_only": false,
@@ -8106,6 +8107,7 @@
         {
             "action": "detonate url",
             "description": "Detonate URL in ThreatStream",
+            "verbose": "If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
             "type": "generic",
             "identifier": "detonate_url",
             "read_only": false,

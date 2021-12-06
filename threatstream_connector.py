@@ -1802,11 +1802,16 @@ class ThreatstreamConnector(BaseConnector):
         files = {
             "file": vault_file
         }
-        data = {
+        data = dict()
+        data = self._build_data_detonate_actions(action_result, data, param)
+
+        if data is None:
+            return action_result.get_status()
+        data.update({
             "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-file": vault_path,
             "report_radio-classification": param.get('classification')
-        }
+        })
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
             return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
                 selected simultaneously for detonation. Please select one of them.")
@@ -1831,11 +1836,6 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
             if vmray_max_jobs:
                 data["vmray_max_jobs"] = vmray_max_jobs
-
-        data = self._build_data_detonate_actions(action_result, data, param)
-
-        if data is None:
-            return action_result.get_status()
 
         ret_val, resp_json = self._make_rest_call(
             action_result,
@@ -1857,11 +1857,17 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         payload = self._generate_payload()
-        data = {
+        data = dict()
+        data = self._build_data_detonate_actions(action_result, data, param)
+
+        if data is None:
+            return action_result.get_status()
+
+        data.update({
             "report_radio-platform": param.get('platform', 'WINDOWS7'),
             "report_radio-url": param.get('url'),
             "report_radio-classification": param.get('classification')
-        }
+        })
 
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
             return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
@@ -1888,11 +1894,6 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
             if vmray_max_jobs:
                 data["vmray_max_jobs"] = vmray_max_jobs
-
-        data = self._build_data_detonate_actions(action_result, data, param)
-
-        if data is None:
-            return action_result.get_status()
 
         ret_val, resp_json = self._make_rest_call(
             action_result,
