@@ -7857,22 +7857,22 @@
                     "order": 2
                 },
                 "use_premium_sandbox": {
-                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "use_vmray_sandbox": {
-                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "vmray_max_jobs": {
-                    "description": "Specify the number of detonations you want VMRay to perform for the submission.",
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission",
                     "data_type": "numeric",
                     "order": 5
                 },
                 "fields": {
-                    "description": "JSON formatted string of additional fields to be included in the detonate file action. e.g. {\"file_has_password\":\"true\",\"file_password\":\"abc123\"}. Please check the API doc to find more information on other valid fields.",
+                    "description": "JSON formatted string of additional fields to be included in the detonate file action. e.g. {\"file_has_password\":\"true\",\"file_password\":\"abc123\"}. Please check the API doc to find more information on other valid fields",
                     "data_type": "string",
                     "order": 6
                 }
@@ -8135,17 +8135,17 @@
                     "order": 2
                 },
                 "use_premium_sandbox": {
-                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true.",
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true",
                     "data_type": "boolean",
                     "order": 3
                 },
                 "use_vmray_sandbox": {
-                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true.",
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true",
                     "data_type": "boolean",
                     "order": 4
                 },
                 "vmray_max_jobs": {
-                    "description": "Specify the number of detonations you want VMRay to perform for the submission.",
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission",
                     "data_type": "numeric",
                     "order": 5
                 },
@@ -24424,7 +24424,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.fields",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"confidence\": 60}"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -24555,6 +24558,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Customer"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.type",
                     "data_type": "string",
                     "example_values": [
@@ -24623,7 +24633,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_public",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
                         false
                     ]
@@ -24661,7 +24671,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.remote_api",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
                         true
                     ]
@@ -24689,7 +24699,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_anonymous",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
                         false
                     ]
@@ -24773,7 +24783,7 @@
                         "high",
                         "very high"
                     ],
-                    "description": "Priority assigned to the investigation.",
+                    "description": "Priority assigned to the investigation",
                     "data_type": "string",
                     "order": 1
                 },
@@ -24875,7 +24885,7 @@
                     "data_type": "string"
                 },
                 {
-                    "column_name": "investigation ID",
+                    "column_name": "Investigation ID",
                     "data_path": "action_result.data.*.id",
                     "example_values": [
                         0
@@ -24996,9 +25006,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25291,9 +25298,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25414,8 +25418,7 @@
                     "order": 0,
                     "required": true,
                     "description": "ID of the investigation to retrieve",
-                    "data_type": "numeric",
-                    "primary": true
+                    "data_type": "numeric"
                 }
             },
             "versions": "EQ(*)",
@@ -25610,9 +25613,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25741,8 +25741,7 @@
                     "order": 0,
                     "required": true,
                     "description": "ID of the investigation to update",
-                    "data_type": "numeric",
-                    "primary": true
+                    "data_type": "numeric"
                 },
                 "fields": {
                     "required": true,
@@ -25823,7 +25822,7 @@
                     "data_type": "string"
                 },
                 {
-                    "column_name": "investigation ID",
+                    "column_name": "Investigation ID",
                     "data_path": "action_result.data.*.id",
                     "example_values": [
                         0
@@ -25942,9 +25941,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -26104,7 +26100,7 @@
                         "id"
                     ],
                     "data_type": "numeric",
-                    "column_name": "investigation ID"
+                    "column_name": "Investigation ID"
                 },
                 {
                     "data_path": "action_result.data",

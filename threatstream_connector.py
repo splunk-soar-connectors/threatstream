@@ -1435,8 +1435,8 @@ class ThreatstreamConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Threatstream server. \
-                Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Threatstream server. "\
+                "Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
@@ -1491,8 +1491,8 @@ class ThreatstreamConnector(BaseConnector):
                     fields = ast.literal_eval(param["fields"])
                 except Exception as e:
                     error_msg = self._get_error_message_from_exception(e)
-                    return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary: {0}. \
-                        Please ensure that provided input is in valid JSON format".format(error_msg))
+                    return action_result.set_status(phantom.APP_ERROR,
+                        "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_msg))
 
                 if not isinstance(fields, dict):
                     return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
@@ -1507,10 +1507,12 @@ class ThreatstreamConnector(BaseConnector):
                     else:
                         data.update(fields)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                    return action_result.set_status(phantom.APP_ERROR,
+                        "Providing '{key}' in fields parameter is mandatory for importing an observable \
                                 (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Providing '{key}' in fields parameter is mandatory for importing an observable \
                             (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
 
         else:
@@ -1813,8 +1815,8 @@ class ThreatstreamConnector(BaseConnector):
             "report_radio-classification": param.get('classification')
         })
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
-            return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
-                selected simultaneously for detonation. Please select one of them.")
+            return action_result.set_status(phantom.APP_ERROR,
+                "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them.")
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
         if param.get("use_premium_sandbox", None):
@@ -1870,8 +1872,8 @@ class ThreatstreamConnector(BaseConnector):
         })
 
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
-            return action_result.set_status(phantom.APP_ERROR, "Both premium sandbox and vmray sandbox cannot be \
-                selected simultaneously for detonation. Please select one of them.")
+            return action_result.set_status(phantom.APP_ERROR,
+                "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them.")
 
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
@@ -3169,8 +3171,8 @@ class ThreatstreamConnector(BaseConnector):
             action_result.add_data(list())
 
         if message == "None of the entities got modified, please provide valid entities":
-            return action_result.set_status(phantom.APP_SUCCESS, "{}. \
-                Please check for the non-modified ids as they would be already associated or invalid".format(message))
+            return action_result.set_status(phantom.APP_SUCCESS,
+                "{}. Please check for the non-modified ids as they would be already associated or invalid".format(message))
         elif message:
             return action_result.set_status(phantom.APP_SUCCESS,
                 "Successfully updated associations. {}. Please check for the non-modified ids as they would be already associated or invalid"
