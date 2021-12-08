@@ -4136,7 +4136,7 @@ class ThreatstreamConnector(BaseConnector):
         status = param.get("status")
         tlp = param.get("tlp")
         severity = param.get("severity")
-        confidence = self._validate_integer(action_result, param.get("confidence"), THREATSTREAM_CONFIDENCE, allow_zero=True)
+        ret_val, confidence = self._validate_integer(action_result, param.get("confidence"), THREATSTREAM_CONFIDENCE, allow_zero=True)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         expiration_date = param.get("expiration_date")
