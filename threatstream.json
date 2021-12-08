@@ -8,7 +8,7 @@
     "app_version": "3.3.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, November 2021"
+        "Cloud, December 2021"
     ],
     "utctime_updated": "2021-11-30T23:49:48.000000Z",
     "package_name": "phantom_threatstream",
@@ -17582,14 +17582,14 @@
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
-                        "Rule is created successfully."
+                        "Rule is created successfully"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Rule is created successfully."
+                        "Rule is created successfully"
                     ]
                 },
                 {
@@ -24934,7 +24934,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -24972,7 +24972,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25025,7 +25025,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25226,7 +25226,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25264,7 +25264,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25314,7 +25314,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25541,7 +25541,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25579,7 +25579,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25632,7 +25632,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25871,7 +25871,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25907,7 +25907,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25960,7 +25960,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },

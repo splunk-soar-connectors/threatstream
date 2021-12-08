@@ -3340,7 +3340,7 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        message = "Rule is created successfully."
+        message = "Rule is created successfully"
 
         action_result.add_data(resp_json)
         summary = action_result.update_summary({})
