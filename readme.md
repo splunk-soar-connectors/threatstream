@@ -21,6 +21,21 @@
 
       
 
+    -   **For version 3.3.X :**
+
+          
+
+        -   Import domain observable - **source** parameter has been added
+        -   Import URL observable - **source, allow_unresolved** parameters have been
+            added
+        -   Import IP observable - **source** parameter has been added
+        -   Import file observable - **source** parameter has been added
+        -   Import email observable - **source** parameter has been added
+        -   Detonate file - **use_premium_sandbox, use_vmray_sandbox, vmray_max_jobs, fields**
+            parameters have been added
+        -   Detonate URL - **use_premium_sandbox, use_vmray_sandbox, vmray_max_jobs, fields**
+            parameters have been added
+
     -   **For version 3.0.X :**
 
           
