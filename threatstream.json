@@ -24346,7 +24346,7 @@
                     ]
                 },
                 "status": {
-                    "description": "Status to give the observable",
+                    "description": "Status to give the observable (For example, active, inactive, falsepos)",
                     "data_type": "string",
                     "order": 5
                 },
