@@ -1473,9 +1473,10 @@ class ThreatstreamConnector(BaseConnector):
                         ]
                     }
                 if ob_type in ["domain", "url"]:
-                    data.update({"meta": {
-                        "allow_unresolved": param.get('allow_unresolved', False)
-                    }})
+                    if param.get('allow_unresolved', False):
+                        data.update({"meta": {
+                            "allow_unresolved": param.get('allow_unresolved', False)
+                        }})
             else:
                 key = "threat_type"
                 endpoint = ENDPOINT_IMPORT_APPROVAL_IOC
@@ -1553,11 +1554,12 @@ class ThreatstreamConnector(BaseConnector):
                     object_dict.update({"domain": value})
 
                 if action_name in [self.ACTION_ID_IMPORT_DOMAIN_OBSERVABLES, self.ACTION_ID_IMPORT_URL_OBSERVABLES]:
-                    data = {
-                        "meta": {
-                                "allow_unresolved": param.get('allow_unresolved', False)
-                            }
-                    }
+                    if param.get('allow_unresolved', False):
+                        data = {
+                            "meta": {
+                                    "allow_unresolved": param.get('allow_unresolved', False)
+                                }
+                        }
 
                 if confidence:
                     object_dict.update({"confidence": confidence})
