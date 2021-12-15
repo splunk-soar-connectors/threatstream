@@ -27,6 +27,7 @@ import uuid
 import dateutil.parser
 import phantom.app as phantom
 import phantom.rules as phrules
+from phantom.vault import Vault
 import pytz
 import requests
 import simplejson as json
@@ -1955,8 +1956,8 @@ class ThreatstreamConnector(BaseConnector):
 
         # Creating temporary directory and file
         try:
-            if hasattr(phrules, 'get_vault_tmp_dir'):
-                temp_dir = phrules.get_vault_tmp_dir()
+            if hasattr(Vault, 'get_vault_tmp_dir'):
+                temp_dir = Vault.get_vault_tmp_dir()
             else:
                 temp_dir = "/opt/phantom/vault/tmp/"
             temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
