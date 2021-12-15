@@ -27,13 +27,13 @@ import uuid
 import dateutil.parser
 import phantom.app as phantom
 import phantom.rules as phrules
-from phantom.vault import Vault
 import pytz
 import requests
 import simplejson as json
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
+from phantom.vault import Vault
 
 import pythonwhois
 from ipwhois import IPWhois
