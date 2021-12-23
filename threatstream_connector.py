@@ -635,6 +635,7 @@ class ThreatstreamConnector(BaseConnector):
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
+        extend_source = param.get("extend_source", False)
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
@@ -644,6 +645,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
 
         ioc_type = "domain"
+
         ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, param, limit=limit)
         if (not ret_val):
             return action_result.get_status()
@@ -652,6 +654,7 @@ class ThreatstreamConnector(BaseConnector):
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
+        extend_source = param.get("extend_source", False)
         ioc_type = "ip"
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)

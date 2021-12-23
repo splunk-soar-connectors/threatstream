@@ -1,5 +1,26 @@
 <b>ThreatStream Release Notes - Published by Splunk June 15, 2021</b>
 <br><br>
+<b>Version 3.2.8 - Released November 29, 2021</b>
+<ul>
+<li>Added support for the 'extend_source' parameter in the following actions: [PAPP-18117]</li>
+  <ul>
+	<li>url reputation</li>
+	<li>file reputation</li>
+	<li>domain reputation</li>
+	<li>ip reputation</li>
+	<li>email reputation</li>
+  </ul>
+<li>Added below mentioned new actions:</li>
+  <ul>
+	<li>create investigation</li>
+	<li>update investigation</li>
+	<li>get investigation</li>
+	<li>delete investigation</li>
+	<li>list investigations</li>
+  </ul>
+<li>Added support for SHA512 in the 'file reputation' action</li>
+<li>Updated default value of 'platform' parameter in the 'detonate url' and 'detonate file' actions due to change in API</li>
+</ul>
 <b>Version 3.0.3 - Released June 15, 2021</b>
 <ul>
 <li>Improved compatibility changes for python 3</li>
