@@ -1,0 +1,138 @@
+<b>ThreatStream Release Notes - Published by Splunk December 23, 2021</b>
+<br><br>
+<b>Version 3.3.2 - Released December 23, 2021</b>
+<ul>
+<li>Marked the app as FIPS Compliant [PAPP-21568]</li>
+<li>Improved 'ip reputation' and 'domain reputation' actions [PAPP-19922]</li>
+<li>Enabled interacting with Widget values for Investigation actions [PAPP-21485]</li>
+<li>Improved usability for indicator typei [PAPP-21096]</li>
+</ul>
+<b>Version 3.2.8 - Released November 29, 2021</b>
+<ul>
+<li>Added support for the 'extend_source' parameter in the following actions: [PAPP-18117]</li>
+  <ul>
+	<li>url reputation</li>
+	<li>file reputation</li>
+	<li>domain reputation</li>
+	<li>ip reputation</li>
+	<li>email reputation</li>
+  </ul>
+<li>Added below mentioned new actions:</li>
+  <ul>
+	<li>create investigation</li>
+	<li>update investigation</li>
+	<li>get investigation</li>
+	<li>delete investigation</li>
+	<li>list investigations</li>
+  </ul>
+<li>Added support for SHA512 in the 'file reputation' action</li>
+<li>Updated default value of 'platform' parameter in the 'detonate url' and 'detonate file' actions due to change in API</li>
+</ul>
+<b>Version 3.0.3 - Released June 15, 2021</b>
+<ul>
+<li>Improved compatibility changes for python 3</li>
+<li>Added below mentioned new actions:</li>
+  <ul>
+	<li>add association</li>
+	<li>remove association</li>
+	<li>list association</li>
+	<li>create vulnerability</li>
+	<li>update vulnerability</li>
+	<li>delete vulnerability</li>
+	<li>create actor</li>
+	<li>update actor</li>
+	<li>delete actor</li>
+	<li>list actors</li>
+	<li>create rule</li>
+	<li>update rule</li>
+	<li>delete rule</li>
+	<li>list rules</li>
+	<li>create threat bulletin</li>
+	<li>update threat bulletin</li>
+	<li>delete threat bulletin</li>
+	<li>list threat bulletins</li>
+	<li>list imports</li>
+  </ul>
+<li>Added 'allow_unresolved' parameter for the 'import observables' and 'import domain observable' actions</li>
+<li>Added 'with_approval' parameter for all the importing observables related actions [PAPP-14771]</li>
+<li>Added additional parameter 'publication_status' in the 'list threat models' action [PAPP-15769]</li>
+<li>Fixed issue of limiting the returned results for all reputation related actions [PAPP-16026]</li>
+<li>Fixed the error message issue for all the actions [PAPP-15381]</li>
+<li>Fixed the library issue for the 'whois domain' action [PAPP-15260]</li>
+<li>Fixed the workflow for the 'url reputation' action [PAPP-17155]</li>
+<li>Updated app documentation for the latest changes</li>
+</ul>
+<b>Version 2.0.9 - Released December 04, 2020</b>
+<ul>
+<li>Compatibility changes for Python 3 support</li>
+<li>Added 3 new actions</li>
+  <ul>
+	<li>list import sessions</li>
+	<li>update import session</li>
+	<li>list threat models</li>
+  </ul>
+<li>Fixed issues in output views</li>
+<li>Handled exceptions with valid error messages</li>
+<li>Implemented pagination</li>
+</ul>
+<b>Version 1.0.39 - Released May 28, 2020</b>
+<ul>
+<li>Bug fixes in 'url reputation' action for limit action parameter </li>
+<li>Bug fixes in incident actions</li>
+</ul>
+<b>Version 2.0.9 - Released December 04, 2020</b>
+<ul>
+<li>Compatibility changes for Python 3 support</li>
+<li>Added 3 new actions</li>
+  <ul>
+	<li>list import sessions</li>
+	<li>update import session</li>
+	<li>list threat models</li>
+  </ul>
+<li>Fixed issues in output views</li>
+<li>Handled exceptions with valid error messages</li>
+<li>Implemented pagination</li>
+</ul>
+<b>Version 1.0.39 - Released May 28, 2020</b>
+<ul>
+<li>Bug fixes in 'url reputation' action for limit action parameter </li>
+<li>Bug fixes in incident actions</li>
+</ul>
+<b>Version 1.0.35 - Released February 28, 2020</b>
+<ul>
+<li>Added on-prem support</li>
+<li>Handled exceptions for the Unicode issues</li>
+</ul>
+<b>Version 1.0.33 - Released September 13, 2019</b>
+<ul>
+<li> Added 18 new actions</li>
+<li> Bug fixes in on poll action</li>
+<li> Implemented pagination and custom views </li>
+<li> Added support for multiple file hash types </li>
+</ul>
+<b>Version 1.0.24 - Released April 13, 2018</b>
+<ul>
+<li> Added incident management actions (create/list/get/delete/update incident)</li>
+<li> Added ingestion action</li>
+</ul>
+<b>Version 1.0.19 - Released February 07, 2018</b>
+<ul>
+<li>App action views and Logo updates</li>
+</ul>
+<b>Version 1.0.17 - Released July 27, 2017</b>
+<ul>
+<li>3.0 compatibility update release only</li>
+</ul>
+<b>Version 1.0.16 - Released March 6, 2017</b>
+<ul>
+<li>Changed asset type to "reputation"</li>
+</ul>
+<b>Version 1.0.14 - Released October 18, 2016</b>
+<ul>
+<li>Changed app type to "threat intel"</li>
+<li>Made improvements to the datapath settings</li>
+</ul>
+<b>Version 1.0.11 - Released August 5, 2016</b>
+<ul>
+<li>Initial release</li>
+</ul>

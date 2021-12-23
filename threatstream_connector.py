@@ -1,9 +1,19 @@
 # File: threatstream_connector.py
+#
 # Copyright (c) 2016-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
-
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Phantom imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -528,23 +538,36 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, THREATSTREAM_SUCCESS_WHOIS_MESSAGE)
 
-    def _retrieve_ip_domain(self, value, ioc_type, action_result, limit=None, extend_source=False):
+    def _retrieve_ip_domain(self, value, ioc_type, action_result, param, limit=None):
         """ Retrieve all the information needed for domains or IPs """
+        extend_source = param.get("extend_source", False)
+        include_pdns = param.get("pdns", False)
+        include_insights = param.get("insights", False)
+        include_external_references = param.get("external_references", False)
+
+        self.debug_print('Retrieving ip domain with {0}'.format(param))
+
         ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
         if (not ret_val):
             return action_result.get_status()
 
-        ret_val = self._pdns(value, ioc_type, action_result)
-        if (not ret_val):
-            return action_result.get_status()
+        if include_pdns:
+            self.debug_print('Fetching pdns')
+            ret_val = self._pdns(value, ioc_type, action_result)
+            if (not ret_val):
+                return action_result.get_status()
 
-        ret_val = self._insight(value, ioc_type, action_result)
-        if (not ret_val):
-            return action_result.get_status()
+        if include_insights:
+            self.debug_print('Fetching insights')
+            ret_val = self._insight(value, ioc_type, action_result)
+            if (not ret_val):
+                return action_result.get_status()
 
-        ret_val = self._external_references(value, action_result)
-        if (not ret_val):
-            return action_result.get_status()
+        if include_external_references:
+            self.debug_print('Fetching external references')
+            ret_val = self._external_references(value, action_result)
+            if (not ret_val):
+                return action_result.get_status()
 
         return phantom.APP_SUCCESS
 
@@ -612,7 +635,6 @@ class ThreatstreamConnector(BaseConnector):
     def _domain_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = self._handle_py_ver_compat_for_input_str(param[THREATSTREAM_JSON_DOMAIN])
-        extend_source = param.get("extend_source", False)
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
@@ -622,7 +644,8 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
 
         ioc_type = "domain"
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
+
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, param, limit=limit)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Domain")
@@ -630,14 +653,13 @@ class ThreatstreamConnector(BaseConnector):
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
-        extend_source = param.get("extend_source", False)
         ioc_type = "ip"
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
+        ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, param, limit=limit)
         if (not ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on IP")

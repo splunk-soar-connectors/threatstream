@@ -5,12 +5,12 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.2.8",
+    "app_version": "3.3.2",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, November 2021"
     ],
-    "utctime_updated": "2021-11-25T20:26:17.000000Z",
+    "utctime_updated": "2021-12-19T00:36:42.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
@@ -19,20 +19,69 @@
     "product_version_regex": ".*",
     "python_version": "3",
     "min_phantom_version": "5.0.0",
+    "fips_compliant": true,
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "dns",
-                "input_file": "dnspython/dnspython-1.16.0-py2.py3-none-any.whl"
+                "module": "argparse",
+                "input_file": "wheels/argparse-1.4.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-3.0.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "dnspython",
+                "input_file": "wheels/dnspython-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
             },
             {
                 "module": "ipwhois",
-                "input_file": "ipwhois/ipwhois-1.1.0-py2.py3-none-any.whl"
+                "input_file": "wheels/ipwhois-1.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "wheels/python_dateutil-2.8.1-py2.py3-none-any.whl"
             },
             {
                 "module": "pythonwhois",
-                "input_file": "pythonwhois/pythonwhois-2.4.3-py2.py3-none-any.whl"
+                "input_file": "wheels/pythonwhois-2.4.3-py3-none-any.whl"
+            },
+            {
+                "module": "pytz",
+                "input_file": "wheels/pytz-2021.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "simplejson",
+                "input_file": "wheels/simplejson-3.17.2-cp36-cp36m-manylinux2010_x86_64.manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/soupsieve-2.3.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
             }
         ]
     },
@@ -420,7 +469,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -446,6 +495,21 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "pdns": {
+                    "description": "If enabled, pdns will also be fetched",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "insights": {
+                    "description": "If enabled, insights will also be fetched",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "external_references": {
+                    "description": "If enabled, external references will also be fetched",
+                    "data_type": "boolean",
+                    "order": 5
                 }
             },
             "output": [
@@ -474,6 +538,30 @@
                 },
                 {
                     "data_path": "action_result.parameter.extend_source",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.pdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.insights",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_references",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -744,7 +832,7 @@
         {
             "action": "ip reputation",
             "description": "Get information about a given IP",
-            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -770,6 +858,21 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "pdns": {
+                    "description": "If enabled, pdns will also be fetched",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "insights": {
+                    "description": "If enabled, insights will also be fetched",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "external_references": {
+                    "description": "If enabled, external references will also be fetched",
+                    "data_type": "boolean",
+                    "order": 5
                 }
             },
             "output": [
@@ -801,6 +904,30 @@
                 },
                 {
                     "data_path": "action_result.parameter.extend_source",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.pdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.insights",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_references",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -6175,7 +6302,169 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": true,
+                    "value_list": [
+                        "actor_ip",
+                        "actor_ipv6",
+                        "adware_domain",
+                        "adware_registry_key",
+                        "anon_proxy",
+                        "anon_proxy_ipv6",
+                        "anon_vpn",
+                        "anon_vpn_ipv6",
+                        "apt_domain",
+                        "apt_email",
+                        "apt_file_name",
+                        "apt_file_path",
+                        "apt_ip",
+                        "apt_ipv6",
+                        "apt_md5",
+                        "apt_mta",
+                        "apt_mutex",
+                        "apt_registry_key",
+                        "apt_service_description",
+                        "apt_service_displayname",
+                        "apt_service_name",
+                        "apt_ssdeep",
+                        "apt_subject",
+                        "apt_ua",
+                        "apt_url",
+                        "bot_ip",
+                        "bot_ipv6",
+                        "brute_ip",
+                        "brute_ipv6",
+                        "c2_domain",
+                        "c2_ip",
+                        "c2_ipv6",
+                        "c2_url",
+                        "comm_proxy_domain",
+                        "comm_proxy_ip",
+                        "compromised_domain",
+                        "compromised_email",
+                        "compromised_ip",
+                        "compromised_ipv6",
+                        "compromised_service_account",
+                        "compromised_url",
+                        "crypto_hash",
+                        "crypto_ip",
+                        "crypto_pool",
+                        "crypto_url",
+                        "crypto_wallet",
+                        "ddos_ip",
+                        "ddos_ipv6",
+                        "disposable_email_domain",
+                        "dyn_dns",
+                        "exfil_domain",
+                        "exfil_ip",
+                        "exfil_ipv6",
+                        "exfil_url",
+                        "exploit_domain",
+                        "exploit_ip",
+                        "exploit_ipv6",
+                        "exploit_url",
+                        "fraud_domain",
+                        "fraud_ip",
+                        "fraud_md5",
+                        "fraud_email",
+                        "fraud_url",
+                        "free_email_domain",
+                        "geolocation_url",
+                        "hack_tool",
+                        "i2p_ip",
+                        "i2p_ipv6",
+                        "ipcheck_url",
+                        "mal_domain",
+                        "mal_email",
+                        "mal_file_name",
+                        "mal_file_path",
+                        "mal_ip",
+                        "mal_ipv6",
+                        "mal_md5",
+                        "mal_mutex",
+                        "mal_registry_key",
+                        "mal_service_description",
+                        "mal_service_displayname",
+                        "mal_service_name",
+                        "mal_ssdeep",
+                        "mal_sslcert_sh1",
+                        "mal_ua",
+                        "mal_url",
+                        "p2pcnc",
+                        "p2pcnc_ipv6",
+                        "parked_domain",
+                        "parked_ip",
+                        "parked_ipv6",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_domain",
+                        "phish_email",
+                        "phish_ip",
+                        "phish_ipv6",
+                        "phish_md5",
+                        "phish_url",
+                        "proxy_ip",
+                        "proxy_ipv6",
+                        "scan_ip",
+                        "scan_ipv6",
+                        "sinkhole_domain",
+                        "sinkhole_ip",
+                        "sinkhole_ipv6",
+                        "social_media_url",
+                        "spam_domain",
+                        "spam_email",
+                        "spam_ip",
+                        "spam_ipv6",
+                        "spam_mta",
+                        "spam_url",
+                        "speedtest_url",
+                        "ssh_ip",
+                        "ssh_ipv6",
+                        "ssl_cert_serial_number",
+                        "suppress",
+                        "suspicious_domain",
+                        "suspicious_email",
+                        "suspicious_ip",
+                        "suspicious_reg_email",
+                        "suspicious_url",
+                        "tor_ip",
+                        "tor_ipv6",
+                        "torrent_tracker_url",
+                        "vpn_domain",
+                        "vps_ip",
+                        "vps_ipv6",
+                        "whois_bulk_reg_email",
+                        "whois_privacy_domain",
+                        "whois_privacy_email",
+                        "adware",
+                        "anomalous",
+                        "anonymization",
+                        "apt",
+                        "bot",
+                        "brute",
+                        "c2",
+                        "compromised",
+                        "crypto",
+                        "data_leakage",
+                        "ddos",
+                        "dyn_dns",
+                        "exfil",
+                        "exploit",
+                        "fraud",
+                        "hack_tool",
+                        "i2p",
+                        "informational",
+                        "malware",
+                        "p2p",
+                        "parked",
+                        "phish",
+                        "scan",
+                        "sinkhole",
+                        "spam",
+                        "suppress",
+                        "suspicious",
+                        "tor",
+                        "vps"
+                    ]
                 },
                 "classification": {
                     "description": "Designate classification for observable",
@@ -6404,7 +6693,169 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": true,
+                    "value_list": [
+                        "actor_ip",
+                        "actor_ipv6",
+                        "adware_domain",
+                        "adware_registry_key",
+                        "anon_proxy",
+                        "anon_proxy_ipv6",
+                        "anon_vpn",
+                        "anon_vpn_ipv6",
+                        "apt_domain",
+                        "apt_email",
+                        "apt_file_name",
+                        "apt_file_path",
+                        "apt_ip",
+                        "apt_ipv6",
+                        "apt_md5",
+                        "apt_mta",
+                        "apt_mutex",
+                        "apt_registry_key",
+                        "apt_service_description",
+                        "apt_service_displayname",
+                        "apt_service_name",
+                        "apt_ssdeep",
+                        "apt_subject",
+                        "apt_ua",
+                        "apt_url",
+                        "bot_ip",
+                        "bot_ipv6",
+                        "brute_ip",
+                        "brute_ipv6",
+                        "c2_domain",
+                        "c2_ip",
+                        "c2_ipv6",
+                        "c2_url",
+                        "comm_proxy_domain",
+                        "comm_proxy_ip",
+                        "compromised_domain",
+                        "compromised_email",
+                        "compromised_ip",
+                        "compromised_ipv6",
+                        "compromised_service_account",
+                        "compromised_url",
+                        "crypto_hash",
+                        "crypto_ip",
+                        "crypto_pool",
+                        "crypto_url",
+                        "crypto_wallet",
+                        "ddos_ip",
+                        "ddos_ipv6",
+                        "disposable_email_domain",
+                        "dyn_dns",
+                        "exfil_domain",
+                        "exfil_ip",
+                        "exfil_ipv6",
+                        "exfil_url",
+                        "exploit_domain",
+                        "exploit_ip",
+                        "exploit_ipv6",
+                        "exploit_url",
+                        "fraud_domain",
+                        "fraud_ip",
+                        "fraud_md5",
+                        "fraud_email",
+                        "fraud_url",
+                        "free_email_domain",
+                        "geolocation_url",
+                        "hack_tool",
+                        "i2p_ip",
+                        "i2p_ipv6",
+                        "ipcheck_url",
+                        "mal_domain",
+                        "mal_email",
+                        "mal_file_name",
+                        "mal_file_path",
+                        "mal_ip",
+                        "mal_ipv6",
+                        "mal_md5",
+                        "mal_mutex",
+                        "mal_registry_key",
+                        "mal_service_description",
+                        "mal_service_displayname",
+                        "mal_service_name",
+                        "mal_ssdeep",
+                        "mal_sslcert_sh1",
+                        "mal_ua",
+                        "mal_url",
+                        "p2pcnc",
+                        "p2pcnc_ipv6",
+                        "parked_domain",
+                        "parked_ip",
+                        "parked_ipv6",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_domain",
+                        "phish_email",
+                        "phish_ip",
+                        "phish_ipv6",
+                        "phish_md5",
+                        "phish_url",
+                        "proxy_ip",
+                        "proxy_ipv6",
+                        "scan_ip",
+                        "scan_ipv6",
+                        "sinkhole_domain",
+                        "sinkhole_ip",
+                        "sinkhole_ipv6",
+                        "social_media_url",
+                        "spam_domain",
+                        "spam_email",
+                        "spam_ip",
+                        "spam_ipv6",
+                        "spam_mta",
+                        "spam_url",
+                        "speedtest_url",
+                        "ssh_ip",
+                        "ssh_ipv6",
+                        "ssl_cert_serial_number",
+                        "suppress",
+                        "suspicious_domain",
+                        "suspicious_email",
+                        "suspicious_ip",
+                        "suspicious_reg_email",
+                        "suspicious_url",
+                        "tor_ip",
+                        "tor_ipv6",
+                        "torrent_tracker_url",
+                        "vpn_domain",
+                        "vps_ip",
+                        "vps_ipv6",
+                        "whois_bulk_reg_email",
+                        "whois_privacy_domain",
+                        "whois_privacy_email",
+                        "adware",
+                        "anomalous",
+                        "anonymization",
+                        "apt",
+                        "bot",
+                        "brute",
+                        "c2",
+                        "compromised",
+                        "crypto",
+                        "data_leakage",
+                        "ddos",
+                        "dyn_dns",
+                        "exfil",
+                        "exploit",
+                        "fraud",
+                        "hack_tool",
+                        "i2p",
+                        "informational",
+                        "malware",
+                        "p2p",
+                        "parked",
+                        "phish",
+                        "scan",
+                        "sinkhole",
+                        "spam",
+                        "suppress",
+                        "suspicious",
+                        "tor",
+                        "vps"
+                    ]
                 },
                 "classification": {
                     "description": "Designate classification for observable",
@@ -6590,7 +7041,169 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": true,
+                    "value_list": [
+                        "actor_ip",
+                        "actor_ipv6",
+                        "adware_domain",
+                        "adware_registry_key",
+                        "anon_proxy",
+                        "anon_proxy_ipv6",
+                        "anon_vpn",
+                        "anon_vpn_ipv6",
+                        "apt_domain",
+                        "apt_email",
+                        "apt_file_name",
+                        "apt_file_path",
+                        "apt_ip",
+                        "apt_ipv6",
+                        "apt_md5",
+                        "apt_mta",
+                        "apt_mutex",
+                        "apt_registry_key",
+                        "apt_service_description",
+                        "apt_service_displayname",
+                        "apt_service_name",
+                        "apt_ssdeep",
+                        "apt_subject",
+                        "apt_ua",
+                        "apt_url",
+                        "bot_ip",
+                        "bot_ipv6",
+                        "brute_ip",
+                        "brute_ipv6",
+                        "c2_domain",
+                        "c2_ip",
+                        "c2_ipv6",
+                        "c2_url",
+                        "comm_proxy_domain",
+                        "comm_proxy_ip",
+                        "compromised_domain",
+                        "compromised_email",
+                        "compromised_ip",
+                        "compromised_ipv6",
+                        "compromised_service_account",
+                        "compromised_url",
+                        "crypto_hash",
+                        "crypto_ip",
+                        "crypto_pool",
+                        "crypto_url",
+                        "crypto_wallet",
+                        "ddos_ip",
+                        "ddos_ipv6",
+                        "disposable_email_domain",
+                        "dyn_dns",
+                        "exfil_domain",
+                        "exfil_ip",
+                        "exfil_ipv6",
+                        "exfil_url",
+                        "exploit_domain",
+                        "exploit_ip",
+                        "exploit_ipv6",
+                        "exploit_url",
+                        "fraud_domain",
+                        "fraud_ip",
+                        "fraud_md5",
+                        "fraud_email",
+                        "fraud_url",
+                        "free_email_domain",
+                        "geolocation_url",
+                        "hack_tool",
+                        "i2p_ip",
+                        "i2p_ipv6",
+                        "ipcheck_url",
+                        "mal_domain",
+                        "mal_email",
+                        "mal_file_name",
+                        "mal_file_path",
+                        "mal_ip",
+                        "mal_ipv6",
+                        "mal_md5",
+                        "mal_mutex",
+                        "mal_registry_key",
+                        "mal_service_description",
+                        "mal_service_displayname",
+                        "mal_service_name",
+                        "mal_ssdeep",
+                        "mal_sslcert_sh1",
+                        "mal_ua",
+                        "mal_url",
+                        "p2pcnc",
+                        "p2pcnc_ipv6",
+                        "parked_domain",
+                        "parked_ip",
+                        "parked_ipv6",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_domain",
+                        "phish_email",
+                        "phish_ip",
+                        "phish_ipv6",
+                        "phish_md5",
+                        "phish_url",
+                        "proxy_ip",
+                        "proxy_ipv6",
+                        "scan_ip",
+                        "scan_ipv6",
+                        "sinkhole_domain",
+                        "sinkhole_ip",
+                        "sinkhole_ipv6",
+                        "social_media_url",
+                        "spam_domain",
+                        "spam_email",
+                        "spam_ip",
+                        "spam_ipv6",
+                        "spam_mta",
+                        "spam_url",
+                        "speedtest_url",
+                        "ssh_ip",
+                        "ssh_ipv6",
+                        "ssl_cert_serial_number",
+                        "suppress",
+                        "suspicious_domain",
+                        "suspicious_email",
+                        "suspicious_ip",
+                        "suspicious_reg_email",
+                        "suspicious_url",
+                        "tor_ip",
+                        "tor_ipv6",
+                        "torrent_tracker_url",
+                        "vpn_domain",
+                        "vps_ip",
+                        "vps_ipv6",
+                        "whois_bulk_reg_email",
+                        "whois_privacy_domain",
+                        "whois_privacy_email",
+                        "adware",
+                        "anomalous",
+                        "anonymization",
+                        "apt",
+                        "bot",
+                        "brute",
+                        "c2",
+                        "compromised",
+                        "crypto",
+                        "data_leakage",
+                        "ddos",
+                        "dyn_dns",
+                        "exfil",
+                        "exploit",
+                        "fraud",
+                        "hack_tool",
+                        "i2p",
+                        "informational",
+                        "malware",
+                        "p2p",
+                        "parked",
+                        "phish",
+                        "scan",
+                        "sinkhole",
+                        "spam",
+                        "suppress",
+                        "suspicious",
+                        "tor",
+                        "vps"
+                    ]
                 },
                 "classification": {
                     "description": "Designate classification for observable",
@@ -6779,7 +7392,169 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": true,
+                    "value_list": [
+                        "actor_ip",
+                        "actor_ipv6",
+                        "adware_domain",
+                        "adware_registry_key",
+                        "anon_proxy",
+                        "anon_proxy_ipv6",
+                        "anon_vpn",
+                        "anon_vpn_ipv6",
+                        "apt_domain",
+                        "apt_email",
+                        "apt_file_name",
+                        "apt_file_path",
+                        "apt_ip",
+                        "apt_ipv6",
+                        "apt_md5",
+                        "apt_mta",
+                        "apt_mutex",
+                        "apt_registry_key",
+                        "apt_service_description",
+                        "apt_service_displayname",
+                        "apt_service_name",
+                        "apt_ssdeep",
+                        "apt_subject",
+                        "apt_ua",
+                        "apt_url",
+                        "bot_ip",
+                        "bot_ipv6",
+                        "brute_ip",
+                        "brute_ipv6",
+                        "c2_domain",
+                        "c2_ip",
+                        "c2_ipv6",
+                        "c2_url",
+                        "comm_proxy_domain",
+                        "comm_proxy_ip",
+                        "compromised_domain",
+                        "compromised_email",
+                        "compromised_ip",
+                        "compromised_ipv6",
+                        "compromised_service_account",
+                        "compromised_url",
+                        "crypto_hash",
+                        "crypto_ip",
+                        "crypto_pool",
+                        "crypto_url",
+                        "crypto_wallet",
+                        "ddos_ip",
+                        "ddos_ipv6",
+                        "disposable_email_domain",
+                        "dyn_dns",
+                        "exfil_domain",
+                        "exfil_ip",
+                        "exfil_ipv6",
+                        "exfil_url",
+                        "exploit_domain",
+                        "exploit_ip",
+                        "exploit_ipv6",
+                        "exploit_url",
+                        "fraud_domain",
+                        "fraud_ip",
+                        "fraud_md5",
+                        "fraud_email",
+                        "fraud_url",
+                        "free_email_domain",
+                        "geolocation_url",
+                        "hack_tool",
+                        "i2p_ip",
+                        "i2p_ipv6",
+                        "ipcheck_url",
+                        "mal_domain",
+                        "mal_email",
+                        "mal_file_name",
+                        "mal_file_path",
+                        "mal_ip",
+                        "mal_ipv6",
+                        "mal_md5",
+                        "mal_mutex",
+                        "mal_registry_key",
+                        "mal_service_description",
+                        "mal_service_displayname",
+                        "mal_service_name",
+                        "mal_ssdeep",
+                        "mal_sslcert_sh1",
+                        "mal_ua",
+                        "mal_url",
+                        "p2pcnc",
+                        "p2pcnc_ipv6",
+                        "parked_domain",
+                        "parked_ip",
+                        "parked_ipv6",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_domain",
+                        "phish_email",
+                        "phish_ip",
+                        "phish_ipv6",
+                        "phish_md5",
+                        "phish_url",
+                        "proxy_ip",
+                        "proxy_ipv6",
+                        "scan_ip",
+                        "scan_ipv6",
+                        "sinkhole_domain",
+                        "sinkhole_ip",
+                        "sinkhole_ipv6",
+                        "social_media_url",
+                        "spam_domain",
+                        "spam_email",
+                        "spam_ip",
+                        "spam_ipv6",
+                        "spam_mta",
+                        "spam_url",
+                        "speedtest_url",
+                        "ssh_ip",
+                        "ssh_ipv6",
+                        "ssl_cert_serial_number",
+                        "suppress",
+                        "suspicious_domain",
+                        "suspicious_email",
+                        "suspicious_ip",
+                        "suspicious_reg_email",
+                        "suspicious_url",
+                        "tor_ip",
+                        "tor_ipv6",
+                        "torrent_tracker_url",
+                        "vpn_domain",
+                        "vps_ip",
+                        "vps_ipv6",
+                        "whois_bulk_reg_email",
+                        "whois_privacy_domain",
+                        "whois_privacy_email",
+                        "adware",
+                        "anomalous",
+                        "anonymization",
+                        "apt",
+                        "bot",
+                        "brute",
+                        "c2",
+                        "compromised",
+                        "crypto",
+                        "data_leakage",
+                        "ddos",
+                        "dyn_dns",
+                        "exfil",
+                        "exploit",
+                        "fraud",
+                        "hack_tool",
+                        "i2p",
+                        "informational",
+                        "malware",
+                        "p2p",
+                        "parked",
+                        "phish",
+                        "scan",
+                        "sinkhole",
+                        "spam",
+                        "suppress",
+                        "suspicious",
+                        "tor",
+                        "vps"
+                    ]
                 },
                 "confidence": {
                     "description": "Confidence level",
@@ -7005,7 +7780,169 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": true,
+                    "value_list": [
+                        "actor_ip",
+                        "actor_ipv6",
+                        "adware_domain",
+                        "adware_registry_key",
+                        "anon_proxy",
+                        "anon_proxy_ipv6",
+                        "anon_vpn",
+                        "anon_vpn_ipv6",
+                        "apt_domain",
+                        "apt_email",
+                        "apt_file_name",
+                        "apt_file_path",
+                        "apt_ip",
+                        "apt_ipv6",
+                        "apt_md5",
+                        "apt_mta",
+                        "apt_mutex",
+                        "apt_registry_key",
+                        "apt_service_description",
+                        "apt_service_displayname",
+                        "apt_service_name",
+                        "apt_ssdeep",
+                        "apt_subject",
+                        "apt_ua",
+                        "apt_url",
+                        "bot_ip",
+                        "bot_ipv6",
+                        "brute_ip",
+                        "brute_ipv6",
+                        "c2_domain",
+                        "c2_ip",
+                        "c2_ipv6",
+                        "c2_url",
+                        "comm_proxy_domain",
+                        "comm_proxy_ip",
+                        "compromised_domain",
+                        "compromised_email",
+                        "compromised_ip",
+                        "compromised_ipv6",
+                        "compromised_service_account",
+                        "compromised_url",
+                        "crypto_hash",
+                        "crypto_ip",
+                        "crypto_pool",
+                        "crypto_url",
+                        "crypto_wallet",
+                        "ddos_ip",
+                        "ddos_ipv6",
+                        "disposable_email_domain",
+                        "dyn_dns",
+                        "exfil_domain",
+                        "exfil_ip",
+                        "exfil_ipv6",
+                        "exfil_url",
+                        "exploit_domain",
+                        "exploit_ip",
+                        "exploit_ipv6",
+                        "exploit_url",
+                        "fraud_domain",
+                        "fraud_ip",
+                        "fraud_md5",
+                        "fraud_email",
+                        "fraud_url",
+                        "free_email_domain",
+                        "geolocation_url",
+                        "hack_tool",
+                        "i2p_ip",
+                        "i2p_ipv6",
+                        "ipcheck_url",
+                        "mal_domain",
+                        "mal_email",
+                        "mal_file_name",
+                        "mal_file_path",
+                        "mal_ip",
+                        "mal_ipv6",
+                        "mal_md5",
+                        "mal_mutex",
+                        "mal_registry_key",
+                        "mal_service_description",
+                        "mal_service_displayname",
+                        "mal_service_name",
+                        "mal_ssdeep",
+                        "mal_sslcert_sh1",
+                        "mal_ua",
+                        "mal_url",
+                        "p2pcnc",
+                        "p2pcnc_ipv6",
+                        "parked_domain",
+                        "parked_ip",
+                        "parked_ipv6",
+                        "parked_url",
+                        "pastesite_url",
+                        "phish_domain",
+                        "phish_email",
+                        "phish_ip",
+                        "phish_ipv6",
+                        "phish_md5",
+                        "phish_url",
+                        "proxy_ip",
+                        "proxy_ipv6",
+                        "scan_ip",
+                        "scan_ipv6",
+                        "sinkhole_domain",
+                        "sinkhole_ip",
+                        "sinkhole_ipv6",
+                        "social_media_url",
+                        "spam_domain",
+                        "spam_email",
+                        "spam_ip",
+                        "spam_ipv6",
+                        "spam_mta",
+                        "spam_url",
+                        "speedtest_url",
+                        "ssh_ip",
+                        "ssh_ipv6",
+                        "ssl_cert_serial_number",
+                        "suppress",
+                        "suspicious_domain",
+                        "suspicious_email",
+                        "suspicious_ip",
+                        "suspicious_reg_email",
+                        "suspicious_url",
+                        "tor_ip",
+                        "tor_ipv6",
+                        "torrent_tracker_url",
+                        "vpn_domain",
+                        "vps_ip",
+                        "vps_ipv6",
+                        "whois_bulk_reg_email",
+                        "whois_privacy_domain",
+                        "whois_privacy_email",
+                        "adware",
+                        "anomalous",
+                        "anonymization",
+                        "apt",
+                        "bot",
+                        "brute",
+                        "c2",
+                        "compromised",
+                        "crypto",
+                        "data_leakage",
+                        "ddos",
+                        "dyn_dns",
+                        "exfil",
+                        "exploit",
+                        "fraud",
+                        "hack_tool",
+                        "i2p",
+                        "informational",
+                        "malware",
+                        "p2p",
+                        "parked",
+                        "phish",
+                        "scan",
+                        "sinkhole",
+                        "spam",
+                        "suppress",
+                        "suspicious",
+                        "tor",
+                        "vps"
+                    ]
                 },
                 "confidence": {
                     "description": "Confidence level",
@@ -7218,14 +8155,14 @@
                     "description": "Type of observable to import",
                     "data_type": "string",
                     "order": 0,
+                    "required": true,
                     "value_list": [
                         "ip",
                         "domain",
                         "url",
                         "email",
                         "hash"
-                    ],
-                    "required": true
+                    ]
                 },
                 "value": {
                     "description": "Observable value",
@@ -24198,12 +25135,15 @@
                 },
                 {
                     "column_name": "investigation ID",
+                    "column_order": 0,
                     "data_path": "action_result.data.*.id",
                     "example_values": [
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -24259,7 +25199,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "column_name": "Priority",
@@ -24286,14 +25229,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
+                    "data_type": "string",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24335,7 +25284,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -24349,28 +25301,40 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.resource_uri",
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -24502,7 +25466,10 @@
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "investigation id"
+                    ]
                 },
                 {
                     "column_name": "Is Public",
@@ -24536,7 +25503,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -24581,14 +25551,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24627,7 +25603,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -24648,21 +25627,30 @@
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56953/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -24737,7 +25725,10 @@
                     "required": true,
                     "description": "ID of the investigation to retrieve",
                     "data_type": "numeric",
-                    "primary": true
+                    "primary": true,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 }
             },
             "versions": "EQ(*)",
@@ -24763,7 +25754,10 @@
                         "56198"
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "column_name": "Assignee",
@@ -24813,7 +25807,10 @@
                     "example_values": [
                         0
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -24855,7 +25852,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -24869,11 +25869,17 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "column_name": "Priority",
@@ -24900,14 +25906,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -24949,7 +25961,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -24977,14 +25992,20 @@
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -25064,7 +26085,10 @@
                     "required": true,
                     "description": "ID of the investigation to update",
                     "data_type": "numeric",
-                    "primary": true
+                    "primary": true,
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 "fields": {
                     "required": true,
@@ -25094,7 +26118,10 @@
                     "example_values": [
                         "56198"
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.fields",
@@ -25151,7 +26178,10 @@
                         0
                     ],
                     "data_type": "numeric",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.import_sessions",
@@ -25189,7 +26219,10 @@
                     "example_values": [
                         "2342"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org.name",
@@ -25203,11 +26236,17 @@
                     "example_values": [
                         "/api/v1/userorganization/2342/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.owner_org_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.priority",
@@ -25232,14 +26271,20 @@
                     "example_values": [
                         "user@phantom.us"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.id",
                     "example_values": [
                         "6941"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.is_active",
@@ -25281,7 +26326,10 @@
                     "example_values": [
                         "2324"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
@@ -25302,21 +26350,30 @@
                     "example_values": [
                         "/api/v1/user/6941/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reporter_id",
                     "example_values": [
                         6941
                     ],
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "contains": [
+                        "id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.resource_uri",
                     "example_values": [
                         "/api/v1/investigation/56198/"
                     ],
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.source_type",
@@ -25396,7 +26453,7 @@
                     "data_type": "numeric",
                     "primary": true,
                     "contains": [
-                        "id"
+                        "threatstream investigation id"
                     ]
                 }
             },
@@ -25422,11 +26479,11 @@
                     "example_values": [
                         56911
                     ],
-                    "contains": [
-                        "id"
-                    ],
                     "data_type": "numeric",
-                    "column_name": "investigation ID"
+                    "column_name": "investigation ID",
+                    "contains": [
+                        "threatstream investigation id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
