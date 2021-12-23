@@ -644,6 +644,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_VALUE)
 
         ioc_type = "domain"
+
         ret_val = self._retrieve_ip_domain(value, ioc_type, action_result, param, limit=limit)
         if (not ret_val):
             return action_result.get_status()
