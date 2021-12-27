@@ -1,29 +1,7 @@
 Splunk SOAR ThreatStream
-Copyright 2021 Splunk Inc.
+Copyright (c) 2016-2021 Splunk Inc.
 
 Third-party Software Attributions:
-
-Library: python-dateutil
-Version: 2.8.1
-License: Apache 2.0
-License: BSD 3
-Copyright 2015 - dateutil contributors (see AUTHORS file)
-Copyright 2012-2014 - Tomi Pieviläinen <tomi.pievilainen@iki.fi>
-Copyright 2017 dateutil contributors (see AUTHORS file)
-Copyright 2015 - Paul Ganssle <paul@ganssle.io>
-Copyright 2014-2016 - Yaron de Leeuw <me@jarondl.net>
-Copyright 2003-2011 - Gustavo Niemeyer <gustavo@niemeyer.net>
-Copyright 2017 Paul Ganssle <paul@ganssle.io>
-
-Library: pythonwhois
-Version: 2.4.3
-License: WTFPL
-Unknown copyright
-
-Library: ipwhois
-Version: 1.1.0
-License: BSD 2
-Copyright 2013-2019 Philip Hane
 
 Library: beautifulsoup4
 Version: 4.9.1
@@ -32,25 +10,49 @@ Copyright 2004-2017 Leonard Richardson
 Copyright 2004-2019 Leonard Richardson
 Copyright 2018 Isaac Muse
 
-Library: simplejson
-Version: 3.17.2
-License: Academic 2.1
-License: MIT
-Copyright 2006 Bob Ippolito
-Copyright 2003-2004 Lawrence E
+Library: dnspython
+Version: 1.16.0
+License: ISC
+Copyright 2001-2017 Nominum, Inc
+Copyright Dnspython Contributors
 
-Library: pudb
-Version: 2019.2
+Library: ipwhois
+Version: 1.1.0
+License: BSD 2
+Copyright 2013-2019 Philip Hane
+
+Library: python-dateutil
+Version: 2.8.1
+License: Apache 2.0
+License: BSD 3
+Copyright 2003-2011 - Gustavo Niemeyer <gustavo@niemeyer.net>
+Copyright 2012-2014 - Tomi Pieviläinen <tomi.pievilainen@iki.fi>
+Copyright 2014-2016 - Yaron de Leeuw <me@jarondl.net>
+Copyright 2015 - Paul Ganssle <paul@ganssle.io>
+Copyright 2015 - dateutil contributors (see AUTHORS file)
+Copyright 2017 Paul Ganssle <paul@ganssle.io>
+Copyright 2017 dateutil contributors (see AUTHORS file)
+
+Library: pythonwhois
+Version: 2.4.3
+License: WTFPL
+Unknown copyright
+
+Library: pytz
+Version: 2021.1
 License: MIT
-Copyright 2009 Andreas Kloeckner and contributors
+License: Zope
+Copyright 1987-2006 implementation only works for dates between
+Copyright 2003-2019 Stuart Bishop <stuart@stuartbishop.net>
 
 Library: requests
 Version: 2.25.0
 License: Apache 2.0
 Kenneth Reitz
 
-Library: pytz
-Version: 2021.1
+Library: simplejson
+Version: 3.17.2
+License: Academic 2.1
 License: MIT
-Copyright 1987-2006 implementation only works for dates between
-Copyright 2003-2019 Stuart Bishop <stuart@stuartbishop.net>
+Copyright 2003-2004 Lawrence E
+Copyright 2006 Bob Ippolito
