@@ -5,12 +5,12 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.3.2",
+    "app_version": "3.3.3",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, November 2021"
     ],
-    "utctime_updated": "2021-12-19T00:36:42.000000Z",
+    "utctime_updated": "2022-01-07T22:13:14.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
