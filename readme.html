@@ -404,6 +404,28 @@ and limitations under the License.
     <b>NOTE:</b> If the input contains any threat_type value except the ones listed above, the action will behave according to the API behavior.
 </p>
 
+<h2>Port Information</h2>
+  <p>
+    The app uses HTTP/HTTPS protocol for communicating with the ThreatStream Server. Below are the default ports used by Splunk SOAR.
+    <table>
+      <tr class=plain>
+        <th>Service Name</th>
+        <th>Transport Protocol</th>
+        <th>Port</th>
+      </tr>
+      <tr>
+        <td>http</td>
+        <td>tcp</td>
+        <td>80</td>
+      </tr>
+      <tr>
+        <td>https</td>
+        <td>tcp</td>
+        <td>443</td>
+      </tr>
+    </table>
+  </p> 
+
 <p>
 	<h2>ipwhois</h2>
 	This app uses the ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019 Philip Hane.

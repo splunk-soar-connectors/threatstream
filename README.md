@@ -268,6 +268,13 @@ import_observables actions (To be given as input when with_approval parameter is
 **NOTE:** If the input contains any threat_type value except the ones listed above, the action will
 behave according to the API behavior.
 
+## Port Information
+The app uses HTTP/HTTPS protocol for communicating with the ThreatStream Server. Below are the default ports used by Splunk SOAR.
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443
+
 ## ipwhois
 
 This app uses the ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019
