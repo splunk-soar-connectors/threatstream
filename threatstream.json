@@ -8,9 +8,9 @@
     "app_version": "3.4.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, December 2021"
+        "Cloud, January 2022"
     ],
-    "utctime_updated": "2021-12-19T00:36:42.000000Z",
+    "utctime_updated": "2022-01-07T22:13:14.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
@@ -20,7 +20,7 @@
     "python_version": "3",
     "min_phantom_version": "5.0.0",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {

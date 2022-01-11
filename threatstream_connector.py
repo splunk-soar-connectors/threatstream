@@ -1,6 +1,6 @@
 # File: threatstream_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1962,7 +1962,7 @@ class ThreatstreamConnector(BaseConnector):
 
         # download file
         try:
-            pcap_file = requests.get(pcap).content
+            pcap_file = requests.get(pcap).content    # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
         except:
             return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file"), None
 
@@ -2011,7 +2011,7 @@ class ThreatstreamConnector(BaseConnector):
             .format(self.get_phantom_base_url(), incident_id, self.get_asset_id())
 
         try:
-            r = requests.get(url, verify=False)
+            r = requests.get(url, verify=False)    # nosemgrep
             resp_json = r.json()
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
@@ -2034,7 +2034,7 @@ class ThreatstreamConnector(BaseConnector):
             url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
             try:
                 data = {"name": '{}-{}'.format(incident_id, incident_name)}
-                r = requests.post(url, verify=False, json=data)
+                r = requests.post(url, verify=False, json=data)    # nosemgrep
                 resp_json = r.json()
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
@@ -4517,4 +4517,4 @@ if __name__ == '__main__':
         # Dump the return value
         print(ret_val)
 
-    exit(0)
+    sys.exit(0)

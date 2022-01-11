@@ -10,8 +10,8 @@ Minimum Product Version: 5\.0\.0
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 
-[comment]: # " File: readme.md"
-[comment]: # " Copyright (c) 2016-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # " Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -33,7 +33,7 @@ Integrates a variety of generic, reputation, and investigative actions from the 
 
       
 
-    -   **For version 3.3.X :**
+    -   **For version 3.4.X :**
 
           
 
