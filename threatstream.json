@@ -6467,7 +6467,7 @@
                     ]
                 },
                 "source": {
-                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -6870,7 +6870,7 @@
                     ]
                 },
                 "source": {
-                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -7244,7 +7244,7 @@
                     ]
                 },
                 "source": {
-                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -7608,7 +7608,7 @@
                     ]
                 },
                 "source": {
-                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -8008,7 +8008,7 @@
                     ]
                 },
                 "source": {
-                    "description": "Source of observable to import(It will be reflected on UI only when observable is imported without approval)",
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
                     "data_type": "string",
                     "order": 2
                 },
