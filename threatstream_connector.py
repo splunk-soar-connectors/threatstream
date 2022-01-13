@@ -599,9 +599,9 @@ class ThreatstreamConnector(BaseConnector):
         """ Test connectivity to threatstream by doing a simple request """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self.save_progress("Please verify if the hostname provided in the [hostname] parameter is cloud or on-prem and provide input "\
-                            "in the [Is the provided instance in hostname parameter cloud?] parameter accordingly. "\
-                            "This parameter will impact the actions' execution of the application.")
+        self.save_progress("Please verify if the hostname provided in the [hostname] parameter is cloud or on-prem and provide input \
+                            in the [Is the provided instance in hostname parameter cloud?] parameter accordingly. \
+                            This parameter will impact the actions' execution of the application.")
 
         self.save_progress("Starting connectivity test")
         payload = self._generate_payload(limit="1")
@@ -1293,9 +1293,8 @@ class ThreatstreamConnector(BaseConnector):
                 fields = ast.literal_eval(param["fields"])
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error building fields dictionary: {0}. "\
-                        "Please ensure that provided input is in valid JSON format.".format(error_msg))
+                action_result.set_status(phantom.APP_ERROR,
+                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
                 return None
 
             if not isinstance(fields, dict):
@@ -1522,12 +1521,12 @@ class ThreatstreamConnector(BaseConnector):
                         data.update(fields)
                 else:
                     return action_result.set_status(phantom.APP_ERROR,
-                        "Providing '{key}' in fields parameter is mandatory for importing an observable "\
-                                "(e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
+                        "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                                (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
             else:
                 return action_result.set_status(phantom.APP_ERROR,
-                    "Providing '{key}' in fields parameter is mandatory for importing an observable "\
-                            "(e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
+                    "Providing '{key}' in fields parameter is mandatory for importing an observable \
+                            (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
 
         else:
             ret_val, confidence = self._validate_integer(action_result, param.get('confidence', 100), THREATSTREAM_INVALID_CONFIDENCE)
@@ -2110,8 +2109,8 @@ class ThreatstreamConnector(BaseConnector):
                     if incident.get("organization_id") == int(org_id):
                         incidents.append(incident)
                     else:
-                        self.debug_print("Skipping incident ID: {0} due to organization ID: {1} "\
-                            "being different than the configuration parameter organization_id: {2}".format(
+                        self.debug_print("Skipping incident ID: {0} due to organization ID: {1} \
+                            being different than the configuration parameter organization_id: {2}".format(
                             incident.get("id"), incident.get("organization_id"), org_id))
 
                 if not interim_incidents:
@@ -2131,8 +2130,8 @@ class ThreatstreamConnector(BaseConnector):
                 if incident.get("organization_id") == int(org_id):
                     incidents.append(incident)
                 else:
-                    self.debug_print("Skipping incident ID: {0} due organization ID: {1} "\
-                        "being different than the configuration parameter organization_id: {2}".format(
+                    self.debug_print("Skipping incident ID: {0} due organization ID: {1} \
+                        being different than the configuration parameter organization_id: {2}".format(
                         incident.get("id"), incident.get("organization_id"), org_id))
 
         self.save_progress("Fetched {0} incidents in the oldest first order based on modified_ts time.".format(len(incidents)))
@@ -3787,9 +3786,9 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. {}. Details: {}".format(
-                            output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(
-                            ', '.join(cloud_intelligence)), action_result.get_message())
+                        output_message = "{}. {}. Details: {}"\
+                            .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE
+                            .format(', '.join(cloud_intelligence)), action_result.get_message())
                     else:
                         output_message = "{}. Details: {}"\
                             .format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE
@@ -3808,13 +3807,13 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. {}. Details: {}".format(
-                            output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(
-                            ', '.join(local_intelligence)), action_result.get_message())
+                        output_message = "{}. {}. Details: {}"\
+                            .format(output_message, THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE
+                            .format(', '.join(local_intelligence)), action_result.get_message())
                     else:
-                        output_message = "{}. Details: {}".format(
-                            THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(
-                            ', '.join(local_intelligence)), action_result.get_message())
+                        output_message = "{}. Details: {}"\
+                            .format(THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE
+                            .format(', '.join(local_intelligence)), action_result.get_message())
 
                 if response and response.get("local_ids"):
                     intelligence.extend(response.get("local_ids"))
@@ -3975,11 +3974,12 @@ class ThreatstreamConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             is_error = True
                             if output_message:
-                                output_message = "{}. {}. Details: {}".format(
-                                    output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(
-                                    ', '.join(cloud_intelligence)), action_result.get_message())
+                                output_message = "{}. {}. Details: {}"\
+                                    .format(output_message, THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE
+                                    .format(', '.join(cloud_intelligence)), action_result.get_message())
                             else:
-                                output_message = "{}. Details: {}".format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE
+                                output_message = "{}. Details: {}"\
+                                    .format(THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE
                                     .format(', '.join(cloud_intelligence)), action_result.get_message())
 
                 if phantom.is_fail(ret_val):
@@ -4165,13 +4165,12 @@ class ThreatstreamConnector(BaseConnector):
                 fields = ast.literal_eval(param.get("fields"))
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
-                return action_result.set_status(
-                    phantom.APP_ERROR, "Error building fields dictionary: {0}. "\
-                        "Please ensure that provided input is in valid JSON format.".format(error_msg))
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
 
             if not isinstance(fields, dict):
-                return action_result.set_status(phantom.APP_ERROR, "Error building fields dictionary. "\
-                    "Please ensure that provided input is in valid JSON dictionary format")
+                return action_result.set_status(phantom.APP_ERROR,
+                    "Error building fields dictionary. Please ensure that provided input is in valid JSON dictionary format")
 
             data.update(fields)
 
