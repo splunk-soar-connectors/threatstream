@@ -10,8 +10,8 @@ Minimum Product Version: 5\.0\.0
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 
-[comment]: # " File: readme.md"
-[comment]: # " Copyright (c) 2016-2021 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # " Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -32,6 +32,21 @@ Integrates a variety of generic, reputation, and investigative actions from the 
     the app.
 
       
+
+    -   **For version 3.4.X :**
+
+          
+
+        -   Import domain observable - **source** parameter has been added
+        -   Import URL observable - **source, allow_unresolved** parameters have been
+            added
+        -   Import IP observable - **source** parameter has been added
+        -   Import file observable - **source** parameter has been added
+        -   Import email observable - **source** parameter has been added
+        -   Detonate file - **use_premium_sandbox, use_vmray_sandbox, vmray_max_jobs, fields**
+            parameters have been added
+        -   Detonate URL - **use_premium_sandbox, use_vmray_sandbox, vmray_max_jobs, fields**
+            parameters have been added
 
     -   **For version 3.0.X :**
 
@@ -252,6 +267,13 @@ import_observables actions (To be given as input when with_approval parameter is
 
 **NOTE:** If the input contains any threat_type value except the ones listed above, the action will
 behave according to the API behavior.
+
+## Port Information
+The app uses HTTP/HTTPS protocol for communicating with the ThreatStream Server. Below are the default ports used by Splunk SOAR.
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443
 
 ## ipwhois
 

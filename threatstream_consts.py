@@ -1,6 +1,6 @@
 # File: threatstream_consts.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,7 @@ ENDPOINT_COMMENT_IMPORT_SESSION = "/v1/importsession/{session_id}/comment/"
 ENDPOINT_THREAT_BULLETIN = "/v1/tipreport/"
 ENDPOINT_ATTACHMENT_THREAT_BULLETIN = "/v1/tipreport/{id}/attachment/"
 ENDPOINT_UPDATE_THREAT_BULLETIN = "/v1/tipreport/{id}/"
+ENDPOINT_UPDATE_OBSERVABLE = "/v2/intelligence/{id}/"
 ENDPOINT_IMPORT_SESSIONS_THREAT_BULLETIN = "/v1/tipreport/{id}/update_import_sessions/"
 ENDPOINT_FETCH_ENTITIES = "/v1/{entity_type}/{id}/{associated_entity_type}/"
 ENDPOINT_THREAT_BULLETIN_ASSOCIATE_INTELLIGENCE = '/v1/tipreport/{id}/intelligence/bulk_add/'
@@ -77,8 +78,10 @@ THREATSTREAM_ERR_INVALID_PARAM = "Please provide a non-zero positive integer in 
 THREATSTREAM_ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
 THREATSTREAM_ERR_API_INVALID_VALUE = "Please provide valid values in entity_type and associated_entity_type parameters"
 THREATSTREAM_ERR_INVALID_INTELLIGENCE = "None of the intelligence got associated, please provide valid intelligence"
-THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE = "Error occurred while associating local IDs: {}. Please provide valid local IDs in 'local intelligence' parameter"
-THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE = "Error occurred while associating remote IDs: {}. Please provide valid remote IDs in 'cloud intelligence' parameter"
+THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE = "Error occurred while associating local IDs: {}. "\
+    "Please provide valid local IDs in 'local intelligence' parameter"
+THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE = "Error occurred while associating remote IDs: {}. "\
+    "Please provide valid remote IDs in 'cloud intelligence' parameter"
 THREATSTREAM_SUCCESS_THREATBULLETIN_MESSAGE = "Successfully created threat bulletin with id: {}"
 THREATSTREAM_SUCCESS_INCIDENT_MESSAGE = "Successfully created incident with id: {}"
 THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE = "Successfully created {} with id: {}"
@@ -89,7 +92,10 @@ THREATSTREAM_ERR_INVALID_FIELD_PARAM_VALUE = "Please enter the value of the key,
 THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM = "Please enter the value of keywords parameter in form of list"
 THREATSTREAM_ERR_RULE_ID_NOT_FOUND = "Error while fetching the rule ID of the created rule"
 THREATSTREAM_ERR_MISSING_LOCAL_REMOTE_ID = "Please provide either local_ids or remote_ids param"
-THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', 'attachment', 'comment' or 'fields' to update the provided {}"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL = "Please provide at least one parameter, either 'intelligence', "\
+    "'attachment', 'comment' or 'fields' to update the provided {}"
+THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one parameter, either 'indicator_type', "\
+    "'confidence', 'tlp', 'severity', 'status', 'expiration_date' or 'fields' to update the provided observable"
 
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
@@ -97,6 +103,7 @@ THREATSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0
 
 THREATSTREAM_LIMIT = "'limit' action parameter"
 THREATSTREAM_ITEM_ID = "'item_id' action parameter"
+THREATSTREAM_VMRAY_MAX_JOBS = "'vmray_max_jobs' action parameter"
 THREATSTREAM_REPORT_ID = "'report_id' action parameter"
 THREATSTREAM_THREAT_BULLETIN_ID = "'threat_bulletin_id' action parameter"
 THREATSTREAM_VULNERABILITY_ID = "'vulnerability_id' action parameter"
