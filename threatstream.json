@@ -5,12 +5,12 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.3.2",
+    "app_version": "3.4.3",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, November 2021"
+        "Cloud, January 2022"
     ],
-    "utctime_updated": "2021-12-19T00:36:42.000000Z",
+    "utctime_updated": "2022-01-21T10:26:01.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
@@ -20,7 +20,7 @@
     "python_version": "3",
     "min_phantom_version": "5.0.0",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {
@@ -6466,10 +6466,15 @@
                         "vps"
                     ]
                 },
+                "source": {
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -6485,12 +6490,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6499,17 +6504,17 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "allow_unresolved": {
                     "description": "Unresolved domains will be imported if set to true",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -6537,6 +6542,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.create_on_cloud",
@@ -6857,10 +6869,15 @@
                         "vps"
                     ]
                 },
+                "source": {
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -6876,12 +6893,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -6890,12 +6907,17 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
+                },
+                "allow_unresolved": {
+                    "description": "Unresolved urls will be imported if set to true",
+                    "data_type": "boolean",
+                    "order": 8
                 }
             },
             "output": [
@@ -6905,6 +6927,21 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.allow_unresolved",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
                     ]
                 },
                 {
@@ -7033,7 +7070,8 @@
                     "order": 0,
                     "required": true,
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "primary": true
                 },
@@ -7205,10 +7243,15 @@
                         "vps"
                     ]
                 },
+                "source": {
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 2,
+                    "order": 3,
                     "value_list": [
                         "public",
                         "private"
@@ -7224,12 +7267,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 3
+                    "order": 4
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 4,
+                    "order": 5,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -7238,12 +7281,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 5
+                    "order": 6
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 }
             },
             "output": [
@@ -7263,6 +7306,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.create_on_cloud",
@@ -7289,7 +7339,8 @@
                         "122.122.122.122"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "column_name": "IP Address",
                     "column_order": 0
@@ -7556,16 +7607,21 @@
                         "vps"
                     ]
                 },
+                "source": {
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "confidence": {
                     "description": "Confidence level",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 3,
                     "required": true
                 },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "value_list": [
                         "public",
                         "private"
@@ -7581,12 +7637,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
+                    "order": 6,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -7595,12 +7651,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -7620,6 +7676,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.confidence",
@@ -7944,16 +8007,21 @@
                         "vps"
                     ]
                 },
+                "source": {
+                    "description": "Source of observable to import (It will only be reflected on UI when observable is imported without approval)",
+                    "data_type": "string",
+                    "order": 2
+                },
                 "confidence": {
                     "description": "Confidence level",
                     "data_type": "numeric",
-                    "order": 2,
+                    "order": 3,
                     "required": true
                 },
                 "classification": {
                     "description": "Designate classification for observable",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "value_list": [
                         "public",
                         "private"
@@ -7969,12 +8037,12 @@
                         "high",
                         "very-high"
                     ],
-                    "order": 4
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to associate with this Observable",
                     "data_type": "string",
-                    "order": 5,
+                    "order": 6,
                     "contains": [
                         "threatstream tags"
                     ],
@@ -7983,12 +8051,12 @@
                 "create_on_cloud": {
                     "description": "Create on remote (cloud)? (applicable only for hybrid on-prem instances)",
                     "data_type": "boolean",
-                    "order": 6
+                    "order": 7
                 },
                 "with_approval": {
                     "description": "Import the observable with approvals",
                     "data_type": "boolean",
-                    "order": 7
+                    "order": 8
                 }
             },
             "output": [
@@ -8008,6 +8076,13 @@
                     ],
                     "column_name": "Classification",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "testsource"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.confidence",
@@ -8146,7 +8221,7 @@
         {
             "action": "import observables",
             "description": "Import observables into ThreatStream",
-            "verbose": "<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}) whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - {\"threat_type\": \"&lt;threat_type&gt;\"}).</li><li>The \"allow_unresolved\" parameter will be passed in the API call if the \"value\" parameter is set to \"domain\" and \"with_approval\" parameter is set to \"False\".</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li><li>If both the \"itype\" and \"threat_type\" values are passed in the \"fields\" parameter when \"with_approval\" is set to \"True\", the action will behave according to the API behavior.</li></ul>",
+            "verbose": "<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\"}) whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - {\"threat_type\": \"&lt;threat_type&gt;\"}).</li><li>The \"allow_unresolved\" parameter will be passed in the API call if the \"value\" parameter is set to \"domain\" or \"url\" and \"with_approval\" parameter is set to \"False\".</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter (e.g - {\"itype\": \"&lt;indicator_type&gt;\", \"confidence\": &lt;confidence_value&gt;}).</li><li>If both the \"itype\" and \"threat_type\" values are passed in the \"fields\" parameter when \"with_approval\" is set to \"True\", the action will behave according to the API behavior.</li></ul>",
             "type": "generic",
             "identifier": "import_observables",
             "read_only": false,
@@ -8641,6 +8716,7 @@
         {
             "action": "detonate file",
             "description": "Detonate file in ThreatStream",
+            "verbose": "If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
             "type": "generic",
             "identifier": "detonate_file",
             "read_only": false,
@@ -8667,6 +8743,26 @@
                     "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 2
+                },
+                "use_premium_sandbox": {
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "use_vmray_sandbox": {
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "vmray_max_jobs": {
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission",
+                    "data_type": "numeric",
+                    "order": 5
+                },
+                "fields": {
+                    "description": "JSON formatted string of additional fields to be included in the detonate file action. e.g. {\"file_has_password\":\"true\",\"file_password\":\"abc123\"}. Please check the API doc to find more information on other valid fields",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "output": [
@@ -8703,6 +8799,36 @@
                     "column_order": 0,
                     "example_values": [
                         "dd88508cda7bcfc71ffdbc0e26afe97d3fb9a0b6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_premium_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_vmray_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vmray_max_jobs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"file_has_password\":\"true\",\"file_password\":\"abc123\",\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\",\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {
@@ -8869,6 +8995,7 @@
         {
             "action": "detonate url",
             "description": "Detonate URL in ThreatStream",
+            "verbose": "If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
             "type": "generic",
             "identifier": "detonate_url",
             "read_only": false,
@@ -8894,6 +9021,26 @@
                     "description": "Classification of the sandbox submission - private or public",
                     "data_type": "string",
                     "order": 2
+                },
+                "use_premium_sandbox": {
+                    "description": "Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "use_vmray_sandbox": {
+                    "description": "Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "vmray_max_jobs": {
+                    "description": "Specify the number of detonations you want VMRay to perform for the submission",
+                    "data_type": "numeric",
+                    "order": 5
+                },
+                "fields": {
+                    "description": "JSON formatted string of additional fields to be included in the detonate url action. e.g. {\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\"}. Please check the API doc to find more infomation on other valid fields",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "output": [
@@ -8927,6 +9074,36 @@
                     ],
                     "contains": [
                         "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_premium_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_vmray_sandbox",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vmray_max_jobs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"import_indicators\":\"true\",\"report_radio-notes\":\"Credential-Exposure,compromised_email\",\"trusted_circles\":\"13\"}"
                     ]
                 },
                 {
@@ -11377,7 +11554,7 @@
         {
             "action": "update import session",
             "description": "This action updates the fields of the provided item id",
-            "verbose": "If 'null' is provided in the expire time parameter, then expiration time will be set to '9999-12-31T00:00:00'.</li></ul>",
+            "verbose": "If \"null\" is provided in the expire time parameter, then expiration time will be set to \"9999-12-31T00:00:00\".</li></ul>",
             "type": "generic",
             "identifier": "import_session_update",
             "read_only": false,
@@ -18293,14 +18470,14 @@
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
-                        "Rule is created successfully."
+                        "Rule is created successfully"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Rule is created successfully."
+                        "Rule is created successfully"
                     ]
                 },
                 {
@@ -25013,6 +25190,468 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "update observable",
+            "description": "Update an observable in ThreatStream",
+            "verbose": "If any of the indicator_type, confidence, tlp, severity, status, or expiration_date parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.",
+            "type": "generic",
+            "identifier": "update_observable",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "ID of the observable",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "threatstream intelligence id"
+                    ],
+                    "primary": true
+                },
+                "indicator_type": {
+                    "description": "Indicator type to give the observable",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "confidence": {
+                    "description": "Confidence to give the observable",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "tlp": {
+                    "description": "Tlp to give the observable",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "severity": {
+                    "description": "Severity to give the observable",
+                    "data_type": "string",
+                    "order": 4,
+                    "value_list": [
+                        "low",
+                        "medium",
+                        "high",
+                        "very-high"
+                    ]
+                },
+                "status": {
+                    "description": "Status to give the observable (For example, active, inactive, falsepos)",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "expiration_date": {
+                    "description": "Expiration timestamp to give the observable (in UTC format)",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "fields": {
+                    "description": "JSON formatted string of fields to include with the observable",
+                    "data_type": "string",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "263745273"
+                    ],
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "mal_email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        43
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "false positive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.expiration_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-11-09T14:55:06.097Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"confidence\": 60}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "example_values": [
+                        "Successfully updated observable"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "example_values": [
+                        1
+                    ],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        255050731
+                    ],
+                    "column_order": 0,
+                    "column_name": "Observable ID",
+                    "contains": [
+                        "threatstream intelligence id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.asn",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "green"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Tlp"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.next",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.detail2",
+                    "data_type": "string",
+                    "example_values": [
+                        "imported by user 136"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.previous",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "medium"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Severity"
+                },
+                {
+                    "data_path": "action_result.data.*.rdns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "dxd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.tlp",
+                    "data_type": "string",
+                    "example_values": [
+                        "red"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.org_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        67
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.remote_api",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1234"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.source_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Customer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "6ae8e41a-6fa1-43fb-bd08-02c1babf7fa0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.itype",
+                    "data_type": "string",
+                    "example_values": [
+                        "apt_email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Indicator Type"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "55test@test.com"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Value"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.source.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ],
+                    "column_order": 3,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.feed_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.update_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        539165917
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37
+                    ],
+                    "column_order": 4,
+                    "column_name": "Confidence"
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-10T11:48:12.678"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remote_api",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-12T11:02:35.625"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "apt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threatscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        28
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_anonymous",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-11-09T14:55:06.097Z"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Expired Timestamp"
+                },
+                {
+                    "data_path": "action_result.data.*.import_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source_modified",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.import_session_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.retina_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner_organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        67
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_reported_confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 10,
+                "title": "Observable Info"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "create investigation",
             "read_only": false,
             "description": "Create an investigation in ThreatStream",
@@ -25032,7 +25671,7 @@
                         "high",
                         "very high"
                     ],
-                    "description": "Priority assigned to the investigation.",
+                    "description": "Priority assigned to the investigation",
                     "data_type": "string",
                     "order": 1
                 },
@@ -25186,7 +25825,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25227,7 +25866,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string",
                     "contains": [
@@ -25267,9 +25906,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25292,7 +25928,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25511,7 +26147,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25549,7 +26185,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string",
                     "contains": [
@@ -25589,9 +26225,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25611,7 +26244,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25860,7 +26493,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -25904,7 +26537,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string",
                     "contains": [
@@ -25944,9 +26577,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -25969,7 +26599,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -26172,7 +26802,7 @@
                     "data_type": "string"
                 },
                 {
-                    "column_name": "investigation ID",
+                    "column_name": "Investigation ID",
                     "data_path": "action_result.data.*.id",
                     "example_values": [
                         0
@@ -26227,7 +26857,7 @@
                 {
                     "data_path": "action_result.data.*.owner_org.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
@@ -26269,7 +26899,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.email",
                     "example_values": [
-                        "user@phantom.us"
+                        "user@test.us"
                     ],
                     "data_type": "string",
                     "contains": [
@@ -26309,9 +26939,6 @@
                 },
                 {
                     "data_path": "action_result.data.*.reporter.name",
-                    "example_values": [
-                        ""
-                    ],
                     "data_type": "string"
                 },
                 {
@@ -26334,7 +26961,7 @@
                 {
                     "data_path": "action_result.data.*.reporter.organization.name",
                     "example_values": [
-                        "phantom.us"
+                        "test.us"
                     ],
                     "data_type": "string"
                 },
