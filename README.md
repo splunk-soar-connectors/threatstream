@@ -2,7 +2,7 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3\.3\.2  
+Connector Version: 3\.4\.3  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): "\.\*"  
@@ -38,8 +38,7 @@ Integrates a variety of generic, reputation, and investigative actions from the 
           
 
         -   Import domain observable - **source** parameter has been added
-        -   Import URL observable - **source, allow_unresolved** parameters have been
-            added
+        -   Import URL observable - **source, allow_unresolved** parameters have been added
         -   Import IP observable - **source** parameter has been added
         -   Import file observable - **source** parameter has been added
         -   Import email observable - **source** parameter has been added
@@ -269,11 +268,14 @@ import_observables actions (To be given as input when with_approval parameter is
 behave according to the API behavior.
 
 ## Port Information
-The app uses HTTP/HTTPS protocol for communicating with the ThreatStream Server. Below are the default ports used by Splunk SOAR.
-SERVICE NAME | TRANSPORT PROTOCOL | PORT
------------- | ------------------ | ----
-**http** | tcp | 80
-**https** | tcp | 443
+
+The app uses HTTP/HTTPS protocol for communicating with the ThreatStream Server. Below are the
+default ports used by Splunk SOAR.
+
+| Service Name | Transport Protocol | Port |
+|--------------|--------------------|------|
+| http         | tcp                | 80   |
+| https        | tcp                | 443  |
 
 ## ipwhois
 
@@ -359,6 +361,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [delete threat bulletin](#action-delete-threat-bulletin) - Delete threat bulletin in ThreatStream by ID  
 [delete vulnerability](#action-delete-vulnerability) - Delete vulnerability in ThreatStream by ID  
 [delete actor](#action-delete-actor) - Delete actor in ThreatStream by ID number  
+[update observable](#action-update-observable) - Update an observable in ThreatStream  
 [create investigation](#action-create-investigation) - Create an investigation in ThreatStream  
 [list investigations](#action-list-investigations) - List investigations present in ThreatStream  
 [get investigation](#action-get-investigation) - Retrieve investigation present in Threatstream by ID  
@@ -1557,6 +1560,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **domain** |  required  | Value of domain | string |  `domain` 
 **indicator\_type** |  required  | Type of observable to import | string | 
+**source** |  optional  | Source of observable to import \(It will only be reflected on UI when observable is imported without approval\) | string | 
 **classification** |  optional  | Designate classification for observable | string | 
 **severity** |  optional  | Severity of the observable | string | 
 **tags** |  optional  | Comma\-separated list of tags to associate with this Observable | string |  `threatstream tags` 
@@ -1570,6 +1574,7 @@ DATA PATH | TYPE | CONTAINS
 action\_result\.status | string | 
 action\_result\.parameter\.allow\_unresolved | boolean | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.domain | string |  `domain` 
 action\_result\.parameter\.indicator\_type | string | 
@@ -1599,16 +1604,20 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **url** |  required  | Value of URL | string |  `url` 
 **indicator\_type** |  required  | Type of observable to import | string | 
+**source** |  optional  | Source of observable to import \(It will only be reflected on UI when observable is imported without approval\) | string | 
 **classification** |  optional  | Designate classification for observable | string | 
 **severity** |  optional  | Severity of the observable | string | 
 **tags** |  optional  | Comma\-separated list of tags to associate with this Observable | string |  `threatstream tags` 
 **create\_on\_cloud** |  optional  | Create on remote \(cloud\)? \(applicable only for hybrid on\-prem instances\) | boolean | 
 **with\_approval** |  optional  | Import the observable with approvals | boolean | 
+**allow\_unresolved** |  optional  | Unresolved urls will be imported if set to true | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.parameter\.allow\_unresolved | boolean | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.classification | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.indicator\_type | string | 
@@ -1633,8 +1642,9 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**ip\_address** |  required  | Value of IP | string |  `ip` 
+**ip\_address** |  required  | Value of IP | string |  `ip`  `ipv6` 
 **indicator\_type** |  required  | Type of observable to import | string | 
+**source** |  optional  | Source of observable to import \(It will only be reflected on UI when observable is imported without approval\) | string | 
 **classification** |  optional  | Designate classification for observable | string | 
 **severity** |  optional  | Severity of the observable | string | 
 **tags** |  optional  | Comma\-separated list of tags to associate with this Observable | string |  `threatstream tags` 
@@ -1646,9 +1656,10 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.indicator\_type | string | 
-action\_result\.parameter\.ip\_address | string |  `ip` 
+action\_result\.parameter\.ip\_address | string |  `ip`  `ipv6` 
 action\_result\.parameter\.severity | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.with\_approval | boolean | 
@@ -1671,6 +1682,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **file\_hash** |  required  | Hash value of file | string |  `sha1`  `sha256`  `md5`  `hash` 
 **indicator\_type** |  required  | Type of observable to import | string | 
+**source** |  optional  | Source of observable to import \(It will only be reflected on UI when observable is imported without approval\) | string | 
 **confidence** |  required  | Confidence level | numeric | 
 **classification** |  optional  | Designate classification for observable | string | 
 **severity** |  optional  | Severity of the observable | string | 
@@ -1683,6 +1695,7 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.confidence | numeric | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.file\_hash | string |  `sha1`  `sha256`  `md5`  `hash` 
@@ -1712,6 +1725,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **email** |  required  | Value of email | string |  `email` 
 **indicator\_type** |  required  | Type of observable to import | string | 
+**source** |  optional  | Source of observable to import \(It will only be reflected on UI when observable is imported without approval\) | string | 
 **confidence** |  required  | Confidence level | numeric | 
 **classification** |  optional  | Designate classification for observable | string | 
 **severity** |  optional  | Severity of the observable | string | 
@@ -1724,6 +1738,7 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.confidence | numeric | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.email | string |  `email` 
@@ -1746,7 +1761,7 @@ Import observables into ThreatStream
 Type: **generic**  
 Read only: **False**
 
-<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter \(e\.g \- \{"itype"\: "&lt;indicator\_type&gt;"\}\) whereas, for importing observables with approval, the user must provide threat type in the field parameter \(e\.g \- \{"threat\_type"\: "&lt;threat\_type&gt;"\}\)\.</li><li>The "allow\_unresolved" parameter will be passed in the API call if the "value" parameter is set to "domain" and "with\_approval" parameter is set to "False"\.</li><li>The possible values of indicator type \(itype\) and threat\_type are listed at the starting of the documentation\. If the input contains any indicator type \(itype\) or threat\_type value except the ones listed, the action will behave according to the API behavior\.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter \(e\.g \- \{"itype"\: "&lt;indicator\_type&gt;", "confidence"\: &lt;confidence\_value&gt;\}\)\.</li><li>If both the "itype" and "threat\_type" values are passed in the "fields" parameter when "with\_approval" is set to "True", the action will behave according to the API behavior\.</li></ul>
+<ul><li>For importing observables without approval, the user must provide indicator type in the field parameter \(e\.g \- \{"itype"\: "&lt;indicator\_type&gt;"\}\) whereas, for importing observables with approval, the user must provide threat type in the field parameter \(e\.g \- \{"threat\_type"\: "&lt;threat\_type&gt;"\}\)\.</li><li>The "allow\_unresolved" parameter will be passed in the API call if the "value" parameter is set to "domain" or "url" and "with\_approval" parameter is set to "False"\.</li><li>The possible values of indicator type \(itype\) and threat\_type are listed at the starting of the documentation\. If the input contains any indicator type \(itype\) or threat\_type value except the ones listed, the action will behave according to the API behavior\.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter \(e\.g \- \{"itype"\: "&lt;indicator\_type&gt;", "confidence"\: &lt;confidence\_value&gt;\}\)\.</li><li>If both the "itype" and "threat\_type" values are passed in the "fields" parameter when "with\_approval" is set to "True", the action will behave according to the API behavior\.</li></ul>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -1844,12 +1859,18 @@ Detonate file in ThreatStream
 Type: **generic**  
 Read only: **False**
 
+If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **platform** |  optional  | Which platform to run the detonation on \- Ex\: WINDOWS10x64\. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform | string | 
 **vault\_id** |  required  | Vault id of file to be detonated | string |  `vault id`  `sha1` 
 **classification** |  required  | Classification of the sandbox submission \- private or public | string | 
+**use\_premium\_sandbox** |  optional  | Specify whether the premium sandbox should be used for detonation \- true or false\. If you want to use the Joe Sandbox service for detonation, set this attribute to true | boolean | 
+**use\_vmray\_sandbox** |  optional  | Specify whether the vmray sandbox should be used for detonation \- true or false\. If you want to use the VMRay sandbox service for detonation, set this attribute to true | boolean | 
+**vmray\_max\_jobs** |  optional  | Specify the number of detonations you want VMRay to perform for the submission | numeric | 
+**fields** |  optional  | JSON formatted string of additional fields to be included in the detonate file action\. e\.g\. \{"file\_has\_password"\:"true","file\_password"\:"abc123"\}\. Please check the API doc to find more information on other valid fields | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -1858,6 +1879,10 @@ action\_result\.status | string |
 action\_result\.parameter\.classification | string | 
 action\_result\.parameter\.platform | string | 
 action\_result\.parameter\.vault\_id | string |  `vault id`  `sha1` 
+action\_result\.parameter\.use\_premium\_sandbox | boolean | 
+action\_result\.parameter\.use\_vmray\_sandbox | boolean | 
+action\_result\.parameter\.vmray\_max\_jobs | numeric | 
+action\_result\.parameter\.fields | string | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.reports\.ANDROID4\.4\.detail | string | 
 action\_result\.data\.\*\.reports\.ANDROID4\.4\.status | string | 
@@ -1897,12 +1922,18 @@ Detonate URL in ThreatStream
 Type: **generic**  
 Read only: **False**
 
+If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **platform** |  optional  | Which platform to run the detonation on \- Ex\: WINDOWS10x64\. Default is 'WINDOWS7' which will run the detonation on 'WINDOWS7' platform | string | 
 **url** |  required  | URL to be detonated | string |  `url` 
 **classification** |  required  | Classification of the sandbox submission \- private or public | string | 
+**use\_premium\_sandbox** |  optional  | Specify whether the premium sandbox should be used for detonation \- true or false\. If you want to use the Joe Sandbox service for detonation, set this attribute to true | boolean | 
+**use\_vmray\_sandbox** |  optional  | Specify whether the vmray sandbox should be used for detonation \- true or false\. If you want to use the VMRay sandbox service for detonation, set this attribute to true | boolean | 
+**vmray\_max\_jobs** |  optional  | Specify the number of detonations you want VMRay to perform for the submission | numeric | 
+**fields** |  optional  | JSON formatted string of additional fields to be included in the detonate url action\. e\.g\. \{"import\_indicators"\:"true","report\_radio\-notes"\:"Credential\-Exposure,compromised\_email"\}\. Please check the API doc to find more infomation on other valid fields | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
@@ -1911,6 +1942,10 @@ action\_result\.status | string |
 action\_result\.parameter\.classification | string | 
 action\_result\.parameter\.platform | string | 
 action\_result\.parameter\.url | string |  `url` 
+action\_result\.parameter\.use\_premium\_sandbox | boolean | 
+action\_result\.parameter\.use\_vmray\_sandbox | boolean | 
+action\_result\.parameter\.vmray\_max\_jobs | numeric | 
+action\_result\.parameter\.fields | string | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.reports\.WINDOWS7\.detail | string | 
 action\_result\.data\.\*\.reports\.WINDOWS7\.id | numeric | 
@@ -2328,7 +2363,7 @@ This action updates the fields of the provided item id
 Type: **generic**  
 Read only: **False**
 
-If 'null' is provided in the expire time parameter, then expiration time will be set to '9999\-12\-31T00\:00\:00'\.</li></ul>
+If "null" is provided in the expire time parameter, then expiration time will be set to "9999\-12\-31T00\:00\:00"\.</li></ul>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -4531,6 +4566,90 @@ action\_result\.message | string |
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
+## action: 'update observable'
+Update an observable in ThreatStream
+
+Type: **generic**  
+Read only: **False**
+
+If any of the indicator\_type, confidence, tlp, severity, status, or expiration\_date parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered\.
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**id** |  required  | ID of the observable | string |  `threatstream intelligence id` 
+**indicator\_type** |  optional  | Indicator type to give the observable | string | 
+**confidence** |  optional  | Confidence to give the observable | numeric | 
+**tlp** |  optional  | Tlp to give the observable | string | 
+**severity** |  optional  | Severity to give the observable | string | 
+**status** |  optional  | Status to give the observable \(For example, active, inactive, falsepos\) | string | 
+**expiration\_date** |  optional  | Expiration timestamp to give the observable \(in UTC format\) | string | 
+**fields** |  optional  | JSON formatted string of fields to include with the observable | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.status | string | 
+action\_result\.parameter\.id | string |  `threatstream intelligence id` 
+action\_result\.parameter\.indicator\_type | string | 
+action\_result\.parameter\.confidence | numeric | 
+action\_result\.parameter\.tlp | string | 
+action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.status | string | 
+action\_result\.parameter\.expiration\_date | string | 
+action\_result\.parameter\.fields | string | 
+action\_result\.message | string | 
+action\_result\.summary | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric | 
+action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
+action\_result\.data\.\*\.ip | string | 
+action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.org | string | 
+action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.meta\.next | string | 
+action\_result\.data\.\*\.meta\.detail2 | string | 
+action\_result\.data\.\*\.meta\.previous | string | 
+action\_result\.data\.\*\.meta\.severity | string | 
+action\_result\.data\.\*\.rdns | string | 
+action\_result\.data\.\*\.tags\.\*\.id | string | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
+action\_result\.data\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | numeric | 
+action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.source\_user | string | 
+action\_result\.data\.\*\.type | string | 
+action\_result\.data\.\*\.uuid | string | 
+action\_result\.data\.\*\.itype | string | 
+action\_result\.data\.\*\.value | string | 
+action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.country | string | 
+action\_result\.data\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.subtype | string | 
+action\_result\.data\.\*\.latitude | string | 
+action\_result\.data\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.longitude | string | 
+action\_result\.data\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.confidence | numeric | 
+action\_result\.data\.\*\.created\_by | string | 
+action\_result\.data\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.threat\_type | string | 
+action\_result\.data\.\*\.threatscore | numeric | 
+action\_result\.data\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.expiration\_ts | string | 
+action\_result\.data\.\*\.import\_source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.retina\_confidence | numeric | 
+action\_result\.data\.\*\.owner\_organization\_id | numeric | 
+action\_result\.data\.\*\.source\_reported\_confidence | numeric |   
+
 ## action: 'create investigation'
 Create an investigation in ThreatStream
 
@@ -4541,7 +4660,7 @@ Read only: **False**
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **name** |  required  | Name to give the investigation | string | 
-**priority** |  required  | Priority assigned to the investigation\. | string | 
+**priority** |  required  | Priority assigned to the investigation | string | 
 **fields** |  optional  | JSON formatted string of fields to include with the investigation | string | 
 **create\_on\_cloud** |  optional  | Create on remote \(cloud\)? \(applicable only for hybrid on\-prem instances\) | boolean | 
 
