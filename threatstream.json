@@ -56,10 +56,6 @@
                 "input_file": "wheels/shared/python_dateutil-2.8.1-py2.py3-none-any.whl"
             },
             {
-                "module": "pythonwhois",
-                "input_file": "wheels/py3/pythonwhois-2.4.3-py3-none-any.whl"
-            },
-            {
                 "module": "pytz",
                 "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
             },
@@ -82,6 +78,10 @@
             {
                 "module": "urllib3",
                 "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "wizard_whois",
+                "input_file": "wheels/shared/wizard_whois-2.5.9-py2.py3-none-any.whl"
             }
         ]
     },
@@ -27179,10 +27179,6 @@
                 "input_file": "wheels/shared/python_dateutil-2.8.1-py2.py3-none-any.whl"
             },
             {
-                "module": "pythonwhois",
-                "input_file": "wheels/py3/pythonwhois-2.4.3-py3-none-any.whl"
-            },
-            {
                 "module": "pytz",
                 "input_file": "wheels/shared/pytz-2021.1-py2.py3-none-any.whl"
             },
@@ -27205,6 +27201,10 @@
             {
                 "module": "urllib3",
                 "input_file": "wheels/shared/urllib3-1.26.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "wizard_whois",
+                "input_file": "wheels/shared/wizard_whois-2.5.9-py2.py3-none-any.whl"
             }
         ]
     }
