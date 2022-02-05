@@ -2,11 +2,11 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3\.4\.3  
+Connector Version: 3\.4\.4  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 
@@ -282,10 +282,10 @@ default ports used by Splunk SOAR.
 This app uses the ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019
 Philip Hane.
 
-## pythonwhois
+## wizard-whois
 
-This app uses the pythonwhois module, which is licensed under the WTFPL License, Copyright (c) 2014
-Sven Slootweg.
+This app uses the wizard-whois module, which is licensed under the MIT License, Copyright (c)
+Michael Ramsey.
 
 ## dnspython
 

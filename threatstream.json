@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.4.3",
+    "app_version": "3.4.4",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, February 2022"
