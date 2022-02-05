@@ -30,12 +30,12 @@ import phantom.rules as phrules
 import pytz
 import requests
 import simplejson as json
+import wizard_whois
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
 
-import pythonwhois
 from ipwhois import IPWhois
 # Local imports
 from threatstream_consts import *
@@ -488,7 +488,7 @@ class ThreatstreamConnector(BaseConnector):
 
         # This fix for hanging issue of japanese domain
         if value.endswith("jp"):
-            whois_response = pythonwhois.get_whois(value)
+            whois_response = wizard_whois.get_whois(value)
         else:
             payload = self._generate_payload()
             whois = ENDPOINT_WHOIS.format(ioc_value=value)
@@ -501,7 +501,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, WHOIS_NO_DATA)
 
             try:
-                whois_response = pythonwhois.parse.parse_raw_whois([resp_json['data']], True)
+                whois_response = wizard_whois.parse.parse_raw_whois([resp_json['data']], True)
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR,
                     THREATSTREAM_ERR_FETCH_REPLY.format(error=self._get_error_message_from_exception(e)))

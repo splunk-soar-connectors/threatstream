@@ -119,7 +119,7 @@ and limitations under the License.
                                 <th>PCAP</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             <tr>
                                 <td>{{ data.info.category }}</td>
                                 <td>{{ data.info.started }}</td>
@@ -146,8 +146,8 @@ and limitations under the License.
                                 <th>URL</th>
                             </tr>
                         </thead>
-                        <tbody> 
-                            {% for screenshot in data.screenshots %}   
+                        <tbody>
+                            {% for screenshot in data.screenshots %}
                                 <tr>
                                     <td>{{ screenshot }}</td>
                                 </tr>
@@ -173,8 +173,8 @@ and limitations under the License.
                                 <th>SHA1</th>
                             </tr>
                         </thead>
-                        <tbody> 
-                            {% for file in data.dropped %}   
+                        <tbody>
+                            {% for file in data.dropped %}
                                 <tr>
                                     <td>{{ file.name }}</td>
                                     <td>{{ file.size }}</td>
@@ -201,8 +201,8 @@ and limitations under the License.
                                 <th>Count</th>
                             </tr>
                         </thead>
-                        <tbody> 
-                            {% for process in data.processes %}   
+                        <tbody>
+                            {% for process in data.processes %}
                                 <tr>
                                     <td>{{ process.process_name }}</td>
                                     <td>{{ process.process_count }}</td>
@@ -221,13 +221,13 @@ and limitations under the License.
                                 <th>Files</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             {% if not data.behavior_files %}
                                 <tr>
                                     <td>No file found</td>
                                 </tr>
                             {% else %}
-                                {% for file in data.behavior_files %}   
+                                {% for file in data.behavior_files %}
                                     <tr>
                                         <td>{{ file }}</td>
                                     </tr>
@@ -241,13 +241,13 @@ and limitations under the License.
                                 <th>Keys</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             {% if not data.behavior_keys %}
                                 <tr>
                                     <td>No key found</td>
                                 </tr>
                             {% else %}
-                                {% for key in data.behavior_keys %}   
+                                {% for key in data.behavior_keys %}
                                     <tr>
                                         <td>{{ key }}</td>
                                     </tr>
@@ -261,13 +261,13 @@ and limitations under the License.
                                 <th>Mutexes</th>
                             </tr>
                         </thead>
-                        <tbody> 
+                        <tbody>
                             {% if not data.behavior_mutexes %}
                                 <tr>
                                     <td>No mutex found</td>
                                 </tr>
                             {% else %}
-                                {% for mutex in data.behavior_mutexes %}   
+                                {% for mutex in data.behavior_mutexes %}
                                     <tr>
                                         <td>{{ mutex }}</td>
                                     </tr>
