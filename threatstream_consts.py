@@ -14,7 +14,7 @@
 # and limitations under the License.
 DEFAULT_MAX_RESULTS = 1000
 THREATSTREAM_JSON_USERNAME = "username"
-THREATSTREAM_JSON_API_KEY = "api_key"
+THREATSTREAM_JSON_API_KEY = "api_key"  # pragma: allowlist secret
 THREATSTREAM_JSON_HASH = "hash"
 THREATSTREAM_JSON_DOMAIN = "domain"
 THREATSTREAM_JSON_IP = "ip"
