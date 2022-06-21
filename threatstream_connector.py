@@ -485,11 +485,17 @@ class ThreatstreamConnector(BaseConnector):
 
     def _whois(self, value, action_result, tipe=""):
         final_response = dict()
+        whois_response = None
 
         # This fix for hanging issue of japanese domain
         if value.endswith("jp"):
-            whois_response = wizard_whois.get_whois(value)
-        else:
+            try:
+                whois_response = wizard_whois.get_whois(value)
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                self.debug_print("Error occurred while handling Japanese domain. {}".format(error_msg))
+
+        if not whois_response:
             payload = self._generate_payload()
             whois = ENDPOINT_WHOIS.format(ioc_value=value)
 
