@@ -2973,6 +2973,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated threat bulletin")
 
     def _handle_delete_threat_bulletin(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3047,6 +3048,7 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_associations(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -3563,7 +3565,7 @@ class ThreatstreamConnector(BaseConnector):
                 "Processing": "processing,approving,rejecting"
             }
 
-            status = param["status"]
+            status = param.get("status")
 
             payload["status"] = status_map[status]
 
