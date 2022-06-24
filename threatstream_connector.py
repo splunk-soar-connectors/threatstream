@@ -327,6 +327,15 @@ class ThreatstreamConnector(BaseConnector):
                     verify=self._verify,
                     files=files,
                     timeout=DEFAULT_TIMEOUT)
+            except requests.exceptions.InvalidSchema:
+                err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
+            except requests.exceptions.InvalidURL:
+                err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
+            except requests.exceptions.ConnectionError:
+                err_msg = 'Error details: connection refused from the server {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
@@ -342,6 +351,15 @@ class ThreatstreamConnector(BaseConnector):
                     verify=self._verify,
                     files=files,
                     timeout=DEFAULT_TIMEOUT)
+            except requests.exceptions.InvalidSchema:
+                err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
+            except requests.exceptions.InvalidURL:
+                err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
+            except requests.exceptions.ConnectionError:
+                err_msg = 'Error details: connection refused from the server {}'.format(url)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(
@@ -433,7 +451,7 @@ class ThreatstreamConnector(BaseConnector):
 
         payload = self._generate_payload(type=ioc_type, value=value)
 
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INISGHT, payload)
+        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INSIGHT, payload)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error retrieving insights")
 
@@ -596,6 +614,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "")
 
     def _file_reputation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_HASH]
         extend_source = param.get("extend_source", False)
@@ -621,6 +641,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on File")
 
     def _domain_reputation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_DOMAIN]
 
@@ -639,6 +661,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Domain")
 
     def _ip_reputation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
         ioc_type = "ip"
@@ -653,6 +677,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on IP")
 
     def _url_reputation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_URL]
         extend_source = param.get("extend_source", False)
@@ -668,6 +694,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on URL")
 
     def _email_reputation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         value = param[THREATSTREAM_JSON_EMAIL]
@@ -686,6 +714,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved information on Email")
 
     def _whois_domain(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_DOMAIN]
         ret_val = self._whois(value, action_result, tipe="domain")
@@ -694,6 +724,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.get_status()
 
     def _whois_ip(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
         ret_val = self._whois(value, action_result, tipe="ip")
@@ -731,7 +763,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return items_list
 
-    def _handle_list_observable(self, param):
+    def _handle_list_observables(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -755,7 +787,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_vulnerability(self, param):
+    def _handle_list_vulnerabilities(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -814,12 +846,9 @@ class ThreatstreamConnector(BaseConnector):
         if not payload:
             payload = self._generate_payload()
         if param and param.get("incident_id"):
-            try:
-                incident_id = int(param["incident_id"])
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'incident id' parameter"), None
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e))), None
+            ret_val, incident_id = self._validate_integer(action_result, param["incident_id"], THREATSTREAM_INCIDENT_ID)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
@@ -899,12 +928,9 @@ class ThreatstreamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            intelligence_id = int(param["intelligence_id"])
-        except ValueError:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'intelligence id' parameter")
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
+        ret_val, intelligence_id = self._validate_integer(action_result, param["intelligence_id"], THREATSTREAM_INTELLIGENCE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         payload = self._generate_payload(id=intelligence_id)
 
@@ -923,12 +949,9 @@ class ThreatstreamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            vulnerability_id = int(param["vulnerability_id"])
-        except ValueError:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'vulnerability id' parameter")
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
+        ret_val, vulnerability_id = self._validate_integer(action_result, param["vulnerability_id"], THREATSTREAM_VULNERABILITY_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         payload = self._generate_payload()
 
@@ -952,12 +975,9 @@ class ThreatstreamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            incident_id = int(param["incident_id"])
-        except ValueError:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'incident id' parameter")
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
+        ret_val, incident_id = self._validate_integer(action_result, param["incident_id"], THREATSTREAM_INCIDENT_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         payload = self._generate_payload()
 
@@ -1125,12 +1145,9 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         message = None
-        try:
-            incident_id = int(param["incident_id"])
-        except ValueError:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'incident id' parameter")
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
+        ret_val, incident_id = self._validate_integer(action_result, param["incident_id"], THREATSTREAM_INCIDENT_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not (param.get("local_intelligence") or param.get("cloud_intelligence")) and not param.get("fields"):
             return action_result.set_status(
@@ -1681,7 +1698,7 @@ class ThreatstreamConnector(BaseConnector):
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_import_ioc(self, param):
+    def _handle_import_observables(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1689,16 +1706,14 @@ class ThreatstreamConnector(BaseConnector):
         self.import_support(param, action_result)
         return action_result.get_status()
 
-    def _handle_tag_ioc(self, param):
+    def _handle_tag_observable(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
-        try:
-            intelligence_id = int(param["id"])
-        except ValueError:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer in 'intelligence id' parameter")
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error: {}".format(self._get_error_message_from_exception(e)))
+
+        ret_val, intelligence_id = self._validate_integer(action_result, param["id"], THREATSTREAM_INTELLIGENCE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         org_id = config.get("organization_id", None)
         if org_id is None:
@@ -1740,6 +1755,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully tagged observable")
 
     def _handle_get_status(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
         endpoint = param.get("endpoint")
@@ -1752,6 +1769,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved detonation status")
 
     def _handle_get_report(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
         endpoint = param.get("endpoint")
@@ -1789,6 +1808,7 @@ class ThreatstreamConnector(BaseConnector):
         return data
 
     def _handle_detonate_file(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1873,6 +1893,7 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
 
     def _handle_detonate_url(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1930,6 +1951,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated URL")
 
     def _handle_get_pcap(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         payload = self._generate_payload()
@@ -2256,6 +2279,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 
     def _handle_import_session_search(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -2292,6 +2317,7 @@ class ThreatstreamConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _handle_import_session_update(self, param):  # noqa
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2455,6 +2481,7 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, ". ".join(messages))
 
     def _handle_threat_model_search(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -2543,6 +2570,7 @@ class ThreatstreamConnector(BaseConnector):
         return data
 
     def _handle_create_threat_bulletin(self, param):  # noqa
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         comments = param.get('comments')
@@ -2721,6 +2749,7 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_update_threat_bulletin(self, param):  # noqa
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2976,6 +3005,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted threat bulletin")
 
     def _handle_list_threat_bulletins(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -3186,11 +3217,13 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated associations")
 
     def _handle_add_association(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         endpoint = ENDPOINT_ADD_ASSOCIATION
         return self._handle_association(param, endpoint)
 
     def _handle_remove_association(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         endpoint = ENDPOINT_REMOVE_ASSOCIATION
         return self._handle_association(param, endpoint)
@@ -3296,6 +3329,8 @@ class ThreatstreamConnector(BaseConnector):
         return phantom.APP_SUCCESS, resp_json
 
     def _handle_create_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         create_on_cloud = param.get("create_on_cloud", False)
 
@@ -3353,6 +3388,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_update_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, rule_id = self._validate_integer(action_result, param["rule_id"], THREATSTREAM_RULE_ID)
@@ -3393,6 +3430,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_list_rules(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -3415,6 +3454,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_delete_rule(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, rule_id = self._validate_integer(action_result, param["rule_id"], THREATSTREAM_RULE_ID)
@@ -3446,6 +3487,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted rule")
 
     def _handle_list_actors(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -3466,6 +3509,8 @@ class ThreatstreamConnector(BaseConnector):
         summary['actors_returned'] = action_result.get_data_size()
 
     def _handle_delete_actor(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, actor_id = self._validate_integer(action_result, param["actor_id"], THREATSTREAM_ACTOR_ID)
@@ -3496,7 +3541,9 @@ class ThreatstreamConnector(BaseConnector):
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted actor")
 
-    def _handle_list_import(self, param):
+    def _handle_list_imports(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -4071,12 +4118,16 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated {}".format(entity_type))
 
     def _handle_create_vulnerability(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self._create_threat_model(action_result, param, ENDPOINT_VULNERABILITY, "vulnerability")
         return action_result.get_status()
 
     def _handle_update_vulnerability(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, vulnerability_id = self._validate_integer(action_result, param["id"], THREATSTREAM_ID)
@@ -4088,6 +4139,7 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.get_status()
 
     def _handle_delete_vulnerability(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -4123,12 +4175,16 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted vulnerability")
 
     def _handle_create_actor(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self._create_threat_model(action_result, param, ENDPOINT_ACTOR, "actor")
         return action_result.get_status()
 
     def _handle_update_actor(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, actor_id = self._validate_integer(action_result, param["id"], THREATSTREAM_ID)
@@ -4139,6 +4195,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.get_status()
 
     def _handle_update_observable(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, observable_id = self._validate_integer(action_result, param["id"], THREATSTREAM_ID)
@@ -4210,6 +4268,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated observable")
 
     def _handle_create_investigation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         name = param['name']
@@ -4247,6 +4307,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, 'Successfully created investigation')
 
     def _handle_list_investigations(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
@@ -4268,6 +4330,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_investigation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
 
@@ -4295,6 +4359,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved investigation')
 
     def _handle_update_investigation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, investigation_id = self._validate_integer(
@@ -4332,6 +4398,8 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated investigation')
 
     def _handle_delete_investigation(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ret_val, investigation_id = self._validate_integer(
@@ -4384,9 +4452,9 @@ class ThreatstreamConnector(BaseConnector):
         elif action == self.ACTION_ID_LIST_INCIDENTS:
             ret_val = self._handle_list_incidents(param)
         elif action == self.ACTION_ID_LIST_VULNERABILITY:
-            ret_val = self._handle_list_vulnerability(param)
+            ret_val = self._handle_list_vulnerabilities(param)
         elif action == self.ACTION_ID_LIST_OBSERVABLE:
-            ret_val = self._handle_list_observable(param)
+            ret_val = self._handle_list_observables(param)
         elif action == self.ACTION_ID_GET_INCIDENT:
             ret_val = self._handle_get_incident(param)
         elif action == self.ACTION_ID_GET_VULNERABILITY:
@@ -4400,7 +4468,7 @@ class ThreatstreamConnector(BaseConnector):
         elif action == self.ACTION_ID_UPDATE_INCIDENT:
             ret_val = self._handle_update_incident(param)
         elif action == self.ACTION_ID_IMPORT_IOC:
-            ret_val = self._handle_import_ioc(param)
+            ret_val = self._handle_import_observables(param)
         elif action == self.ACTION_ID_IMPORT_EMAIL_OBSERVABLES:
             ret_val = self._handle_import_email_observable(param)
         elif action == self.ACTION_ID_IMPORT_FILE_OBSERVABLES:
@@ -4426,7 +4494,7 @@ class ThreatstreamConnector(BaseConnector):
         elif action == self.ACTION_ID_GET_PCAP:
             ret_val = self._handle_get_pcap(param)
         elif action == self.ACTION_ID_TAG_IOC:
-            ret_val = self._handle_tag_ioc(param)
+            ret_val = self._handle_tag_observable(param)
         elif action == self.ACTION_IMPORT_SESSION_SEARCH:
             ret_val = self._handle_import_session_search(param)
         elif action == self.ACTION_IMPORT_SESSION_UPDATE:
@@ -4458,7 +4526,7 @@ class ThreatstreamConnector(BaseConnector):
         elif action == self.ACTION_LIST_ACTORS:
             ret_val = self._handle_list_actors(param)
         elif action == self.ACTION_LIST_IMPORT:
-            ret_val = self._handle_list_import(param)
+            ret_val = self._handle_list_imports(param)
         elif action == self.ACTION_CREATE_VULNERABILITY:
             ret_val = self._handle_create_vulnerability(param)
         elif action == self.ACTION_UPDATE_VULNERABILITY:
