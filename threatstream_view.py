@@ -115,7 +115,7 @@ def display_view(provides, all_app_runs, context):
     if provides == "get report":
         ret_val = 'threatstream_get_report.html'
 
-    if provides == "import session update":
+    if provides == "update import session":
         ret_val = 'threatstream_get_import_session.html'
 
     if provides in ["add association", "remove association"]:
