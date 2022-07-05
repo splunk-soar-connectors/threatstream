@@ -71,7 +71,18 @@ ENDPOINT_IMPORT = '/v1/import'
 ENDPOINT_INVESTIGATION = '/v1/investigation/'
 ENDPOINT_SINGLE_INVESTIGATION = '/v1/investigation/{}/'
 
+# Value lists
+THREATSTREAM_PUBLICATION_STATUS = ["new", "published", "reviewed", "pending_review", "review_requested"]
+THREATSTREAM_CLASSIFICATION = ["public", "private"]
+THREATSTREAM_SEVERITY = ["low", "medium", "high", "very-high"]
+THREATSTREAM_TLP = ["white", "green", "amber", "red"]
+THREATSTREAM_BODY_CONTENT_TYPE = ["markdown", "richtext"]
+THREATSTREAM_STATUS = ["Approved", "Ready To Review", "Errors", "Rejected", "Processing"]
+THREATSTREAM_PRIORITY = ["very low", "low", "medium", "high", "very high"]
+THREATSTREAM_OBSERVABLE_TYPE = ["ip", "domain", "url", "email", "hash"]
+
 # Error and status messages
+THREATSTREAM_INVALID_SELECTION = "Invalid '{0}' entered. Must be one of: {1}."
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
 THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from the server: {error}"

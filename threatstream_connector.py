@@ -1469,17 +1469,29 @@ class ThreatstreamConnector(BaseConnector):
 
         if action_name == self.ACTION_ID_IMPORT_IOC:
             value = param["value"]
+
+            if param["classification"] not in THREATSTREAM_CLASSIFICATION:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("classification", ", ".join(THREATSTREAM_CLASSIFICATION))
+                )
             if not with_approval:
+                observable_type = param["observable_type"]
+                if observable_type not in THREATSTREAM_OBSERVABLE_TYPE:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        THREATSTREAM_INVALID_SELECTION.format("observable type", ", ".join(THREATSTREAM_OBSERVABLE_TYPE))
+                    )
                 key = "itype"
                 endpoint = ENDPOINT_IMPORT_IOC
                 method = "patch"
                 use_json = True
-                if param["observable_type"] == "ip":
+                if observable_type == "ip":
                     ob_type = "srcip"
-                elif param["observable_type"] == "hash":
+                elif observable_type == "hash":
                     ob_type = "md5"
                 else:
-                    ob_type = param["observable_type"]
+                    ob_type = observable_type
                 data = {
                     "objects": [
                         {
@@ -1542,6 +1554,18 @@ class ThreatstreamConnector(BaseConnector):
             severity = param.get('severity')
             tags = param.get('tags')
             source = param.get('source')
+
+            if severity and severity not in THREATSTREAM_SEVERITY:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("severity", ", ".join(THREATSTREAM_SEVERITY))
+                )
+
+            if classification and classification not in THREATSTREAM_CLASSIFICATION:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("classification", ", ".join(THREATSTREAM_CLASSIFICATION))
+                )
 
             if not with_approval:
                 endpoint = ENDPOINT_IMPORT_IOC
@@ -1727,11 +1751,18 @@ class ThreatstreamConnector(BaseConnector):
 
         data = {THREATSTREAM_JSON_TAGS: []}
 
+        tlp = param.get('tlp')
+        if tlp and tlp not in THREATSTREAM_TLP:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP))
+            )
+
         for tag in tags:
             data[THREATSTREAM_JSON_TAGS].append({
                 "name": tag,
                 "org_id": org_id,
-                "tlp": param.get('tlp', 'red'),
+                "tlp": tlp,
                 THREATSTREAM_JSON_SOURCE_USER_ID: param[THREATSTREAM_JSON_SOURCE_USER_ID]
             })
 
@@ -2338,6 +2369,12 @@ class ThreatstreamConnector(BaseConnector):
 
         updated = False
 
+        if tlp and tlp not in THREATSTREAM_TLP:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP))
+            )
+
         if (threat_model_type or threat_model_to_associate) and not (threat_model_type and threat_model_to_associate):
             return action_result.set_status(phantom.APP_ERROR,
                                             "Please provide both 'threat_model_type' and 'threat_model_to_associate' parameters")
@@ -2499,6 +2536,11 @@ class ThreatstreamConnector(BaseConnector):
             payload["tags.name"] = param.get("tags_name")
 
         if param.get("publication_status"):
+            if param.get("publication_status") not in THREATSTREAM_PUBLICATION_STATUS:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("publication status", ", ".join(THREATSTREAM_PUBLICATION_STATUS))
+                )
             payload["publication_status"] = param.get("publication_status")
 
         threat_models = self._paginator(ENDPOINT_THREAT_MODEL_SEARCH, action_result, limit=limit, payload=payload)
@@ -2581,6 +2623,20 @@ class ThreatstreamConnector(BaseConnector):
         create_on_cloud = param.get("create_on_cloud", False)
         local_intelligence = param.get("local_intelligence")
         cloud_intelligence = param.get("cloud_intelligence")
+        status = param.get('status')
+        body_content_type = param.get('body_content_type')
+
+        if status and status not in THREATSTREAM_PUBLICATION_STATUS:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                THREATSTREAM_INVALID_SELECTION.format("status", ", ".join(THREATSTREAM_PUBLICATION_STATUS))
+            )
+
+        if body_content_type and body_content_type not in THREATSTREAM_BODY_CONTENT_TYPE:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                THREATSTREAM_INVALID_SELECTION.format("body content type", ", ".join(THREATSTREAM_BODY_CONTENT_TYPE))
+            )
 
         if local_intelligence:
             local_intelligence = self._create_intelligence(action_result, local_intelligence)
@@ -2596,8 +2652,8 @@ class ThreatstreamConnector(BaseConnector):
             "name": param["name"],
             "is_public": param.get("is_public", False),
             "is_anonymous": param.get("is_anonymous", False),
-            "status": param.get('status', "new"),
-            "body_content_type": param.get('body_content_type', "markdown")
+            "status": status,
+            "body_content_type": body_content_type
         }
 
         data = self._build_threatbulletin_data(param, data)
@@ -2781,6 +2837,11 @@ class ThreatstreamConnector(BaseConnector):
         data = self._build_threatbulletin_data(param, data)
 
         if status:
+            if status not in THREATSTREAM_PUBLICATION_STATUS:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("publication status", ", ".join(THREATSTREAM_PUBLICATION_STATUS))
+                )
             data.update({"status": status})
 
         if import_sessions:
@@ -3020,6 +3081,11 @@ class ThreatstreamConnector(BaseConnector):
             payload["name"] = param.get("name")
 
         if param.get("status"):
+            if param.get("status") not in THREATSTREAM_PUBLICATION_STATUS:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("status", ", ".join(THREATSTREAM_PUBLICATION_STATUS))
+                )
             payload["status"] = param.get("status")
 
         if param.get("source"):
@@ -3566,6 +3632,11 @@ class ThreatstreamConnector(BaseConnector):
             }
 
             status = param.get("status")
+            if status not in THREATSTREAM_STATUS:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("status", ", ".join(THREATSTREAM_STATUS))
+                )
 
             payload["status"] = status_map[status]
 
@@ -4246,6 +4317,11 @@ class ThreatstreamConnector(BaseConnector):
             data.update({"tlp": tlp})
 
         if severity:
+            if severity not in THREATSTREAM_SEVERITY:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    THREATSTREAM_INVALID_SELECTION.format("severity", ", ".join(THREATSTREAM_SEVERITY))
+                )
             data.update({"severity": severity})
 
         if confidence or confidence == 0:
@@ -4276,6 +4352,12 @@ class ThreatstreamConnector(BaseConnector):
 
         name = param['name']
         priority = param['priority']
+
+        if priority not in THREATSTREAM_PRIORITY:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                THREATSTREAM_INVALID_SELECTION.format("priority", ", ".join(THREATSTREAM_PRIORITY))
+            )
 
         create_on_cloud = param.get('create_on_cloud', False)
 
