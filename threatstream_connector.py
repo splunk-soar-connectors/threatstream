@@ -31,11 +31,11 @@ import requests
 import simplejson as json
 import wizard_whois
 from bs4 import BeautifulSoup, UnicodeDammit
+from ipwhois import IPWhois
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
 
-from ipwhois import IPWhois
 # Local imports
 from threatstream_consts import *
 
@@ -402,15 +402,16 @@ class ThreatstreamConnector(BaseConnector):
         payload['username'] = config[THREATSTREAM_JSON_USERNAME]
         payload['api_key'] = config[THREATSTREAM_JSON_API_KEY]
 
-        for k, v in list(kwargs.items()):
-            payload[k] = v
+        for k, v in kwargs.items():
+            if v:
+                payload[k] = v
 
         return payload
 
-    def _intel_details(self, value, action_result, limit=None, extend_source=False):
+    def _intel_details(self, action_result, q=None, value=None, limit=None, extend_source=False):
         """ Use the intelligence endpoint to get general details """
 
-        payload = self._generate_payload(extend_source=extend_source, order_by="-created_ts", value=value, limit=limit)
+        payload = self._generate_payload(extend_source=extend_source, order_by="-created_ts", q=q, value=value, limit=limit)
 
         intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=limit)
 
@@ -550,10 +551,17 @@ class ThreatstreamConnector(BaseConnector):
         include_pdns = param.get("pdns", False)
         include_insights = param.get("insights", False)
         include_external_references = param.get("external_references", False)
+        search_exact_value = param.get("search_exact_value", False)
+        if search_exact_value:
+            extend_source = False
 
         self.debug_print('Retrieving ip domain with {0}'.format(param))
 
-        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
+        if search_exact_value:
+            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+        else:
+            ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
+
         if not ret_val:
             return action_result.get_status()
 
@@ -577,10 +585,13 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _retrieve_email_md5(self, value, ioc_type, action_result, limit=None, extend_source=False):
+    def _retrieve_email_md5(self, value, ioc_type, action_result, limit=None, extend_source=False, search_exact_value=False):
         """ Retrieve all the information needed for email or md5 hashes """
 
-        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
+        if search_exact_value:
+            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+        else:
+            ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
             return action_result.get_status()
 
@@ -682,12 +693,18 @@ class ThreatstreamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_URL]
         extend_source = param.get("extend_source", False)
+        search_exact_value = param.get("search_exact_value", False)
+        if search_exact_value:
+            extend_source = False
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._intel_details(value, action_result, limit=limit, extend_source=extend_source)
+        if search_exact_value:
+            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+        else:
+            ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
             return action_result.get_status()
 
@@ -700,13 +717,18 @@ class ThreatstreamConnector(BaseConnector):
 
         value = param[THREATSTREAM_JSON_EMAIL]
         extend_source = param.get("extend_source", False)
+        search_exact_value = param.get("search_exact_value", False)
+        if search_exact_value:
+            extend_source = False
+
         ioc_type = "email"
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val = self._retrieve_email_md5(value, ioc_type, action_result, limit=limit, extend_source=extend_source)
+        ret_val = self._retrieve_email_md5(
+            value, ioc_type, action_result, limit=limit, extend_source=extend_source, search_exact_value=search_exact_value)
 
         if not ret_val:
             return action_result.get_status()

@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "5.2.0",
+    "min_phantom_version": "5.3.0",
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "pip_dependencies": {
@@ -469,7 +469,7 @@
         {
             "action": "domain reputation",
             "description": "Get information about a given domain",
-            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.",
+            "verbose": "If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data. The <b>search_exact_value</b> parameter searches for the exact domain on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.",
             "type": "investigate",
             "identifier": "domain_reputation",
             "read_only": true,
@@ -510,6 +510,11 @@
                     "description": "If enabled, external references will also be fetched",
                     "data_type": "boolean",
                     "order": 5
+                },
+                "search_exact_value": {
+                    "description": "Search for the exact domain",
+                    "data_type": "boolean",
+                    "order": 6
                 }
             },
             "output": [
@@ -562,6 +567,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.pdns",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search_exact_value",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1264,7 +1277,7 @@
         {
             "action": "email reputation",
             "description": "Get information about a given email",
-            "verbose": "If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter. The <b>search_exact_value</b> parameter searches for the exact email on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.",
             "type": "investigate",
             "identifier": "email_reputation",
             "read_only": true,
@@ -1289,6 +1302,11 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "search_exact_value": {
+                    "description": "Search for the exact email",
+                    "data_type": "boolean",
+                    "order": 3
                 }
             },
             "output": [
@@ -1323,6 +1341,14 @@
                     "data_type": "numeric",
                     "example_values": [
                         1000
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search_exact_value",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1583,7 +1609,7 @@
         {
             "action": "url reputation",
             "description": "Get information about a URL",
-            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.",
+            "verbose": "If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter. The <b>search_exact_value</b> parameter searches for the exact url on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.",
             "type": "investigate",
             "identifier": "url_reputation",
             "read_only": true,
@@ -1608,6 +1634,11 @@
                     "description": "Fetch extra data from Anomali server if available",
                     "data_type": "boolean",
                     "order": 2
+                },
+                "search_exact_value": {
+                    "description": "Search for the exact url",
+                    "data_type": "boolean",
+                    "order": 3
                 }
             },
             "output": [
@@ -1642,6 +1673,14 @@
                     ],
                     "example_values": [
                         "http://122.122.122.122/"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search_exact_value",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
