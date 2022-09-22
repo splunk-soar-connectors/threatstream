@@ -57,7 +57,7 @@ def _json_fallback(obj):
 
 
 class RetVal(tuple):
-    def __new__(cls, val1, val2):
+    def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
 
 
@@ -327,15 +327,18 @@ class ThreatstreamConnector(BaseConnector):
                     verify=self._verify,
                     files=files,
                     timeout=DEFAULT_TIMEOUT)
-            except requests.exceptions.InvalidSchema:
+            except requests.exceptions.InvalidSchema as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
-            except requests.exceptions.InvalidURL:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
+            except requests.exceptions.InvalidURL as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
-            except requests.exceptions.ConnectionError:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
+            except requests.exceptions.ConnectionError as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error details: connection refused from the server {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
@@ -351,15 +354,18 @@ class ThreatstreamConnector(BaseConnector):
                     verify=self._verify,
                     files=files,
                     timeout=DEFAULT_TIMEOUT)
-            except requests.exceptions.InvalidSchema:
+            except requests.exceptions.InvalidSchema as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
-            except requests.exceptions.InvalidURL:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
+            except requests.exceptions.InvalidURL as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
-            except requests.exceptions.ConnectionError:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
+            except requests.exceptions.ConnectionError as e:
+                self._get_error_message_from_exception(e)
                 err_msg = 'Error details: connection refused from the server {}'.format(url)
-                return action_result.set_status(phantom.APP_ERROR, err_msg)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(
@@ -1462,6 +1468,7 @@ class ThreatstreamConnector(BaseConnector):
         error_code = None
         error_msg = THREATSTREAM_ERR_MSG_UNAVAILABLE
 
+        self.error_print("Exception occurred.", e)
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -2042,7 +2049,8 @@ class ThreatstreamConnector(BaseConnector):
         # download file
         try:
             pcap_file = requests.get(pcap, timeout=DEFAULT_TIMEOUT).content
-        except Exception:
+        except Exception as e:
+            self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file"), None
 
         # Creating temporary directory and file

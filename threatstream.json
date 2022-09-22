@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "5.3.0",
+    "min_phantom_version": "5.3.3",
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "pip_dependencies": {
@@ -33,7 +33,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -77,7 +77,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             },
             {
                 "module": "wizard_whois",
@@ -10943,7 +10943,7 @@
         {
             "action": "list import sessions",
             "description": "List all the import sessions",
-            "verbose": "<ul><li>For a Hybrid instance, this action will return both remote and local data based on the input parameters.</li><li>The user can use the <b>list imports<b> action to fetch only remote or local data in the response.</li></ul>",
+            "verbose": "<ul><li>For a Hybrid instance, this action will return both remote and local data based on the input parameters.</li><li>The user can use the <b>list imports</b> action to fetch only remote or local data in the response.</li></ul>",
             "type": "investigate",
             "identifier": "import_session_search",
             "read_only": true,
@@ -27180,7 +27180,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.6.15-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -27224,7 +27224,7 @@
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/shared/urllib3-1.26.11-py2.py3-none-any.whl"
+                "input_file": "wheels/shared/urllib3-1.26.12-py2.py3-none-any.whl"
             },
             {
                 "module": "wizard_whois",
