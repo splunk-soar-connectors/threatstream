@@ -82,7 +82,7 @@ THREATSTREAM_PRIORITY = ["very low", "low", "medium", "high", "very high"]
 THREATSTREAM_OBSERVABLE_TYPE = ["ip", "domain", "url", "email", "hash"]
 
 # Error and status messages
-THREATSTREAM_INVALID_SELECTION = "Invalid '{0}' entered. Must be one of: {1}."
+THREATSTREAM_INVALID_SELECTION = "Invalid '{0}' entered. Must be one of: {1}"
 THREATSTREAM_ERR_INVALID_TYPE = "Invalid IOC Type"
 THREATSTREAM_ERR_INVALID_VALUE = "Invalid IOC Value. Don't include the http:// or any paths"
 THREATSTREAM_ERR_FETCH_REPLY = "Unable to fetch the whois response. Error from the server: {error}"
@@ -100,7 +100,7 @@ THREATSTREAM_SUCCESS_THREATBULLETIN_MESSAGE = "Successfully created threat bulle
 THREATSTREAM_SUCCESS_INCIDENT_MESSAGE = "Successfully created incident with id: {}"
 THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE = "Successfully created {} with id: {}"
 
-THREATSTREAM_ERR_INVALID_JSON_WITH_PARAM = "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format."
+THREATSTREAM_ERR_INVALID_JSON_WITH_PARAM = "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format"
 THREATSTREAM_ERR_INVALID_JSON = "Error building fields dictionary. Please ensure that provided input is in valid JSON dictionary format"
 THREATSTREAM_ERR_INVALID_FIELD_PARAM_VALUE = "Please enter the value of the key, {0}, in 'fields' parameter in form of a list"
 THREATSTREAM_ERR_INVALID_KEYWORDS_PARAM = "Please enter the value of keywords parameter in form of list"
@@ -114,7 +114,7 @@ THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_OBSERVABLE = "Please provide at least one
 WHOIS_NO_DATA = "No Whois Data Available"
 THREATSTREAM_INVALID_TIMEOUT = "Please provide non-zero positive integer in timeout_minutes"
 THREATSTREAM_INVALID_CONFIDENCE = "Please provide positive integer in range of 0-100 in confidence parameter"
-THREATSTREAM_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+THREATSTREAM_ERR_MESSAGE_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 THREATSTREAM_EMPTY_RESPONSE = "Status code: {}. Empty response and no information in the header"
 
 # Numeric parameters key

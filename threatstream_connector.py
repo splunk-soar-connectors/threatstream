@@ -536,7 +536,7 @@ class ThreatstreamConnector(BaseConnector):
 
                     action_result.add_data(final_response)
                     return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
-                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP."))
+                        THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP"))
         except Exception as e:
             final_response["addtional_info"] = None
             self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}"
@@ -1323,7 +1323,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_msg = self._get_error_message_from_exception(e)
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
+                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_msg))
                 return None
 
             if not isinstance(fields, dict):
@@ -1466,7 +1466,7 @@ class ThreatstreamConnector(BaseConnector):
         """
 
         error_code = None
-        error_msg = THREATSTREAM_ERR_MSG_UNAVAILABLE
+        error_msg = THREATSTREAM_ERR_MESSAGE_UNAVAILABLE
 
         self.error_print("Exception occurred.", e)
         try:
@@ -1477,7 +1477,7 @@ class ThreatstreamConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         if not error_code:
             error_text = "Error Message: {}".format(error_msg)
@@ -1913,7 +1913,7 @@ class ThreatstreamConnector(BaseConnector):
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them.")
+                "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them")
 
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
@@ -1971,7 +1971,7 @@ class ThreatstreamConnector(BaseConnector):
         })
 
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
-            error_msg = "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them."
+            error_msg = "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them"
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Note: "True" will not be accepted by the Anomali side
@@ -4326,7 +4326,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format.".format(error_msg))
+                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_msg))
 
             if not isinstance(fields, dict):
                 return action_result.set_status(

@@ -8,7 +8,7 @@
     "app_version": "3.5.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
-        "Cloud, 21 June 2022"
+        "Cloud, 26 September 2022"
     ],
     "utctime_updated": "2022-01-21T10:26:01.000000Z",
     "package_name": "phantom_threatstream",
