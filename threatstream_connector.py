@@ -484,7 +484,7 @@ class ThreatstreamConnector(BaseConnector):
             action_result.add_data({'external_references': resp_json})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
-    def _whois(self, value, action_result, tipe=""):
+    def _whois(self, value, action_result, type=""):
         final_response = dict()
         whois_response = None
 
@@ -525,7 +525,7 @@ class ThreatstreamConnector(BaseConnector):
                                             THREATSTREAM_ERR_PARSE_REPLY.format(error=self._get_error_message_from_exception(e)))
 
         try:
-            if tipe == "ip":
+            if type == "ip":
                 obj_whois = IPWhois(value)
                 whois_response = obj_whois.lookup_whois(asn_methods=["whois", "dns", "http"])
                 if whois_response:
@@ -746,7 +746,7 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_DOMAIN]
-        ret_val = self._whois(value, action_result, tipe="domain")
+        ret_val = self._whois(value, action_result, type="domain")
         if not ret_val:
             return action_result.get_status()
         return action_result.get_status()
@@ -756,7 +756,7 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         value = param[THREATSTREAM_JSON_IP]
-        ret_val = self._whois(value, action_result, tipe="ip")
+        ret_val = self._whois(value, action_result, type="ip")
         if not ret_val:
             return action_result.get_status()
         return action_result.get_status()
@@ -1913,7 +1913,7 @@ class ThreatstreamConnector(BaseConnector):
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them")
+                "Premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them")
 
         # Note: "True" will not be accepted by the Anomali side
         # If use_premium_sandbox=="True" force it to be "true"
@@ -1971,7 +1971,7 @@ class ThreatstreamConnector(BaseConnector):
         })
 
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
-            error_msg = "Both premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them"
+            error_msg = "Premium sandbox and vmray sandbox cannot be selected simultaneously for detonation. Please select one of them"
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         # Note: "True" will not be accepted by the Anomali side
