@@ -2,11 +2,11 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3\.4\.4  
+Connector Version: 3\.5\.0  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.3\.3  
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 
@@ -399,9 +399,9 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.parameter\.extend\_source | boolean | 
 action\_result\.parameter\.hash | string |  `sha1`  `sha256`  `md5`  `hash` 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.extend\_source | boolean | 
 action\_result\.data\.\*\.asn | string | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
@@ -457,7 +457,7 @@ Get information about a given domain
 Type: **investigate**  
 Read only: **True**
 
-If nothing is found, this may be due to the format of the domain\. Try excluding any subdomains \(namely www\)\. If there is still no information found, then it is because ThreatStream has no information on that domain\. ThreatStream, however, may still have Passive DNS \(PDNS\) information on it, which can be found in extra data\. If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\.<br>Extra data includes PDNS, insights, and external resources\. By default, extra data is not included in the response\. You can update the flag params to include the extra data\.
+If nothing is found, this may be due to the format of the domain\. Try excluding any subdomains \(namely www\)\. If there is still no information found, then it is because ThreatStream has no information on that domain\. ThreatStream, however, may still have Passive DNS \(PDNS\) information on it, which can be found in extra data\. If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\.<br>Extra data includes PDNS, insights, and external resources\. By default, extra data is not included in the response\. You can update the flag params to include the extra data\. The <b>search\_exact\_value</b> parameter searches for the exact domain on ThreatStream server\. If this parameter is kept <b>true</b>, then the <b>extend\_source</b> parameter will be ignored and no extra information will be available\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -468,17 +468,19 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **pdns** |  optional  | If enabled, pdns will also be fetched | boolean | 
 **insights** |  optional  | If enabled, insights will also be fetched | boolean | 
 **external\_references** |  optional  | If enabled, external references will also be fetched | boolean | 
+**search\_exact\_value** |  optional  | Search for the exact domain | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.domain | string |  `domain`  `url` 
-action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.extend\_source | boolean | 
-action\_result\.parameter\.pdns | boolean | 
-action\_result\.parameter\.insights | boolean | 
 action\_result\.parameter\.external\_references | boolean | 
+action\_result\.parameter\.insights | boolean | 
+action\_result\.parameter\.limit | numeric | 
+action\_result\.parameter\.pdns | boolean | 
+action\_result\.parameter\.search\_exact\_value | boolean | 
 action\_result\.data\.\*\.asn | string | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
@@ -552,25 +554,17 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.parameter\.extend\_source | boolean | 
+action\_result\.parameter\.external\_references | boolean | 
+action\_result\.parameter\.insights | boolean | 
 action\_result\.parameter\.ip | string |  `ip`  `ipv6` 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.parameter\.extend\_source | boolean | 
 action\_result\.parameter\.pdns | boolean | 
-action\_result\.parameter\.insights | boolean | 
-action\_result\.parameter\.external\_references | boolean | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
-action\_result\.data\.\*\.external\_references\.remote\_api | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.subtype | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.import\_source | string | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
+action\_result\.data\.\*\.created\_by | string | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.expiration\_ts | string | 
@@ -579,10 +573,12 @@ action\_result\.data\.\*\.external\_references\.Google Safe Browsing | string |
 action\_result\.data\.\*\.external\_references\.IPVoid | string | 
 action\_result\.data\.\*\.external\_references\.Shodan | string | 
 action\_result\.data\.\*\.external\_references\.VirusTotal | string | 
+action\_result\.data\.\*\.external\_references\.remote\_api | boolean | 
 action\_result\.data\.\*\.external\_references\.urlscan\.io | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
 action\_result\.data\.\*\.import\_session\_id | numeric | 
+action\_result\.data\.\*\.import\_source | string | 
 action\_result\.data\.\*\.ip | string |  `ip` 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_editable | boolean | 
@@ -597,17 +593,23 @@ action\_result\.data\.\*\.modified\_ts | string |
 action\_result\.data\.\*\.org | string | 
 action\_result\.data\.\*\.owner\_organization\_id | numeric |  `threatstream organization id` 
 action\_result\.data\.\*\.rdns | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.retina\_confidence | numeric | 
 action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.subtype | string | 
 action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\.\*\.source\_user | string | 
 action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
 action\_result\.data\.\*\.tlp | string | 
@@ -627,7 +629,7 @@ Get information about a given email
 Type: **investigate**  
 Read only: **True**
 
-If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\.
+If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\. The <b>search\_exact\_value</b> parameter searches for the exact email on ThreatStream server\. If this parameter is kept <b>true</b>, then the <b>extend\_source</b> parameter will be ignored and no extra information will be available\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -635,16 +637,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **email** |  required  | Email to investigate | string |  `email` 
 **limit** |  optional  | Total number of observables to return | numeric | 
 **extend\_source** |  optional  | Fetch extra data from Anomali server if available | boolean | 
+**search\_exact\_value** |  optional  | Search for the exact email | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.email | string |  `email` 
-action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.extend\_source | boolean | 
-action\_result\.data\.\*\.external\_references\.remote\_api | boolean | 
-action\_result\.data\.\*\.tags | string | 
+action\_result\.parameter\.limit | numeric | 
+action\_result\.parameter\.search\_exact\_value | boolean | 
 action\_result\.data\.\*\.asn | string | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
@@ -652,6 +654,7 @@ action\_result\.data\.\*\.created\_ts | string |
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.expiration\_ts | string | 
 action\_result\.data\.\*\.extended\_source | string | 
+action\_result\.data\.\*\.external\_references\.remote\_api | boolean | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
 action\_result\.data\.\*\.import\_session\_id | string | 
@@ -674,6 +677,7 @@ action\_result\.data\.\*\.retina\_confidence | numeric |
 action\_result\.data\.\*\.source | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
@@ -698,7 +702,7 @@ Get information about a URL
 Type: **investigate**  
 Read only: **True**
 
-If nothing is found, this is because ThreatStream has no information on that URL\. If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\.
+If nothing is found, this is because ThreatStream has no information on that URL\. If the limit parameter is not provided, then the default value \(1000\) will be considered as the value of the limit parameter\. The <b>search\_exact\_value</b> parameter searches for the exact url on ThreatStream server\. If this parameter is kept <b>true</b>, then the <b>extend\_source</b> parameter will be ignored and no extra information will be available\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -706,14 +710,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **url** |  required  | URL to investigate | string |  `url` 
 **limit** |  optional  | Total number of observables to return | numeric | 
 **extend\_source** |  optional  | Fetch extra data from Anomali server if available | boolean | 
+**search\_exact\_value** |  optional  | Search for the exact url | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
+action\_result\.parameter\.extend\_source | boolean | 
 action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.url | string |  `url` 
-action\_result\.parameter\.extend\_source | boolean | 
+action\_result\.parameter\.search\_exact\_value | boolean | 
 action\_result\.data\.\*\.asn | string | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
@@ -787,13 +793,12 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.ip | string |  `ip`  `ipv6` 
-action\_result\.data\.\*\.contacts\.registrant | string | 
-action\_result\.data\.\*\.addtional\_info\.asn\_description | string | 
 action\_result\.data\.\*\.addtional\_info | string | 
 action\_result\.data\.\*\.addtional\_info\.asn | string | 
 action\_result\.data\.\*\.addtional\_info\.asn\_cidr | string | 
 action\_result\.data\.\*\.addtional\_info\.asn\_country\_code | string | 
 action\_result\.data\.\*\.addtional\_info\.asn\_date | string | 
+action\_result\.data\.\*\.addtional\_info\.asn\_description | string | 
 action\_result\.data\.\*\.addtional\_info\.asn\_registry | string | 
 action\_result\.data\.\*\.addtional\_info\.nets\.\*\.address | string | 
 action\_result\.data\.\*\.addtional\_info\.nets\.\*\.cidr | string | 
@@ -815,6 +820,7 @@ action\_result\.data\.\*\.addtional\_info\.raw\_referral | string |
 action\_result\.data\.\*\.addtional\_info\.referral | string | 
 action\_result\.data\.\*\.contacts\.admin\.handle | string | 
 action\_result\.data\.\*\.contacts\.billing | string | 
+action\_result\.data\.\*\.contacts\.registrant | string | 
 action\_result\.data\.\*\.contacts\.registrant\.name | string | 
 action\_result\.data\.\*\.contacts\.tech\.handle | string | 
 action\_result\.data\.\*\.emails | string |  `email` 
@@ -915,16 +921,8 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.intelligence\_id | string |  `threatstream intelligence id` 
-action\_result\.data\.\*\.tags\.\*\.id | string | 
-action\_result\.data\.\*\.tags\.\*\.name | string | 
-action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.subtype | string | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
 action\_result\.data\.\*\.created\_by | string |  `email` 
@@ -952,9 +950,17 @@ action\_result\.data\.\*\.remote\_api | boolean |
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.retina\_confidence | numeric | 
 action\_result\.data\.\*\.source | string |  `email` 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.subtype | string | 
 action\_result\.data\.\*\.tags | string | 
+action\_result\.data\.\*\.tags\.\*\.id | string | 
+action\_result\.data\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
 action\_result\.data\.\*\.tlp | string | 
@@ -986,27 +992,18 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
-action\_result\.data\.\*\.subtype | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.import\_source | string | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.meta\.registration\_created | string | 
-action\_result\.data\.\*\.meta\.registration\_updated | string | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
+action\_result\.data\.\*\.created\_by | string | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.expiration\_ts | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
 action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.import\_source | string | 
 action\_result\.data\.\*\.ip | string |  `ip` 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_editable | boolean | 
@@ -1025,19 +1022,28 @@ action\_result\.data\.\*\.meta\.registrant\_phone | string |
 action\_result\.data\.\*\.meta\.registrant\_updated | string | 
 action\_result\.data\.\*\.meta\.registrantion\_created | string | 
 action\_result\.data\.\*\.meta\.registrantion\_updated | string | 
+action\_result\.data\.\*\.meta\.registration\_created | string | 
+action\_result\.data\.\*\.meta\.registration\_updated | string | 
 action\_result\.data\.\*\.meta\.severity | string | 
 action\_result\.data\.\*\.modified\_ts | string | 
 action\_result\.data\.\*\.org | string | 
 action\_result\.data\.\*\.owner\_organization\_id | numeric | 
 action\_result\.data\.\*\.rdns | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.retina\_confidence | numeric | 
 action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.subtype | string | 
 action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
 action\_result\.data\.\*\.tlp | string | 
@@ -1131,19 +1137,11 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
-action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
+action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.embedded\_content\_url | string | 
@@ -1159,15 +1157,23 @@ action\_result\.data\.\*\.organization\.id | string |  `threatstream organizatio
 action\_result\.data\.\*\.organization\.name | string | 
 action\_result\.data\.\*\.organization\.title | string | 
 action\_result\.data\.\*\.organization\_id | numeric |  `threatstream organization id` 
+action\_result\.data\.\*\.owner\_user\_id | numeric | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.summary\.vulnerabilities\_returned | numeric | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1193,16 +1199,8 @@ DATA PATH | TYPE | CONTAINS
 action\_result\.status | string | 
 action\_result\.parameter\.intel\_value | string | 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.assignee\_user | string | 
-action\_result\.data\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
-action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
@@ -1216,12 +1214,16 @@ action\_result\.data\.\*\.is\_public | boolean |
 action\_result\.data\.\*\.modified\_ts | string | 
 action\_result\.data\.\*\.name | string | 
 action\_result\.data\.\*\.organization\_id | numeric |  `threatstream organization id` 
+action\_result\.data\.\*\.owner\_user\_id | numeric | 
 action\_result\.data\.\*\.parent\.id | string | 
 action\_result\.data\.\*\.parent\.name | string | 
 action\_result\.data\.\*\.parent\.recource\_uri | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
@@ -1232,7 +1234,11 @@ action\_result\.data\.\*\.status\.resource\_uri | string |
 action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.votes\.me | string | 
 action\_result\.data\.\*\.votes\.total | numeric | 
 action\_result\.data\.\*\.watched\_by\_me | boolean | 
@@ -1280,36 +1286,9 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.incident\_id | string |  `threatstream incident id` 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tagger | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.category | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags | string | 
-action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
-action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.comment | string | 
-action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.created | string | 
-action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.from\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
-action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_name | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_email | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_phone | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_address | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registration\_created | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.registration\_updated | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.embedded\_content\_type | string | 
@@ -1318,6 +1297,11 @@ action\_result\.data\.\*\.end\_date | string |
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric | 
 action\_result\.data\.\*\.intelligence\.\*\.asn | string | 
+action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.comment | string | 
+action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.created | string | 
+action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.from\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.association\_info\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.intelligence\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.intelligence\.\*\.country | string | 
 action\_result\.data\.\*\.intelligence\.\*\.created\_by | string |  `email` 
@@ -1336,6 +1320,12 @@ action\_result\.data\.\*\.intelligence\.\*\.itype | string |
 action\_result\.data\.\*\.intelligence\.\*\.latitude | string | 
 action\_result\.data\.\*\.intelligence\.\*\.longitude | string | 
 action\_result\.data\.\*\.intelligence\.\*\.meta\.detail2 | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_address | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_email | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_name | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registrant\_phone | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registration\_created | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.registration\_updated | string | 
 action\_result\.data\.\*\.intelligence\.\*\.meta\.severity | string | 
 action\_result\.data\.\*\.intelligence\.\*\.modified\_ts | string | 
 action\_result\.data\.\*\.intelligence\.\*\.org | string | 
@@ -1347,10 +1337,16 @@ action\_result\.data\.\*\.intelligence\.\*\.retina\_confidence | numeric |
 action\_result\.data\.\*\.intelligence\.\*\.source | string |  `email` 
 action\_result\.data\.\*\.intelligence\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.intelligence\.\*\.status | string | 
+action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.category | string | 
 action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.id | numeric | 
 action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.org\_id | string | 
 action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tagger | string | 
 action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.intelligence\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.intelligence\.\*\.threatscore | numeric | 
@@ -1374,10 +1370,14 @@ action\_result\.data\.\*\.owner\_user\.email | string |  `email`
 action\_result\.data\.\*\.owner\_user\.id | string | 
 action\_result\.data\.\*\.owner\_user\.name | string | 
 action\_result\.data\.\*\.owner\_user\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_user\_id | numeric | 
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
@@ -1385,7 +1385,13 @@ action\_result\.data\.\*\.status\.display\_name | string |
 action\_result\.data\.\*\.status\.id | numeric | 
 action\_result\.data\.\*\.status\.resource\_uri | string | 
 action\_result\.data\.\*\.status\_desc | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.votes\.me | string | 
 action\_result\.data\.\*\.votes\.total | numeric | 
 action\_result\.data\.\*\.watched\_by\_me | boolean | 
@@ -1421,14 +1427,6 @@ action\_result\.parameter\.fields | string |
 action\_result\.parameter\.is\_public | boolean | 
 action\_result\.parameter\.local\_intelligence | string |  `threatstream intelligence id` 
 action\_result\.parameter\.name | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.summary\.created\_on\_cloud | boolean | 
-action\_result\.data\.\*\.fjregnvjnj | string | 
-action\_result\.data\.\*\.invalid field | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.created\_ts | string | 
@@ -1437,8 +1435,10 @@ action\_result\.data\.\*\.embedded\_content\_type | string |
 action\_result\.data\.\*\.embedded\_content\_url | string | 
 action\_result\.data\.\*\.end\_date | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.fjregnvjnj | string | 
 action\_result\.data\.\*\.id | numeric |  `threatstream incident id` 
 action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
+action\_result\.data\.\*\.invalid field | string | 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_cloneable | string | 
 action\_result\.data\.\*\.is\_public | boolean | 
@@ -1453,10 +1453,14 @@ action\_result\.data\.\*\.owner\_user\.email | string |  `email`
 action\_result\.data\.\*\.owner\_user\.id | string | 
 action\_result\.data\.\*\.owner\_user\.name | string | 
 action\_result\.data\.\*\.owner\_user\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_user\_id | numeric | 
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
@@ -1465,11 +1469,13 @@ action\_result\.data\.\*\.status\.id | numeric |
 action\_result\.data\.\*\.status\.resource\_uri | string | 
 action\_result\.data\.\*\.status\_desc | string | 
 action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.votes\.me | string | 
 action\_result\.data\.\*\.votes\.total | numeric | 
 action\_result\.data\.\*\.watched\_by\_me | boolean | 
 action\_result\.data\.\*\.watched\_total\_count | numeric | 
 action\_result\.summary | string | 
+action\_result\.summary\.created\_on\_cloud | boolean | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
@@ -1496,12 +1502,6 @@ action\_result\.parameter\.cloud\_intelligence | string |
 action\_result\.parameter\.fields | string | 
 action\_result\.parameter\.incident\_id | string |  `threatstream incident id` 
 action\_result\.parameter\.local\_intelligence | string | 
-action\_result\.data\.\*\.invalid field | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.created\_ts | string | 
@@ -1512,6 +1512,7 @@ action\_result\.data\.\*\.end\_date | string |
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream incident id` 
 action\_result\.data\.\*\.intelligence\.\*\.id | numeric |  `threatstream incident id` 
+action\_result\.data\.\*\.invalid field | string | 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_cloneable | string | 
 action\_result\.data\.\*\.is\_public | boolean | 
@@ -1526,10 +1527,14 @@ action\_result\.data\.\*\.owner\_user\.email | string |  `email`
 action\_result\.data\.\*\.owner\_user\.id | string | 
 action\_result\.data\.\*\.owner\_user\.name | string | 
 action\_result\.data\.\*\.owner\_user\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_user\_id | numeric | 
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
@@ -1538,6 +1543,7 @@ action\_result\.data\.\*\.status\.id | numeric |
 action\_result\.data\.\*\.status\.resource\_uri | string | 
 action\_result\.data\.\*\.status\_desc | string | 
 action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.votes\.me | string | 
 action\_result\.data\.\*\.votes\.total | numeric | 
 action\_result\.data\.\*\.watched\_by\_me | boolean | 
@@ -1574,18 +1580,18 @@ DATA PATH | TYPE | CONTAINS
 action\_result\.status | string | 
 action\_result\.parameter\.allow\_unresolved | boolean | 
 action\_result\.parameter\.classification | string | 
-action\_result\.parameter\.source | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.domain | string |  `domain` 
 action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.with\_approval | boolean | 
-action\_result\.data\.\*\.job\_id | string | 
-action\_result\.data\.\*\.success | boolean | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.import\_session\_id | string | 
 action\_result\.data | string | 
+action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.job\_id | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.success | boolean | 
 action\_result\.summary\.created\_on\_cloud | boolean | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1617,11 +1623,11 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.allow\_unresolved | boolean | 
-action\_result\.parameter\.source | string | 
 action\_result\.parameter\.classification | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.url | string |  `url` 
 action\_result\.parameter\.with\_approval | boolean | 
@@ -1656,11 +1662,11 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
-action\_result\.parameter\.source | string | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.ip\_address | string |  `ip`  `ipv6` 
 action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.with\_approval | boolean | 
 action\_result\.data | string | 
@@ -1695,18 +1701,18 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
-action\_result\.parameter\.source | string | 
 action\_result\.parameter\.confidence | numeric | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.file\_hash | string |  `sha1`  `sha256`  `md5`  `hash` 
 action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.with\_approval | boolean | 
+action\_result\.data | string | 
+action\_result\.data\.\*\.import\_session\_id | string | 
 action\_result\.data\.\*\.job\_id | string | 
 action\_result\.data\.\*\.success | boolean | 
-action\_result\.data\.\*\.import\_session\_id | string | 
-action\_result\.data | string | 
 action\_result\.summary\.created\_on\_cloud | boolean | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1738,18 +1744,18 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
-action\_result\.parameter\.source | string | 
 action\_result\.parameter\.confidence | numeric | 
 action\_result\.parameter\.create\_on\_cloud | boolean | 
 action\_result\.parameter\.email | string |  `email` 
 action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.source | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.with\_approval | boolean | 
+action\_result\.data | string | 
+action\_result\.data\.\*\.import\_session\_id | string | 
 action\_result\.data\.\*\.job\_id | string | 
 action\_result\.data\.\*\.success | boolean | 
-action\_result\.data\.\*\.import\_session\_id | string | 
-action\_result\.data | string | 
 action\_result\.summary\.created\_on\_cloud | boolean | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1785,11 +1791,11 @@ action\_result\.parameter\.fields | string |
 action\_result\.parameter\.observable\_type | string | 
 action\_result\.parameter\.value | string |  `ip`  `domain`  `url`  `email`  `md5`  `sha1`  `hash` 
 action\_result\.parameter\.with\_approval | boolean | 
-action\_result\.data\.\*\.job\_id | string | 
-action\_result\.data\.\*\.success | boolean | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.import\_session\_id | string | 
 action\_result\.data | string | 
+action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.job\_id | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.success | boolean | 
 action\_result\.summary\.created\_on\_cloud | boolean | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -1817,12 +1823,12 @@ action\_result\.parameter\.id | string |  `threatstream intelligence id`
 action\_result\.parameter\.source\_user\_id | string | 
 action\_result\.parameter\.tags | string |  `threatstream tags` 
 action\_result\.parameter\.tlp | string |  `threatstream tlp` 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.success | boolean | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
 action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.summary | string | 
@@ -1877,12 +1883,12 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.fields | string | 
 action\_result\.parameter\.platform | string | 
-action\_result\.parameter\.vault\_id | string |  `vault id`  `sha1` 
 action\_result\.parameter\.use\_premium\_sandbox | boolean | 
 action\_result\.parameter\.use\_vmray\_sandbox | boolean | 
+action\_result\.parameter\.vault\_id | string |  `vault id`  `sha1` 
 action\_result\.parameter\.vmray\_max\_jobs | numeric | 
-action\_result\.parameter\.fields | string | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.reports\.ANDROID4\.4\.detail | string | 
 action\_result\.data\.\*\.reports\.ANDROID4\.4\.status | string | 
@@ -1940,12 +1946,12 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.classification | string | 
+action\_result\.parameter\.fields | string | 
 action\_result\.parameter\.platform | string | 
 action\_result\.parameter\.url | string |  `url` 
 action\_result\.parameter\.use\_premium\_sandbox | boolean | 
 action\_result\.parameter\.use\_vmray\_sandbox | boolean | 
 action\_result\.parameter\.vmray\_max\_jobs | numeric | 
-action\_result\.parameter\.fields | string | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.reports\.WINDOWS7\.detail | string | 
 action\_result\.data\.\*\.reports\.WINDOWS7\.id | numeric | 
@@ -1975,8 +1981,6 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.endpoint | string |  `threatstream endpoint status` 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.sandbox\_vendor | string | 
 action\_result\.data\.\*\.classification | string | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.date\_added | string | 
@@ -1995,8 +1999,10 @@ action\_result\.data\.\*\.pdf\_generated | numeric |
 action\_result\.data\.\*\.platform | string | 
 action\_result\.data\.\*\.platform\_label | string | 
 action\_result\.data\.\*\.priority | numeric | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.reportid | string | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.sandbox\_vendor | string | 
 action\_result\.data\.\*\.sha1 | string | 
 action\_result\.data\.\*\.sha256 | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
@@ -2034,41 +2040,21 @@ DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
 action\_result\.parameter\.endpoint | string |  `threatstream endpoint report` 
-action\_result\.data\.\*\.results\.target\.url | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.md5 | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.name | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.path | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.sha1 | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.size | numeric | 
-action\_result\.data\.\*\.results\.dropped\.\*\.type | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.crc32 | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.sha256 | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.sha512 | string | 
-action\_result\.data\.\*\.results\.dropped\.\*\.ssdeep | string | 
-action\_result\.data\.\*\.results\.network\.dns\.\*\.type | string | 
-action\_result\.data\.\*\.results\.network\.dns\.\*\.answers\.\*\.data | string | 
-action\_result\.data\.\*\.results\.network\.dns\.\*\.answers\.\*\.type | string | 
-action\_result\.data\.\*\.results\.network\.dns\.\*\.request | string | 
-action\_result\.data\.\*\.results\.network\.domains\.\*\.ip | string | 
-action\_result\.data\.\*\.results\.network\.domains\.\*\.domain | string | 
-action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.pid | numeric | 
-action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.name | string | 
-action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.message | string | 
+action\_result\.data\.\*\.pcap | string |  `url` 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.category | string | 
 action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.funcname | string | 
-action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.object | string | 
-action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.content | string | 
+action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.message | string | 
+action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.name | string | 
+action\_result\.data\.\*\.results\.behavior\.anomaly\.\*\.pid | numeric | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.classname | string | 
-action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.windowname | string | 
-action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.pid | numeric | 
-action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.name | string | 
-action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.parent\_id | numeric | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.pcap | string |  `url` 
+action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.content | string | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.file | string |  `file name`  `file path` 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.moduleaddress | string | 
+action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.object | string | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.pathtofile | string | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.regkey | string | 
+action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.data\.windowname | string | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.eid | numeric | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.event | string | 
 action\_result\.data\.\*\.results\.behavior\.enhanced\.\*\.object | string | 
@@ -2087,12 +2073,25 @@ action\_result\.data\.\*\.results\.behavior\.processes\.\*\.first\_seen | string
 action\_result\.data\.\*\.results\.behavior\.processes\.\*\.parent\_id | numeric | 
 action\_result\.data\.\*\.results\.behavior\.processes\.\*\.process\_id | numeric | 
 action\_result\.data\.\*\.results\.behavior\.processes\.\*\.process\_name | string |  `file name` 
+action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.name | string | 
+action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.parent\_id | numeric | 
+action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.children\.\*\.pid | numeric | 
 action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.name | string |  `file name` 
 action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.parent\_id | numeric | 
 action\_result\.data\.\*\.results\.behavior\.processtree\.\*\.pid | numeric |  `pid` 
 action\_result\.data\.\*\.results\.behavior\.summary\.files | string |  `file path`  `file name` 
 action\_result\.data\.\*\.results\.behavior\.summary\.keys | string | 
 action\_result\.data\.\*\.results\.debug\.log | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.crc32 | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.md5 | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.name | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.path | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.sha1 | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.sha256 | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.sha512 | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.size | numeric | 
+action\_result\.data\.\*\.results\.dropped\.\*\.ssdeep | string | 
+action\_result\.data\.\*\.results\.dropped\.\*\.type | string | 
 action\_result\.data\.\*\.results\.info\.category | string | 
 action\_result\.data\.\*\.results\.info\.custom | string | 
 action\_result\.data\.\*\.results\.info\.duration | numeric | 
@@ -2107,6 +2106,12 @@ action\_result\.data\.\*\.results\.info\.machine\.started\_on | string |
 action\_result\.data\.\*\.results\.info\.package | string | 
 action\_result\.data\.\*\.results\.info\.started | string | 
 action\_result\.data\.\*\.results\.info\.version | string | 
+action\_result\.data\.\*\.results\.network\.dns\.\*\.answers\.\*\.data | string | 
+action\_result\.data\.\*\.results\.network\.dns\.\*\.answers\.\*\.type | string | 
+action\_result\.data\.\*\.results\.network\.dns\.\*\.request | string | 
+action\_result\.data\.\*\.results\.network\.dns\.\*\.type | string | 
+action\_result\.data\.\*\.results\.network\.domains\.\*\.domain | string | 
+action\_result\.data\.\*\.results\.network\.domains\.\*\.ip | string | 
 action\_result\.data\.\*\.results\.network\.hosts | string |  `ip` 
 action\_result\.data\.\*\.results\.network\.pcap\_sha256 | string |  `sha256` 
 action\_result\.data\.\*\.results\.network\.sorted\_pcap\_sha256 | string |  `sha256` 
@@ -2143,6 +2148,7 @@ action\_result\.data\.\*\.results\.target\.file\.sha512 | string |
 action\_result\.data\.\*\.results\.target\.file\.size | numeric | 
 action\_result\.data\.\*\.results\.target\.file\.ssdeep | string | 
 action\_result\.data\.\*\.results\.target\.file\.type | string | 
+action\_result\.data\.\*\.results\.target\.url | string | 
 action\_result\.data\.\*\.screenshots | string |  `url` 
 action\_result\.data\.\*\.success | boolean | 
 action\_result\.summary | string | 
@@ -2192,39 +2198,21 @@ action\_result\.parameter\.limit | numeric |
 action\_result\.parameter\.offset | numeric | 
 action\_result\.parameter\.order\_by | string | 
 action\_result\.parameter\.query | string | 
-action\_result\.data\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.subtype | string | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.is\_editable | boolean | 
-action\_result\.data\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.import\_source | string | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.retina\_confidence | numeric | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.meta\.registrant\_org | string | 
-action\_result\.data\.\*\.meta\.registrant\_name | string | 
-action\_result\.data\.\*\.meta\.registrant\_email | string | 
-action\_result\.data\.\*\.meta\.registrant\_phone | string | 
-action\_result\.data\.\*\.meta\.registrant\_address | string | 
-action\_result\.data\.\*\.meta\.registration\_created | string | 
-action\_result\.data\.\*\.meta\.registration\_updated | string | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
+action\_result\.data\.\*\.created\_by | string | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.expiration\_ts | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
 action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.import\_source | string | 
 action\_result\.data\.\*\.ip | string |  `ip` 
+action\_result\.data\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.is\_editable | boolean | 
 action\_result\.data\.\*\.is\_public | boolean | 
 action\_result\.data\.\*\.itype | string | 
 action\_result\.data\.\*\.latitude | string | 
@@ -2233,22 +2221,40 @@ action\_result\.data\.\*\.meta\.detail | string |
 action\_result\.data\.\*\.meta\.detail2 | string | 
 action\_result\.data\.\*\.meta\.limit | numeric | 
 action\_result\.data\.\*\.meta\.maltype | string | 
+action\_result\.data\.\*\.meta\.registrant\_address | string | 
+action\_result\.data\.\*\.meta\.registrant\_email | string | 
+action\_result\.data\.\*\.meta\.registrant\_name | string | 
+action\_result\.data\.\*\.meta\.registrant\_org | string | 
+action\_result\.data\.\*\.meta\.registrant\_phone | string | 
+action\_result\.data\.\*\.meta\.registration\_created | string | 
+action\_result\.data\.\*\.meta\.registration\_updated | string | 
 action\_result\.data\.\*\.meta\.severity | string | 
 action\_result\.data\.\*\.modified\_ts | string | 
 action\_result\.data\.\*\.org | string | 
 action\_result\.data\.\*\.owner\_organization\_id | numeric | 
 action\_result\.data\.\*\.rdns | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.retina\_confidence | numeric | 
 action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.subtype | string | 
+action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
+action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.trusted\_circle\_ids | string | 
 action\_result\.data\.\*\.type | string | 
 action\_result\.data\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.value | string | 
 action\_result\.summary\.records\_returned | numeric | 
 action\_result\.message | string | 
@@ -2261,7 +2267,7 @@ List all the import sessions
 Type: **investigate**  
 Read only: **True**
 
-<ul><li>For a Hybrid instance, this action will return both remote and local data based on the input parameters\.</li><li>The user can use the <b>list imports<b> action to fetch only remote or local data in the response\.</li></ul>
+<ul><li>For a Hybrid instance, this action will return both remote and local data based on the input parameters\.</li><li>The user can use the <b>list imports</b> action to fetch only remote or local data in the response\.</li></ul>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -2279,25 +2285,6 @@ action\_result\.parameter\.date\_modified\_gte | string |  `threatstream date`
 action\_result\.parameter\.limit | numeric | 
 action\_result\.parameter\.offset | numeric | 
 action\_result\.parameter\.status\_in | string | 
-action\_result\.data\.\*\.orginal\_intelligence | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.id | numeric | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.name | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.public | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.partner | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.use\_chat | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.openinvite | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.description | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.is\_freemium | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.premium\_channel | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.anonymous\_sharing | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.mattermost\_team\_id | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.subscription\_model | string | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.restricted\_publishing | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.validate\_subscriptions | boolean | 
-action\_result\.data\.\*\.trusted\_circles\.\*\.can\_override\_confidence | boolean | 
 action\_result\.data\.\*\.approved\_by\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.approved\_by\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.approved\_by\.email | string |  `email` 
@@ -2339,7 +2326,9 @@ action\_result\.data\.\*\.num\_public | numeric |
 action\_result\.data\.\*\.organization\.id | string | 
 action\_result\.data\.\*\.organization\.name | string | 
 action\_result\.data\.\*\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.orginal\_intelligence | string | 
 action\_result\.data\.\*\.processed\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.sandbox\_submit | string | 
 action\_result\.data\.\*\.source\_confidence\_weight | numeric | 
@@ -2347,9 +2336,26 @@ action\_result\.data\.\*\.status | string |
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.anonymous\_sharing | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.can\_override\_confidence | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.description | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.id | numeric | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.is\_freemium | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.mattermost\_team\_id | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.name | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.openinvite | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.partner | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.premium\_channel | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.public | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.restricted\_publishing | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.subscription\_model | string | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.use\_chat | boolean | 
+action\_result\.data\.\*\.trusted\_circles\.\*\.validate\_subscriptions | boolean | 
 action\_result\.data\.\*\.user\_id | numeric | 
 action\_result\.data\.\*\.visibleForReview | boolean | 
 action\_result\.summary\.import\_sessions\_returned | numeric | 
@@ -2389,47 +2395,19 @@ action\_result\.parameter\.tags | string |  `threatstream tags`
 action\_result\.parameter\.threat\_model\_to\_associate | string | 
 action\_result\.parameter\.threat\_model\_type | string | 
 action\_result\.parameter\.tlp | string |  `threatstream tlp` 
-action\_result\.data\.\*\.approved\_by\.id | string | 
-action\_result\.data\.\*\.approved\_by\.name | string | 
+action\_result\.data\.\*\.approved\_by\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.approved\_by\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.approved\_by\.email | string | 
-action\_result\.data\.\*\.approved\_by\.nickname | string | 
+action\_result\.data\.\*\.approved\_by\.id | string | 
 action\_result\.data\.\*\.approved\_by\.is\_active | boolean | 
+action\_result\.data\.\*\.approved\_by\.is\_readonly | boolean | 
+action\_result\.data\.\*\.approved\_by\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.approved\_by\.name | string | 
+action\_result\.data\.\*\.approved\_by\.nickname | string | 
 action\_result\.data\.\*\.approved\_by\.organization\.id | string | 
 action\_result\.data\.\*\.approved\_by\.organization\.name | string | 
 action\_result\.data\.\*\.approved\_by\.organization\.resource\_uri | string | 
 action\_result\.data\.\*\.approved\_by\.resource\_uri | string | 
-action\_result\.data\.\*\.approved\_by\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.approved\_by\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.approved\_by\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.orginal\_intelligence | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.id | numeric | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.tlp | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.name | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.uuid | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.id | numeric | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.display\_name | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.resource\_uri | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.feed\_id | numeric | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.end\_date | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_public | boolean | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.start\_date | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.modified\_ts | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_cloneable | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.published\_ts | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.assignee\_user | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.owner\_user\_id | numeric | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.source\_created | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.organization\_id | numeric | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.publication\_status | string | 
-action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.approved\_by\.is\_readonly | boolean | 
 action\_result\.data\.\*\.approved\_by\_id | numeric | 
 action\_result\.data\.\*\.associations\.actors\.\*\.id | string | 
 action\_result\.data\.\*\.associations\.actors\.\*\.name | string | 
@@ -2473,7 +2451,34 @@ action\_result\.data\.\*\.num\_public | numeric |
 action\_result\.data\.\*\.organization\.id | string | 
 action\_result\.data\.\*\.organization\.name | string | 
 action\_result\.data\.\*\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.orginal\_intelligence | string | 
 action\_result\.data\.\*\.processed\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.can\_add\_public\_tags | boolean | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.end\_date | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.id | numeric | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_cloneable | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.name | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.organization\_id | numeric | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.owner\_user\_id | numeric | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.publication\_status | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.source\_created | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.start\_date | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.display\_name | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.id | numeric | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.status\.resource\_uri | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.tlp | string | 
+action\_result\.data\.\*\.remote\_associations\.incidents\.\*\.uuid | string | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.sandbox\_submit | string | 
 action\_result\.data\.\*\.source\_confidence\_weight | numeric | 
@@ -2481,6 +2486,7 @@ action\_result\.data\.\*\.status | string |
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\.\*\.tlp | string |  `threatstream tlp` 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.tlp | string | 
@@ -2516,6 +2522,12 @@ action\_result\.parameter\.modified\_ts\_\_gte | string |
 action\_result\.parameter\.publication\_status | string | 
 action\_result\.parameter\.tags\_name | string |  `threatstream tags` 
 action\_result\.data\.\*\.aliases | string | 
+action\_result\.data\.\*\.assignee\_user\.email | string | 
+action\_result\.data\.\*\.assignee\_user\.id | numeric | 
+action\_result\.data\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.circles\.\*\.id | numeric | 
+action\_result\.data\.\*\.circles\.\*\.name | string | 
+action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.cvss2\_score | string | 
 action\_result\.data\.\*\.cvss3\_score | string | 
@@ -2534,6 +2546,7 @@ action\_result\.data\.\*\.owner\_user\.id | numeric |
 action\_result\.data\.\*\.owner\_user\.name | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.sort | numeric | 
 action\_result\.data\.\*\.source\_created | string | 
@@ -2543,19 +2556,12 @@ action\_result\.data\.\*\.status | string |
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.type | string | 
 action\_result\.data\.\*\.uuid | string | 
 action\_result\.summary\.threat\_models\_returned | numeric | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.circles\.\*\.id | numeric | 
-action\_result\.data\.\*\.circles\.\*\.name | string | 
-action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.assignee\_user\.id | numeric | 
-action\_result\.data\.\*\.assignee\_user\.name | string | 
-action\_result\.data\.\*\.assignee\_user\.email | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
@@ -2610,11 +2616,11 @@ action\_result\.parameter\.source | string |
 action\_result\.parameter\.status | string | 
 action\_result\.parameter\.tags | string | 
 action\_result\.parameter\.tlp | string | 
-action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.all\_circles\_visible | boolean | 
 action\_result\.data\.\*\.assignee\_org | string | 
 action\_result\.data\.\*\.assignee\_org\_id | string | 
 action\_result\.data\.\*\.assignee\_org\_name | string | 
+action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.assignee\_user\.email | string |  `email` 
@@ -2781,87 +2787,56 @@ action\_result\.parameter\.source | string |
 action\_result\.parameter\.status | string | 
 action\_result\.parameter\.tags | string | 
 action\_result\.parameter\.tlp | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.history\.\*\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.history\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.comments\.\*\.id | string | 
-action\_result\.data\.\*\.comments\.\*\.tlp | string | 
-action\_result\.data\.\*\.comments\.\*\.body | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.id | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.name | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.email | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.nickname | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.is\_active | boolean | 
-action\_result\.data\.\*\.comments\.\*\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.comments\.\*\.user\.organization\.id | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.organization\.name | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.organization\.resource\_uri | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.resource\_uri | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.comments\.\*\.user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.comments\.\*\.user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.comments\.\*\.title | string | 
-action\_result\.data\.\*\.comments\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.comments\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.comments\.\*\.tip\_report | numeric | 
-action\_result\.data\.\*\.comments\.\*\.modified\_ts | string | 
-action\_result\.data\.\*\.owner\_user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.id | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.id | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.name | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.email | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.nickname | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.is\_active | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.user\.organization\.id | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.organization\.name | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.organization\.resource\_uri | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.resource\_uri | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.attachments\.\*\.user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.s3\_url | string | 
-action\_result\.data\.\*\.attachments\.\*\.filename | string | 
-action\_result\.data\.\*\.attachments\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.attachments\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.\*\.signed\_url | string | 
-action\_result\.data\.\*\.attachments\.\*\.tip\_report | numeric | 
-action\_result\.data\.\*\.attachments\.\*\.modified\_ts | string | 
-action\_result\.data\.\*\.attachments\.\*\.content\_type | string | 
-action\_result\.data\.\*\.attachments\.\*\.s3\_thumbnail\_url | string | 
-action\_result\.data\.\*\.attachments\.\*\.signed\_thumbnail\_url | string | 
-action\_result\.data\.\*\.assignee\_user\.id | string | 
-action\_result\.data\.\*\.assignee\_user\.name | string | 
-action\_result\.data\.\*\.assignee\_user\.email | string | 
-action\_result\.data\.\*\.assignee\_user\.is\_active | boolean | 
-action\_result\.data\.\*\.assignee\_user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.assignee\_user\.organization\.id | string | 
-action\_result\.data\.\*\.assignee\_user\.organization\.name | string | 
-action\_result\.data\.\*\.assignee\_user\.organization\.resource\_uri | string | 
-action\_result\.data\.\*\.assignee\_user\.resource\_uri | string | 
-action\_result\.data\.\*\.assignee\_user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.assignee\_user\.nickname | string | 
-action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.comments\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.comments\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
 action\_result\.data\.\*\.all\_circles\_visible | boolean | 
 action\_result\.data\.\*\.assignee\_org | string | 
 action\_result\.data\.\*\.assignee\_org\_id | string | 
 action\_result\.data\.\*\.assignee\_org\_name | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
+action\_result\.data\.\*\.assignee\_user\.email | string | 
+action\_result\.data\.\*\.assignee\_user\.id | string | 
+action\_result\.data\.\*\.assignee\_user\.is\_active | boolean | 
+action\_result\.data\.\*\.assignee\_user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.assignee\_user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.assignee\_user\.nickname | string | 
+action\_result\.data\.\*\.assignee\_user\.organization\.id | string | 
+action\_result\.data\.\*\.assignee\_user\.organization\.name | string | 
+action\_result\.data\.\*\.assignee\_user\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.assignee\_user\.resource\_uri | string | 
 action\_result\.data\.\*\.assignee\_user\_id | string | 
 action\_result\.data\.\*\.assignee\_user\_name | string | 
+action\_result\.data\.\*\.attachments\.\*\.content\_type | string | 
+action\_result\.data\.\*\.attachments\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.attachments\.\*\.filename | string | 
+action\_result\.data\.\*\.attachments\.\*\.id | string | 
+action\_result\.data\.\*\.attachments\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.attachments\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.attachments\.\*\.s3\_thumbnail\_url | string | 
+action\_result\.data\.\*\.attachments\.\*\.s3\_url | string | 
+action\_result\.data\.\*\.attachments\.\*\.signed\_thumbnail\_url | string | 
+action\_result\.data\.\*\.attachments\.\*\.signed\_url | string | 
+action\_result\.data\.\*\.attachments\.\*\.tip\_report | numeric | 
+action\_result\.data\.\*\.attachments\.\*\.user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.can\_share\_intelligence | boolean | 
+action\_result\.data\.\*\.attachments\.\*\.user\.email | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.id | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.attachments\.\*\.user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.attachments\.\*\.user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.attachments\.\*\.user\.name | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.nickname | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.organization\.id | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.organization\.name | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.attachments\.\*\.user\.resource\_uri | string | 
 action\_result\.data\.\*\.attachments\.content\_type | string | 
 action\_result\.data\.\*\.attachments\.created\_ts | string | 
 action\_result\.data\.\*\.attachments\.filename | string | 
 action\_result\.data\.\*\.attachments\.id | string | 
 action\_result\.data\.\*\.attachments\.modified\_ts | string | 
+action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
 action\_result\.data\.\*\.attachments\.s3\_thumbnail\_url | string | 
 action\_result\.data\.\*\.attachments\.s3\_url | string |  `url` 
 action\_result\.data\.\*\.attachments\.signed\_thumbnail\_url | string | 
@@ -2872,6 +2847,7 @@ action\_result\.data\.\*\.attachments\.user\.can\_share\_intelligence | boolean 
 action\_result\.data\.\*\.attachments\.user\.email | string |  `email` 
 action\_result\.data\.\*\.attachments\.user\.id | string | 
 action\_result\.data\.\*\.attachments\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.attachments\.user\.is\_readonly | boolean | 
 action\_result\.data\.\*\.attachments\.user\.must\_change\_password | boolean | 
 action\_result\.data\.\*\.attachments\.user\.name | string | 
 action\_result\.data\.\*\.attachments\.user\.nickname | string | 
@@ -2882,10 +2858,32 @@ action\_result\.data\.\*\.attachments\.user\.resource\_uri | string |
 action\_result\.data\.\*\.body | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaign | string | 
+action\_result\.data\.\*\.comments\.\*\.body | string | 
+action\_result\.data\.\*\.comments\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.comments\.\*\.id | string | 
+action\_result\.data\.\*\.comments\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.comments\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.comments\.\*\.tip\_report | numeric | 
+action\_result\.data\.\*\.comments\.\*\.title | string | 
+action\_result\.data\.\*\.comments\.\*\.tlp | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.can\_share\_intelligence | boolean | 
+action\_result\.data\.\*\.comments\.\*\.user\.email | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.id | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.comments\.\*\.user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.comments\.\*\.user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.comments\.\*\.user\.name | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.nickname | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.organization\.id | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.organization\.name | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.comments\.\*\.user\.resource\_uri | string | 
 action\_result\.data\.\*\.comments\.body | string | 
 action\_result\.data\.\*\.comments\.created\_ts | string | 
 action\_result\.data\.\*\.comments\.id | string | 
 action\_result\.data\.\*\.comments\.modified\_ts | string | 
+action\_result\.data\.\*\.comments\.remote\_api | boolean | 
 action\_result\.data\.\*\.comments\.tip\_report | numeric | 
 action\_result\.data\.\*\.comments\.title | string | 
 action\_result\.data\.\*\.comments\.tlp | string | 
@@ -2894,6 +2892,7 @@ action\_result\.data\.\*\.comments\.user\.can\_share\_intelligence | boolean |
 action\_result\.data\.\*\.comments\.user\.email | string |  `email` 
 action\_result\.data\.\*\.comments\.user\.id | string | 
 action\_result\.data\.\*\.comments\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.comments\.user\.is\_readonly | boolean | 
 action\_result\.data\.\*\.comments\.user\.must\_change\_password | boolean | 
 action\_result\.data\.\*\.comments\.user\.name | string | 
 action\_result\.data\.\*\.comments\.user\.nickname | string | 
@@ -2909,6 +2908,7 @@ action\_result\.data\.\*\.history\.\*\.action | string |
 action\_result\.data\.\*\.history\.\*\.detail | string | 
 action\_result\.data\.\*\.history\.\*\.id | string | 
 action\_result\.data\.\*\.history\.\*\.quantity | string | 
+action\_result\.data\.\*\.history\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.history\.\*\.tip\_report | numeric | 
 action\_result\.data\.\*\.history\.\*\.ts | string | 
 action\_result\.data\.\*\.history\.\*\.user\.avatar\_s3\_url | string | 
@@ -2916,6 +2916,7 @@ action\_result\.data\.\*\.history\.\*\.user\.can\_share\_intelligence | boolean 
 action\_result\.data\.\*\.history\.\*\.user\.email | string |  `email` 
 action\_result\.data\.\*\.history\.\*\.user\.id | string | 
 action\_result\.data\.\*\.history\.\*\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.history\.\*\.user\.is\_readonly | boolean | 
 action\_result\.data\.\*\.history\.\*\.user\.must\_change\_password | boolean | 
 action\_result\.data\.\*\.history\.\*\.user\.name | string | 
 action\_result\.data\.\*\.history\.\*\.user\.nickname | string | 
@@ -2945,6 +2946,7 @@ action\_result\.data\.\*\.owner\_user\.can\_share\_intelligence | boolean |
 action\_result\.data\.\*\.owner\_user\.email | string |  `email` 
 action\_result\.data\.\*\.owner\_user\.id | string | 
 action\_result\.data\.\*\.owner\_user\.is\_active | boolean | 
+action\_result\.data\.\*\.owner\_user\.is\_readonly | boolean | 
 action\_result\.data\.\*\.owner\_user\.must\_change\_password | boolean | 
 action\_result\.data\.\*\.owner\_user\.name | string | 
 action\_result\.data\.\*\.owner\_user\.nickname | string | 
@@ -2957,14 +2959,18 @@ action\_result\.data\.\*\.owner\_user\_name | string |
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.private\_status\_id | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.status | string | 
 action\_result\.data\.\*\.threat\_actor | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.ttp | string | 
+action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.votes\.me | string | 
 action\_result\.data\.\*\.votes\.total | numeric | 
 action\_result\.data\.\*\.watched\_by\_me | boolean | 
@@ -3002,117 +3008,92 @@ action\_result\.parameter\.limit | numeric |
 action\_result\.parameter\.name | string | 
 action\_result\.parameter\.source | string | 
 action\_result\.parameter\.status | string | 
-action\_result\.data\.\*\.\*\.id | string | 
-action\_result\.data\.\*\.\*\.tlp | string | 
-action\_result\.data\.\*\.\*\.ttp | string | 
-action\_result\.data\.\*\.\*\.name | string | 
-action\_result\.data\.\*\.\*\.uuid | string | 
-action\_result\.data\.\*\.\*\.votes\.me | string | 
-action\_result\.data\.\*\.\*\.votes\.total | numeric | 
-action\_result\.data\.\*\.\*\.parent | string | 
-action\_result\.data\.\*\.\*\.source | string | 
-action\_result\.data\.\*\.\*\.status | string | 
-action\_result\.data\.\*\.\*\.feed\_id | numeric | 
-action\_result\.data\.\*\.\*\.campaign | string | 
-action\_result\.data\.\*\.\*\.is\_email | boolean | 
-action\_result\.data\.\*\.\*\.is\_public | boolean | 
-action\_result\.data\.\*\.\*\.owner\_org | string | 
-action\_result\.data\.\*\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.\*\.owner\_user | string | 
-action\_result\.data\.\*\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.\*\.is\_editable | boolean | 
-action\_result\.data\.\*\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.\*\.all\_circles\_visible | boolean | 
 action\_result\.data\.\*\.\*\.assignee\_org | string | 
-action\_result\.data\.\*\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.\*\.is\_cloneable | string | 
-action\_result\.data\.\*\.\*\.owner\_org\_id | string | 
-action\_result\.data\.\*\.\*\.published\_ts | string | 
-action\_result\.data\.\*\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.\*\.threat\_actor | string | 
-action\_result\.data\.\*\.\*\.assignee\_user\.id | string | 
-action\_result\.data\.\*\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.\*\.assignee\_org\_id | string | 
+action\_result\.data\.\*\.\*\.assignee\_org\_name | string | 
+action\_result\.data\.\*\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.\*\.assignee\_user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.\*\.assignee\_user\.email | string | 
+action\_result\.data\.\*\.\*\.assignee\_user\.id | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\.is\_active | boolean | 
 action\_result\.data\.\*\.\*\.assignee\_user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.\*\.assignee\_user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.\*\.assignee\_user\.nickname | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\.organization\.id | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\.organization\.name | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\.organization\.resource\_uri | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\.resource\_uri | string | 
-action\_result\.data\.\*\.\*\.assignee\_user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.\*\.owner\_user\_id | string | 
-action\_result\.data\.\*\.\*\.starred\_by\_me | boolean | 
-action\_result\.data\.\*\.\*\.watched\_by\_me | boolean | 
-action\_result\.data\.\*\.\*\.owner\_org\_name | string | 
-action\_result\.data\.\*\.\*\.source\_created | string | 
-action\_result\.data\.\*\.\*\.assignee\_org\_id | string | 
-action\_result\.data\.\*\.\*\.original\_source | string | 
-action\_result\.data\.\*\.\*\.owner\_user\_name | string | 
-action\_result\.data\.\*\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\_id | numeric | 
-action\_result\.data\.\*\.\*\.assignee\_org\_name | string | 
-action\_result\.data\.\*\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.\*\.assignee\_user\_name | string | 
-action\_result\.data\.\*\.\*\.original\_source\_id | string | 
-action\_result\.data\.\*\.\*\.all\_circles\_visible | boolean | 
+action\_result\.data\.\*\.\*\.body\_content\_type | string | 
+action\_result\.data\.\*\.\*\.campaign | string | 
 action\_result\.data\.\*\.\*\.can\_add\_public\_tags | string | 
-action\_result\.data\.\*\.\*\.starred\_total\_count | numeric | 
-action\_result\.data\.\*\.\*\.watched\_total\_count | numeric | 
+action\_result\.data\.\*\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.\*\.id | string | 
+action\_result\.data\.\*\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.\*\.is\_cloneable | string | 
+action\_result\.data\.\*\.\*\.is\_editable | boolean | 
+action\_result\.data\.\*\.\*\.is\_email | boolean | 
+action\_result\.data\.\*\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.\*\.name | string | 
+action\_result\.data\.\*\.\*\.original\_source | string | 
+action\_result\.data\.\*\.\*\.original\_source\_id | string | 
+action\_result\.data\.\*\.\*\.owner\_org | string | 
 action\_result\.data\.\*\.\*\.owner\_org\.id | string | 
 action\_result\.data\.\*\.\*\.owner\_org\.name | string | 
 action\_result\.data\.\*\.\*\.owner\_org\.resource\_uri | string | 
-action\_result\.data\.\*\.\*\.owner\_user\.id | string | 
-action\_result\.data\.\*\.\*\.owner\_user\.name | string | 
+action\_result\.data\.\*\.\*\.owner\_org\.title | string | 
+action\_result\.data\.\*\.\*\.owner\_org\_id | string | 
+action\_result\.data\.\*\.\*\.owner\_org\_name | string | 
+action\_result\.data\.\*\.\*\.owner\_user | string | 
+action\_result\.data\.\*\.\*\.owner\_user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.\*\.owner\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.\*\.owner\_user\.email | string | 
-action\_result\.data\.\*\.\*\.owner\_user\.nickname | string | 
+action\_result\.data\.\*\.\*\.owner\_user\.id | string | 
 action\_result\.data\.\*\.\*\.owner\_user\.is\_active | boolean | 
 action\_result\.data\.\*\.\*\.owner\_user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.\*\.owner\_user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.\*\.owner\_user\.name | string | 
+action\_result\.data\.\*\.\*\.owner\_user\.nickname | string | 
 action\_result\.data\.\*\.\*\.owner\_user\.organization\.id | string | 
 action\_result\.data\.\*\.\*\.owner\_user\.organization\.name | string | 
 action\_result\.data\.\*\.\*\.owner\_user\.organization\.resource\_uri | string | 
 action\_result\.data\.\*\.\*\.owner\_user\.resource\_uri | string | 
-action\_result\.data\.\*\.\*\.owner\_user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.\*\.owner\_user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.\*\.owner\_user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.\*\.owner\_user\_id | string | 
+action\_result\.data\.\*\.\*\.owner\_user\_name | string | 
+action\_result\.data\.\*\.\*\.parent | string | 
+action\_result\.data\.\*\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.\*\.source | string | 
+action\_result\.data\.\*\.\*\.source\_created | string | 
+action\_result\.data\.\*\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.\*\.starred\_by\_me | boolean | 
+action\_result\.data\.\*\.\*\.starred\_total\_count | numeric | 
+action\_result\.data\.\*\.\*\.status | string | 
 action\_result\.data\.\*\.\*\.tags\_v2\.\*\.id | string | 
-action\_result\.data\.\*\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.\*\.tags\_v2\.\*\.name | string | 
 action\_result\.data\.\*\.\*\.tags\_v2\.\*\.org\_id | numeric | 
 action\_result\.data\.\*\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.\*\.assignee\_user\.nickname | string | 
-action\_result\.data\.\*\.\*\.assignee\_user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.\*\.owner\_org\.title | string | 
-action\_result\.data\.\*\.assignee\_user | string | 
-action\_result\.data\.\*\.owner\_org | string | 
-action\_result\.data\.\*\.owner\_user | string | 
-action\_result\.data\.\*\.owner\_org\.title | string | 
-action\_result\.data\.\*\.circles\.\*\.id | numeric | 
-action\_result\.data\.\*\.circles\.\*\.name | string | 
-action\_result\.data\.\*\.circles\.\*\.member | boolean | 
-action\_result\.data\.\*\.circles\.\*\.public | boolean | 
-action\_result\.data\.\*\.circles\.\*\.pending | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_edit | boolean | 
-action\_result\.data\.\*\.circles\.\*\.use\_chat | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_invite | boolean | 
-action\_result\.data\.\*\.circles\.\*\.openinvite | boolean | 
-action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.circles\.\*\.description | string | 
-action\_result\.data\.\*\.circles\.\*\.is\_freemium | boolean | 
-action\_result\.data\.\*\.circles\.\*\.num\_members | numeric | 
-action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.circles\.\*\.anonymous\_sharing | boolean | 
-action\_result\.data\.\*\.circles\.\*\.mattermost\_team\_id | string | 
-action\_result\.data\.\*\.circles\.\*\.num\_administrators | numeric | 
-action\_result\.data\.\*\.circles\.\*\.subscription\_model | string | 
-action\_result\.data\.\*\.circles\.\*\.disable\_vendor\_emails | string | 
-action\_result\.data\.\*\.circles\.\*\.restricted\_publishing | boolean | 
-action\_result\.data\.\*\.circles\.\*\.validate\_subscriptions | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_override\_confidence | boolean | 
+action\_result\.data\.\*\.\*\.tags\_v2\.\*\.tlp | string | 
+action\_result\.data\.\*\.\*\.threat\_actor | string | 
+action\_result\.data\.\*\.\*\.tlp | string | 
+action\_result\.data\.\*\.\*\.ttp | string | 
+action\_result\.data\.\*\.\*\.uuid | string | 
+action\_result\.data\.\*\.\*\.votes\.me | string | 
+action\_result\.data\.\*\.\*\.votes\.total | numeric | 
+action\_result\.data\.\*\.\*\.watched\_by\_me | boolean | 
+action\_result\.data\.\*\.\*\.watched\_total\_count | numeric | 
 action\_result\.data\.\*\.all\_circles\_visible | boolean | 
 action\_result\.data\.\*\.assignee\_org | string | 
 action\_result\.data\.\*\.assignee\_org\_id | string | 
 action\_result\.data\.\*\.assignee\_org\_name | string | 
+action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.assignee\_user\.email | string |  `email` 
@@ -3131,6 +3112,28 @@ action\_result\.data\.\*\.assignee\_user\_name | string |
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaign | string | 
 action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
+action\_result\.data\.\*\.circles\.\*\.anonymous\_sharing | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_edit | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_invite | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_override\_confidence | boolean | 
+action\_result\.data\.\*\.circles\.\*\.description | string | 
+action\_result\.data\.\*\.circles\.\*\.disable\_vendor\_emails | string | 
+action\_result\.data\.\*\.circles\.\*\.id | numeric | 
+action\_result\.data\.\*\.circles\.\*\.is\_freemium | boolean | 
+action\_result\.data\.\*\.circles\.\*\.mattermost\_team\_id | string | 
+action\_result\.data\.\*\.circles\.\*\.member | boolean | 
+action\_result\.data\.\*\.circles\.\*\.name | string | 
+action\_result\.data\.\*\.circles\.\*\.num\_administrators | numeric | 
+action\_result\.data\.\*\.circles\.\*\.num\_members | numeric | 
+action\_result\.data\.\*\.circles\.\*\.openinvite | boolean | 
+action\_result\.data\.\*\.circles\.\*\.pending | boolean | 
+action\_result\.data\.\*\.circles\.\*\.public | boolean | 
+action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.circles\.\*\.restricted\_publishing | boolean | 
+action\_result\.data\.\*\.circles\.\*\.subscription\_model | string | 
+action\_result\.data\.\*\.circles\.\*\.use\_chat | boolean | 
+action\_result\.data\.\*\.circles\.\*\.validate\_subscriptions | boolean | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | string |  `threatstream threatbulletin id` 
@@ -3143,11 +3146,14 @@ action\_result\.data\.\*\.modified\_ts | string |
 action\_result\.data\.\*\.name | string | 
 action\_result\.data\.\*\.original\_source | string | 
 action\_result\.data\.\*\.original\_source\_id | string | 
+action\_result\.data\.\*\.owner\_org | string | 
 action\_result\.data\.\*\.owner\_org\.id | string | 
 action\_result\.data\.\*\.owner\_org\.name | string | 
 action\_result\.data\.\*\.owner\_org\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_org\.title | string | 
 action\_result\.data\.\*\.owner\_org\_id | numeric | 
 action\_result\.data\.\*\.owner\_org\_name | string | 
+action\_result\.data\.\*\.owner\_user | string | 
 action\_result\.data\.\*\.owner\_user\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.owner\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.owner\_user\.email | string |  `email` 
@@ -3214,105 +3220,62 @@ action\_result\.parameter\.associated\_entity\_type | string |
 action\_result\.parameter\.entity\_id | string |  `threatstream actor id`  `threatstream campaign id`  `threatstream incident id`  `threatstream vulnerability id`  `threatstream ttp id`  `threatstream threatbulletin id`  `threatstream signature id` 
 action\_result\.parameter\.entity\_type | string | 
 action\_result\.parameter\.limit | numeric | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
-action\_result\.data\.\*\.s\_type | string | 
-action\_result\.summary\.threat\_bulletin\_observables\_returned | numeric | 
-action\_result\.data\.\*\.votes\.me | string | 
-action\_result\.data\.\*\.votes\.total | numeric | 
-action\_result\.data\.\*\.status\.id | numeric | 
-action\_result\.data\.\*\.status\.display\_name | string | 
-action\_result\.data\.\*\.status\.resource\_uri | string | 
-action\_result\.data\.\*\.end\_date | string | 
-action\_result\.data\.\*\.start\_date | string | 
-action\_result\.data\.\*\.starred\_by\_me | boolean | 
-action\_result\.data\.\*\.watched\_by\_me | boolean | 
-action\_result\.data\.\*\.starred\_total\_count | numeric | 
-action\_result\.data\.\*\.watched\_total\_count | numeric | 
-action\_result\.data\.\*\.ttp | string | 
-action\_result\.data\.\*\.parent | string | 
-action\_result\.data\.\*\.circles\.\*\.member | boolean | 
-action\_result\.data\.\*\.circles\.\*\.public | boolean | 
-action\_result\.data\.\*\.circles\.\*\.pending | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_edit | boolean | 
-action\_result\.data\.\*\.circles\.\*\.use\_chat | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_invite | boolean | 
-action\_result\.data\.\*\.circles\.\*\.openinvite | boolean | 
-action\_result\.data\.\*\.circles\.\*\.description | string | 
-action\_result\.data\.\*\.circles\.\*\.is\_freemium | boolean | 
-action\_result\.data\.\*\.circles\.\*\.num\_members | numeric | 
-action\_result\.data\.\*\.circles\.\*\.anonymous\_sharing | boolean | 
-action\_result\.data\.\*\.circles\.\*\.mattermost\_team\_id | string | 
-action\_result\.data\.\*\.circles\.\*\.num\_administrators | numeric | 
-action\_result\.data\.\*\.circles\.\*\.subscription\_model | string | 
-action\_result\.data\.\*\.circles\.\*\.disable\_vendor\_emails | string | 
-action\_result\.data\.\*\.circles\.\*\.restricted\_publishing | boolean | 
-action\_result\.data\.\*\.circles\.\*\.validate\_subscriptions | boolean | 
-action\_result\.data\.\*\.circles\.\*\.can\_override\_confidence | boolean | 
-action\_result\.data\.\*\.campaign | string | 
-action\_result\.data\.\*\.is\_email | boolean | 
-action\_result\.data\.\*\.owner\_org\.id | string | 
-action\_result\.data\.\*\.owner\_org\.name | string | 
-action\_result\.data\.\*\.owner\_org\.resource\_uri | string | 
-action\_result\.data\.\*\.owner\_user\.id | string | 
-action\_result\.data\.\*\.owner\_user\.name | string | 
-action\_result\.data\.\*\.owner\_user\.email | string | 
-action\_result\.data\.\*\.owner\_user\.nickname | string | 
-action\_result\.data\.\*\.owner\_user\.is\_active | boolean | 
-action\_result\.data\.\*\.owner\_user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.owner\_user\.organization\.id | string | 
-action\_result\.data\.\*\.owner\_user\.organization\.name | string | 
-action\_result\.data\.\*\.owner\_user\.organization\.resource\_uri | string | 
-action\_result\.data\.\*\.owner\_user\.resource\_uri | string | 
-action\_result\.data\.\*\.owner\_user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.owner\_user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.owner\_user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.assignee\_org | string | 
-action\_result\.data\.\*\.owner\_org\_id | numeric | 
-action\_result\.data\.\*\.threat\_actor | string | 
-action\_result\.data\.\*\.owner\_org\_name | string | 
-action\_result\.data\.\*\.assignee\_org\_id | string | 
-action\_result\.data\.\*\.original\_source | string | 
-action\_result\.data\.\*\.owner\_user\_name | string | 
-action\_result\.data\.\*\.assignee\_user\_id | string | 
-action\_result\.data\.\*\.assignee\_org\_name | string | 
-action\_result\.data\.\*\.body\_content\_type | string | 
-action\_result\.data\.\*\.assignee\_user\_name | string | 
-action\_result\.data\.\*\.original\_source\_id | string | 
 action\_result\.data\.\*\.all\_circles\_visible | boolean | 
-action\_result\.data\.\*\.assignee\_user\.id | string | 
-action\_result\.data\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.asn | string | 
+action\_result\.data\.\*\.assignee\_org | string | 
+action\_result\.data\.\*\.assignee\_org\_id | string | 
+action\_result\.data\.\*\.assignee\_org\_name | string | 
+action\_result\.data\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
 action\_result\.data\.\*\.assignee\_user\.email | string | 
-action\_result\.data\.\*\.assignee\_user\.nickname | string | 
+action\_result\.data\.\*\.assignee\_user\.id | string | 
 action\_result\.data\.\*\.assignee\_user\.is\_active | boolean | 
 action\_result\.data\.\*\.assignee\_user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.assignee\_user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.assignee\_user\.name | string | 
+action\_result\.data\.\*\.assignee\_user\.nickname | string | 
 action\_result\.data\.\*\.assignee\_user\.organization\.id | string | 
 action\_result\.data\.\*\.assignee\_user\.organization\.name | string | 
 action\_result\.data\.\*\.assignee\_user\.organization\.resource\_uri | string | 
 action\_result\.data\.\*\.assignee\_user\.resource\_uri | string | 
-action\_result\.data\.\*\.assignee\_user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.assignee\_user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.assignee\_user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.is\_category | boolean | 
-action\_result\.data\.\*\.is\_mitre | boolean | 
-action\_result\.data\.\*\.objective | string | 
-action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
-action\_result\.data\.\*\.asn | string | 
-action\_result\.data\.\*\.assignee\_user | string | 
+action\_result\.data\.\*\.assignee\_user\_id | string | 
+action\_result\.data\.\*\.assignee\_user\_name | string | 
 action\_result\.data\.\*\.association\_info\.\*\.comment | string | 
 action\_result\.data\.\*\.association\_info\.\*\.created | string | 
 action\_result\.data\.\*\.association\_info\.\*\.from\_id | string | 
 action\_result\.data\.\*\.association\_info\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.body\_content\_type | string | 
+action\_result\.data\.\*\.campaign | string | 
 action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
+action\_result\.data\.\*\.circles\.\*\.anonymous\_sharing | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_edit | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_invite | boolean | 
+action\_result\.data\.\*\.circles\.\*\.can\_override\_confidence | boolean | 
+action\_result\.data\.\*\.circles\.\*\.description | string | 
+action\_result\.data\.\*\.circles\.\*\.disable\_vendor\_emails | string | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
+action\_result\.data\.\*\.circles\.\*\.is\_freemium | boolean | 
+action\_result\.data\.\*\.circles\.\*\.mattermost\_team\_id | string | 
+action\_result\.data\.\*\.circles\.\*\.member | boolean | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
+action\_result\.data\.\*\.circles\.\*\.num\_administrators | numeric | 
+action\_result\.data\.\*\.circles\.\*\.num\_members | numeric | 
+action\_result\.data\.\*\.circles\.\*\.openinvite | boolean | 
+action\_result\.data\.\*\.circles\.\*\.pending | boolean | 
+action\_result\.data\.\*\.circles\.\*\.public | boolean | 
 action\_result\.data\.\*\.circles\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.circles\.\*\.restricted\_publishing | boolean | 
+action\_result\.data\.\*\.circles\.\*\.subscription\_model | string | 
+action\_result\.data\.\*\.circles\.\*\.use\_chat | boolean | 
+action\_result\.data\.\*\.circles\.\*\.validate\_subscriptions | boolean | 
 action\_result\.data\.\*\.confidence | numeric | 
 action\_result\.data\.\*\.country | string | 
 action\_result\.data\.\*\.created\_by | string |  `email` 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
+action\_result\.data\.\*\.end\_date | string | 
 action\_result\.data\.\*\.expiration\_ts | string | 
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric |  `threatstream actor id`  `threatstream campaign id`  `threatstream incident id`  `threatstream vulnerability id`  `threatstream ttp id`  `threatstream threatbulletin id`  `threatstream signature id` 
@@ -3320,8 +3283,11 @@ action\_result\.data\.\*\.import\_session\_id | numeric |
 action\_result\.data\.\*\.import\_source | string | 
 action\_result\.data\.\*\.ip | string |  `ip` 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.is\_category | boolean | 
 action\_result\.data\.\*\.is\_cloneable | string | 
 action\_result\.data\.\*\.is\_editable | boolean | 
+action\_result\.data\.\*\.is\_email | boolean | 
+action\_result\.data\.\*\.is\_mitre | boolean | 
 action\_result\.data\.\*\.is\_public | boolean | 
 action\_result\.data\.\*\.is\_system | boolean | 
 action\_result\.data\.\*\.itype | string | 
@@ -3331,41 +3297,81 @@ action\_result\.data\.\*\.meta\.detail2 | string |
 action\_result\.data\.\*\.meta\.severity | string | 
 action\_result\.data\.\*\.modified\_ts | string | 
 action\_result\.data\.\*\.name | string | 
+action\_result\.data\.\*\.objective | string | 
 action\_result\.data\.\*\.org | string | 
 action\_result\.data\.\*\.organization\_id | numeric | 
+action\_result\.data\.\*\.original\_source | string | 
+action\_result\.data\.\*\.original\_source\_id | string | 
+action\_result\.data\.\*\.owner\_org\.id | string | 
+action\_result\.data\.\*\.owner\_org\.name | string | 
+action\_result\.data\.\*\.owner\_org\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_org\_id | numeric | 
+action\_result\.data\.\*\.owner\_org\_name | string | 
 action\_result\.data\.\*\.owner\_organization\_id | numeric | 
+action\_result\.data\.\*\.owner\_user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.owner\_user\.can\_share\_intelligence | boolean | 
+action\_result\.data\.\*\.owner\_user\.email | string | 
+action\_result\.data\.\*\.owner\_user\.id | string | 
+action\_result\.data\.\*\.owner\_user\.is\_active | boolean | 
+action\_result\.data\.\*\.owner\_user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.owner\_user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.owner\_user\.name | string | 
+action\_result\.data\.\*\.owner\_user\.nickname | string | 
+action\_result\.data\.\*\.owner\_user\.organization\.id | string | 
+action\_result\.data\.\*\.owner\_user\.organization\.name | string | 
+action\_result\.data\.\*\.owner\_user\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.owner\_user\.resource\_uri | string | 
 action\_result\.data\.\*\.owner\_user\_id | numeric | 
+action\_result\.data\.\*\.owner\_user\_name | string | 
+action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
 action\_result\.data\.\*\.rdns | string | 
 action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.retina\_confidence | numeric | 
+action\_result\.data\.\*\.s\_type | string | 
 action\_result\.data\.\*\.sort | string | 
 action\_result\.data\.\*\.source | string |  `email` 
 action\_result\.data\.\*\.source\_created | string | 
 action\_result\.data\.\*\.source\_modified | string | 
 action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
+action\_result\.data\.\*\.starred\_by\_me | boolean | 
+action\_result\.data\.\*\.starred\_total\_count | numeric | 
+action\_result\.data\.\*\.start\_date | string | 
 action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.status\.display\_name | string | 
+action\_result\.data\.\*\.status\.id | numeric | 
+action\_result\.data\.\*\.status\.resource\_uri | string | 
 action\_result\.data\.\*\.subtype | string | 
 action\_result\.data\.\*\.tags | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
 action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
 action\_result\.data\.\*\.tags\_v2\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
+action\_result\.data\.\*\.threat\_actor | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.trusted\_circle\_ids | string | 
+action\_result\.data\.\*\.ttp | string | 
 action\_result\.data\.\*\.type | string | 
 action\_result\.data\.\*\.update\_id | string | 
 action\_result\.data\.\*\.uuid | string | 
 action\_result\.data\.\*\.value | string |  `email`  `ip`  `sha256` 
+action\_result\.data\.\*\.votes\.me | string | 
+action\_result\.data\.\*\.votes\.total | numeric | 
+action\_result\.data\.\*\.watched\_by\_me | boolean | 
+action\_result\.data\.\*\.watched\_total\_count | numeric | 
 action\_result\.summary\.associations\_returned | numeric | 
+action\_result\.summary\.threat\_bulletin\_observables\_returned | numeric | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
@@ -3877,31 +3883,30 @@ action\_result\.parameter\.fields | string |
 action\_result\.parameter\.is\_public | boolean | 
 action\_result\.parameter\.local\_intelligence | string |  `threatstream intelligence id` 
 action\_result\.parameter\.name | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.id | numeric | 
-action\_result\.data\.\*\.attachments\.url | string | 
-action\_result\.data\.\*\.attachments\.title | string | 
-action\_result\.data\.\*\.attachments\.r\_type | string | 
-action\_result\.data\.\*\.attachments\.s3\_url | string | 
-action\_result\.data\.\*\.attachments\.filename | string | 
-action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.resource\_uri | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.comment\.remote\_api | boolean | 
-action\_result\.data\.\*\.comment\.invalid | string | 
-action\_result\.data\.\*\.comment\.\!\@\#$%^ | string | 
 action\_result\.data\.\*\.aliases | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.attachment | string | 
+action\_result\.data\.\*\.attachments\.filename | string | 
+action\_result\.data\.\*\.attachments\.id | numeric | 
+action\_result\.data\.\*\.attachments\.r\_type | string | 
+action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
+action\_result\.data\.\*\.attachments\.resource\_uri | string | 
+action\_result\.data\.\*\.attachments\.s3\_url | string | 
+action\_result\.data\.\*\.attachments\.title | string | 
+action\_result\.data\.\*\.attachments\.url | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaigns\.\*\.id | numeric | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.comment\.\!\@\#$%^ | string | 
 action\_result\.data\.\*\.comment\.body | string | 
 action\_result\.data\.\*\.comment\.created\_ts | string | 
 action\_result\.data\.\*\.comment\.id | numeric | 
+action\_result\.data\.\*\.comment\.invalid | string | 
 action\_result\.data\.\*\.comment\.modified\_ts | string | 
+action\_result\.data\.\*\.comment\.remote\_api | boolean | 
 action\_result\.data\.\*\.comment\.resource\_uri | string | 
 action\_result\.data\.\*\.comment\.title | string | 
 action\_result\.data\.\*\.comment\.tlp | string | 
@@ -3949,6 +3954,7 @@ action\_result\.data\.\*\.owner\_user\_id | numeric |
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.signatures\.\*\.id | numeric | 
 action\_result\.data\.\*\.source | string | 
@@ -3996,69 +4002,20 @@ action\_result\.parameter\.comment | string |
 action\_result\.parameter\.fields | string | 
 action\_result\.parameter\.id | string |  `threatstream vulnerability id` 
 action\_result\.parameter\.local\_intelligence | string |  `threatstream intelligence id` 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.id | numeric | 
-action\_result\.data\.\*\.attachments\.url | string | 
-action\_result\.data\.\*\.attachments\.title | string | 
-action\_result\.data\.\*\.attachments\.r\_type | string | 
-action\_result\.data\.\*\.attachments\.s3\_url | string | 
-action\_result\.data\.\*\.attachments\.filename | string | 
-action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.resource\_uri | string | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.external\_references\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.ip | string | 
-action\_result\.data\.\*\.intelligence\.\*\.asn | string | 
-action\_result\.data\.\*\.intelligence\.\*\.org | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tlp | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.detail2 | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.severity | string | 
-action\_result\.data\.\*\.intelligence\.\*\.rdns | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tlp | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.name | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.org\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.type | string | 
-action\_result\.data\.\*\.intelligence\.\*\.uuid | string | 
-action\_result\.data\.\*\.intelligence\.\*\.itype | string | 
-action\_result\.data\.\*\.intelligence\.\*\.value | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source | string | 
-action\_result\.data\.\*\.intelligence\.\*\.status | string | 
-action\_result\.data\.\*\.intelligence\.\*\.country | string | 
-action\_result\.data\.\*\.intelligence\.\*\.feed\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
-action\_result\.data\.\*\.intelligence\.\*\.latitude | string | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_public | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.longitude | string | 
-action\_result\.data\.\*\.intelligence\.\*\.update\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.confidence | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.created\_by | string | 
-action\_result\.data\.\*\.intelligence\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.description | string | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_editable | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.modified\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.threat\_type | string | 
-action\_result\.data\.\*\.intelligence\.\*\.threatscore | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.intelligence\.\*\.expiration\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.import\_source | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_created | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.intelligence\.\*\.import\_session\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.retina\_confidence | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.trusted\_circle\_ids | string | 
-action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.owner\_organization\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_reported\_confidence | numeric | 
 action\_result\.data\.\*\.aliases | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.attachment | string | 
+action\_result\.data\.\*\.attachments\.filename | string | 
+action\_result\.data\.\*\.attachments\.id | numeric | 
+action\_result\.data\.\*\.attachments\.r\_type | string | 
+action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
+action\_result\.data\.\*\.attachments\.resource\_uri | string | 
+action\_result\.data\.\*\.attachments\.s3\_url | string | 
+action\_result\.data\.\*\.attachments\.title | string | 
+action\_result\.data\.\*\.attachments\.url | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaigns\.\*\.id | numeric | 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
@@ -4091,6 +4048,7 @@ action\_result\.data\.\*\.embedded\_content\_url | string |
 action\_result\.data\.\*\.external\_references\.\*\.filename | string | 
 action\_result\.data\.\*\.external\_references\.\*\.id | numeric | 
 action\_result\.data\.\*\.external\_references\.\*\.r\_type | string | 
+action\_result\.data\.\*\.external\_references\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.external\_references\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.external\_references\.\*\.s3\_url | string |  `url` 
 action\_result\.data\.\*\.external\_references\.\*\.title | string | 
@@ -4098,6 +4056,53 @@ action\_result\.data\.\*\.external\_references\.\*\.url | string |
 action\_result\.data\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.id | numeric | 
 action\_result\.data\.\*\.incidents\.\*\.id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.asn | string | 
+action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.country | string | 
+action\_result\.data\.\*\.intelligence\.\*\.created\_by | string | 
+action\_result\.data\.\*\.intelligence\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.description | string | 
+action\_result\.data\.\*\.intelligence\.\*\.expiration\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.import\_source | string | 
+action\_result\.data\.\*\.intelligence\.\*\.ip | string | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_editable | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.itype | string | 
+action\_result\.data\.\*\.intelligence\.\*\.latitude | string | 
+action\_result\.data\.\*\.intelligence\.\*\.longitude | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.detail2 | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.severity | string | 
+action\_result\.data\.\*\.intelligence\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.org | string | 
+action\_result\.data\.\*\.intelligence\.\*\.owner\_organization\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.rdns | string | 
+action\_result\.data\.\*\.intelligence\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.intelligence\.\*\.retina\_confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.source | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_created | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_reported\_confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.status | string | 
+action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tlp | string | 
+action\_result\.data\.\*\.intelligence\.\*\.threat\_type | string | 
+action\_result\.data\.\*\.intelligence\.\*\.threatscore | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.tlp | string | 
+action\_result\.data\.\*\.intelligence\.\*\.trusted\_circle\_ids | string | 
+action\_result\.data\.\*\.intelligence\.\*\.type | string | 
+action\_result\.data\.\*\.intelligence\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.uuid | string | 
+action\_result\.data\.\*\.intelligence\.\*\.value | string | 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_cloneable | string | 
 action\_result\.data\.\*\.is\_public | boolean | 
@@ -4118,6 +4123,7 @@ action\_result\.data\.\*\.owner\_user\_id | numeric |
 action\_result\.data\.\*\.parent | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.signatures\.\*\.id | numeric | 
 action\_result\.data\.\*\.source | string | 
@@ -4169,39 +4175,33 @@ action\_result\.parameter\.fields | string |
 action\_result\.parameter\.is\_public | boolean | 
 action\_result\.parameter\.local\_intelligence | string |  `threatstream intelligence id` 
 action\_result\.parameter\.name | string | 
-action\_result\.data\.\*\.soph\_type | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.attachments\.id | numeric | 
-action\_result\.data\.\*\.attachments\.url | string | 
-action\_result\.data\.\*\.attachments\.title | string | 
-action\_result\.data\.\*\.attachments\.r\_type | string | 
-action\_result\.data\.\*\.attachments\.s3\_url | string | 
-action\_result\.data\.\*\.attachments\.filename | string | 
-action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.resource\_uri | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
-action\_result\.data\.\*\.comment\.\!\@\#$%^ | string | 
-action\_result\.data\.\*\.comment\.invalid | string | 
-action\_result\.data\.\*\.comment\.remote\_api | boolean | 
 action\_result\.data\.\*\.aliases\.\*\.id | numeric | 
 action\_result\.data\.\*\.aliases\.\*\.name | string | 
 action\_result\.data\.\*\.aliases\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.attachment | string | 
+action\_result\.data\.\*\.attachments\.filename | string | 
+action\_result\.data\.\*\.attachments\.id | numeric | 
+action\_result\.data\.\*\.attachments\.r\_type | string | 
+action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
+action\_result\.data\.\*\.attachments\.resource\_uri | string | 
+action\_result\.data\.\*\.attachments\.s3\_url | string | 
+action\_result\.data\.\*\.attachments\.title | string | 
+action\_result\.data\.\*\.attachments\.url | string | 
 action\_result\.data\.\*\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaigns\.\*\.id | numeric |  `threatstream campaign id` 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.comment\.\!\@\#$%^ | string | 
 action\_result\.data\.\*\.comment\.body | string | 
 action\_result\.data\.\*\.comment\.created\_ts | string | 
 action\_result\.data\.\*\.comment\.id | numeric | 
+action\_result\.data\.\*\.comment\.invalid | string | 
 action\_result\.data\.\*\.comment\.modified\_ts | string | 
+action\_result\.data\.\*\.comment\.remote\_api | boolean | 
 action\_result\.data\.\*\.comment\.resource\_uri | string | 
 action\_result\.data\.\*\.comment\.title | string | 
 action\_result\.data\.\*\.comment\.tlp | string | 
@@ -4248,12 +4248,14 @@ action\_result\.data\.\*\.personal\_motivations | string |
 action\_result\.data\.\*\.primary\_motivation | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_level | string | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.roles | string | 
 action\_result\.data\.\*\.secondary\_motivations | string | 
 action\_result\.data\.\*\.signatures\.\*\.id | numeric |  `threatstream signature id` 
 action\_result\.data\.\*\.soph\_desc | string | 
+action\_result\.data\.\*\.soph\_type | string | 
 action\_result\.data\.\*\.soph\_type | string | 
 action\_result\.data\.\*\.soph\_type\.display\_name | string | 
 action\_result\.data\.\*\.soph\_type\.id | numeric | 
@@ -4264,6 +4266,10 @@ action\_result\.data\.\*\.source\_modified | string |
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_actor\_types | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.ttps\.\*\.id | numeric |  `threatstream ttp id` 
@@ -4308,104 +4314,23 @@ action\_result\.parameter\.comment | string |
 action\_result\.parameter\.fields | string | 
 action\_result\.parameter\.id | string |  `threatstream actor id` 
 action\_result\.parameter\.local\_intelligence | string |  `threatstream intelligence id` 
-action\_result\.data\.\*\.soph\_type | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.ip | string | 
-action\_result\.data\.\*\.intelligence\.\*\.asn | string | 
-action\_result\.data\.\*\.intelligence\.\*\.org | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tlp | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.detail2 | string | 
-action\_result\.data\.\*\.intelligence\.\*\.meta\.severity | string | 
-action\_result\.data\.\*\.intelligence\.\*\.rdns | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tlp | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.name | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.org\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.type | string | 
-action\_result\.data\.\*\.intelligence\.\*\.uuid | string | 
-action\_result\.data\.\*\.intelligence\.\*\.itype | string | 
-action\_result\.data\.\*\.intelligence\.\*\.value | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source | string | 
-action\_result\.data\.\*\.intelligence\.\*\.status | string | 
-action\_result\.data\.\*\.intelligence\.\*\.country | string | 
-action\_result\.data\.\*\.intelligence\.\*\.feed\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
-action\_result\.data\.\*\.intelligence\.\*\.latitude | string | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_public | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.longitude | string | 
-action\_result\.data\.\*\.intelligence\.\*\.update\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.confidence | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.created\_by | string | 
-action\_result\.data\.\*\.intelligence\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.description | string | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_editable | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.modified\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.threat\_type | string | 
-action\_result\.data\.\*\.intelligence\.\*\.threatscore | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.intelligence\.\*\.expiration\_ts | string | 
-action\_result\.data\.\*\.intelligence\.\*\.import\_source | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_created | string | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.intelligence\.\*\.import\_session\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.retina\_confidence | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.trusted\_circle\_ids | string | 
-action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
-action\_result\.data\.\*\.intelligence\.\*\.owner\_organization\_id | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.source\_reported\_confidence | numeric | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user\_id | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tagger | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.category | string | 
-action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user | string | 
-action\_result\.data\.\*\.attachments\.id | numeric | 
-action\_result\.data\.\*\.attachments\.url | string | 
-action\_result\.data\.\*\.attachments\.title | string | 
-action\_result\.data\.\*\.attachments\.r\_type | string | 
-action\_result\.data\.\*\.attachments\.s3\_url | string | 
-action\_result\.data\.\*\.attachments\.filename | string | 
-action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
-action\_result\.data\.\*\.attachments\.resource\_uri | string | 
-action\_result\.data\.\*\.external\_references\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
-action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
-action\_result\.data\.\*\.comments\.id | numeric | 
-action\_result\.data\.\*\.comments\.tlp | string | 
-action\_result\.data\.\*\.comments\.body | string | 
-action\_result\.data\.\*\.comments\.user\.id | string | 
-action\_result\.data\.\*\.comments\.user\.name | string | 
-action\_result\.data\.\*\.comments\.user\.email | string | 
-action\_result\.data\.\*\.comments\.user\.nickname | string | 
-action\_result\.data\.\*\.comments\.user\.is\_active | boolean | 
-action\_result\.data\.\*\.comments\.user\.organization\.id | string | 
-action\_result\.data\.\*\.comments\.user\.organization\.name | string | 
-action\_result\.data\.\*\.comments\.user\.organization\.resource\_uri | string | 
-action\_result\.data\.\*\.comments\.user\.resource\_uri | string | 
-action\_result\.data\.\*\.comments\.user\.avatar\_s3\_url | string | 
-action\_result\.data\.\*\.comments\.user\.must\_change\_password | boolean | 
-action\_result\.data\.\*\.comments\.user\.can\_share\_intelligence | boolean | 
-action\_result\.data\.\*\.comments\.title | string | 
-action\_result\.data\.\*\.comments\.created\_ts | string | 
-action\_result\.data\.\*\.comments\.modified\_ts | string | 
-action\_result\.data\.\*\.comments\.resource\_uri | string | 
-action\_result\.data\.\*\.comments\.user\.is\_readonly | boolean | 
-action\_result\.data\.\*\.comments\.\!\@\#$%^&\* | string | 
-action\_result\.data\.\*\.comments\.remote\_api | boolean | 
-action\_result\.data\.\*\.comments\.incorrect value | string | 
 action\_result\.data\.\*\.aliases\.\*\.id | numeric | 
 action\_result\.data\.\*\.aliases\.\*\.name | string | 
 action\_result\.data\.\*\.aliases\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.assignee\_user | string | 
 action\_result\.data\.\*\.attachment | string | 
+action\_result\.data\.\*\.attachments\.filename | string | 
+action\_result\.data\.\*\.attachments\.id | numeric | 
+action\_result\.data\.\*\.attachments\.r\_type | string | 
+action\_result\.data\.\*\.attachments\.remote\_api | boolean | 
+action\_result\.data\.\*\.attachments\.resource\_uri | string | 
+action\_result\.data\.\*\.attachments\.s3\_url | string | 
+action\_result\.data\.\*\.attachments\.title | string | 
+action\_result\.data\.\*\.attachments\.url | string | 
 action\_result\.data\.\*\.avatar\_s3\_url | string | 
 action\_result\.data\.\*\.body\_content\_type | string | 
 action\_result\.data\.\*\.campaigns\.\*\.id | numeric |  `threatstream campaign id` 
+action\_result\.data\.\*\.can\_add\_public\_tags | boolean | 
 action\_result\.data\.\*\.circles\.\*\.id | string | 
 action\_result\.data\.\*\.circles\.\*\.name | string | 
 action\_result\.data\.\*\.circles\.\*\.resource\_uri | string | 
@@ -4429,6 +4354,29 @@ action\_result\.data\.\*\.comment\.user\.organization\.id | string |
 action\_result\.data\.\*\.comment\.user\.organization\.name | string | 
 action\_result\.data\.\*\.comment\.user\.organization\.resource\_uri | string | 
 action\_result\.data\.\*\.comment\.user\.resource\_uri | string | 
+action\_result\.data\.\*\.comments\.\!\@\#$%^&\* | string | 
+action\_result\.data\.\*\.comments\.body | string | 
+action\_result\.data\.\*\.comments\.created\_ts | string | 
+action\_result\.data\.\*\.comments\.id | numeric | 
+action\_result\.data\.\*\.comments\.incorrect value | string | 
+action\_result\.data\.\*\.comments\.modified\_ts | string | 
+action\_result\.data\.\*\.comments\.remote\_api | boolean | 
+action\_result\.data\.\*\.comments\.resource\_uri | string | 
+action\_result\.data\.\*\.comments\.title | string | 
+action\_result\.data\.\*\.comments\.tlp | string | 
+action\_result\.data\.\*\.comments\.user\.avatar\_s3\_url | string | 
+action\_result\.data\.\*\.comments\.user\.can\_share\_intelligence | boolean | 
+action\_result\.data\.\*\.comments\.user\.email | string | 
+action\_result\.data\.\*\.comments\.user\.id | string | 
+action\_result\.data\.\*\.comments\.user\.is\_active | boolean | 
+action\_result\.data\.\*\.comments\.user\.is\_readonly | boolean | 
+action\_result\.data\.\*\.comments\.user\.must\_change\_password | boolean | 
+action\_result\.data\.\*\.comments\.user\.name | string | 
+action\_result\.data\.\*\.comments\.user\.nickname | string | 
+action\_result\.data\.\*\.comments\.user\.organization\.id | string | 
+action\_result\.data\.\*\.comments\.user\.organization\.name | string | 
+action\_result\.data\.\*\.comments\.user\.organization\.resource\_uri | string | 
+action\_result\.data\.\*\.comments\.user\.resource\_uri | string | 
 action\_result\.data\.\*\.created\_ts | string | 
 action\_result\.data\.\*\.description | string | 
 action\_result\.data\.\*\.embedded\_content\_type | string | 
@@ -4436,6 +4384,7 @@ action\_result\.data\.\*\.embedded\_content\_url | string |
 action\_result\.data\.\*\.external\_references\.\*\.filename | string | 
 action\_result\.data\.\*\.external\_references\.\*\.id | numeric | 
 action\_result\.data\.\*\.external\_references\.\*\.r\_type | string | 
+action\_result\.data\.\*\.external\_references\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.external\_references\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.external\_references\.\*\.s3\_url | string |  `url` 
 action\_result\.data\.\*\.external\_references\.\*\.title | string | 
@@ -4444,7 +4393,58 @@ action\_result\.data\.\*\.feed\_id | numeric |
 action\_result\.data\.\*\.goals | string | 
 action\_result\.data\.\*\.id | numeric |  `threatstream actor id` 
 action\_result\.data\.\*\.incidents\.\*\.id | numeric |  `threatstream incident id` 
+action\_result\.data\.\*\.intelligence\.\*\.asn | string | 
+action\_result\.data\.\*\.intelligence\.\*\.can\_add\_public\_tags | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.country | string | 
+action\_result\.data\.\*\.intelligence\.\*\.created\_by | string | 
+action\_result\.data\.\*\.intelligence\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.description | string | 
+action\_result\.data\.\*\.intelligence\.\*\.expiration\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.feed\_id | numeric | 
 action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.import\_session\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.import\_source | string | 
+action\_result\.data\.\*\.intelligence\.\*\.ip | string | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_editable | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.itype | string | 
+action\_result\.data\.\*\.intelligence\.\*\.latitude | string | 
+action\_result\.data\.\*\.intelligence\.\*\.longitude | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.detail2 | string | 
+action\_result\.data\.\*\.intelligence\.\*\.meta\.severity | string | 
+action\_result\.data\.\*\.intelligence\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.intelligence\.\*\.org | string | 
+action\_result\.data\.\*\.intelligence\.\*\.owner\_organization\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.rdns | string | 
+action\_result\.data\.\*\.intelligence\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.intelligence\.\*\.retina\_confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.source | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_created | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.intelligence\.\*\.source\_reported\_confidence | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.status | string | 
+action\_result\.data\.\*\.intelligence\.\*\.subtype | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.category | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.name | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.org\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tagger | string | 
+action\_result\.data\.\*\.intelligence\.\*\.tags\.\*\.tlp | string | 
+action\_result\.data\.\*\.intelligence\.\*\.threat\_type | string | 
+action\_result\.data\.\*\.intelligence\.\*\.threatscore | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.tlp | string | 
+action\_result\.data\.\*\.intelligence\.\*\.trusted\_circle\_ids | string | 
+action\_result\.data\.\*\.intelligence\.\*\.type | string | 
+action\_result\.data\.\*\.intelligence\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.intelligence\.\*\.uuid | string | 
+action\_result\.data\.\*\.intelligence\.\*\.value | string | 
 action\_result\.data\.\*\.is\_anonymous | boolean | 
 action\_result\.data\.\*\.is\_cloneable | string | 
 action\_result\.data\.\*\.is\_public | boolean | 
@@ -4466,12 +4466,14 @@ action\_result\.data\.\*\.personal\_motivations | string |
 action\_result\.data\.\*\.primary\_motivation | string | 
 action\_result\.data\.\*\.publication\_status | string | 
 action\_result\.data\.\*\.published\_ts | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
 action\_result\.data\.\*\.resource\_level | string | 
 action\_result\.data\.\*\.resource\_uri | string | 
 action\_result\.data\.\*\.roles | string | 
 action\_result\.data\.\*\.secondary\_motivations | string | 
 action\_result\.data\.\*\.signatures\.\*\.id | numeric |  `threatstream signature id` 
 action\_result\.data\.\*\.soph\_desc | string | 
+action\_result\.data\.\*\.soph\_type | string | 
 action\_result\.data\.\*\.soph\_type | string | 
 action\_result\.data\.\*\.soph\_type\.display\_name | string | 
 action\_result\.data\.\*\.soph\_type\.id | numeric | 
@@ -4482,6 +4484,10 @@ action\_result\.data\.\*\.source\_modified | string |
 action\_result\.data\.\*\.starred\_by\_me | boolean | 
 action\_result\.data\.\*\.starred\_total\_count | numeric | 
 action\_result\.data\.\*\.start\_date | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.id | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.name | string | 
+action\_result\.data\.\*\.tags\_v2\.\*\.org\_id | numeric | 
+action\_result\.data\.\*\.tags\_v2\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_actor\_types | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.ttps\.\*\.id | numeric |  `threatstream ttp id` 
@@ -4590,65 +4596,65 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.parameter\.id | string |  `threatstream intelligence id` 
-action\_result\.parameter\.indicator\_type | string | 
 action\_result\.parameter\.confidence | numeric | 
-action\_result\.parameter\.tlp | string | 
-action\_result\.parameter\.severity | string | 
-action\_result\.parameter\.status | string | 
 action\_result\.parameter\.expiration\_date | string | 
 action\_result\.parameter\.fields | string | 
-action\_result\.message | string | 
-action\_result\.summary | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
-action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
-action\_result\.data\.\*\.ip | string | 
+action\_result\.parameter\.id | string |  `threatstream intelligence id` 
+action\_result\.parameter\.indicator\_type | string | 
+action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.status | string | 
+action\_result\.parameter\.tlp | string | 
 action\_result\.data\.\*\.asn | string | 
-action\_result\.data\.\*\.org | string | 
-action\_result\.data\.\*\.tlp | string | 
-action\_result\.data\.\*\.meta\.next | string | 
+action\_result\.data\.\*\.confidence | numeric | 
+action\_result\.data\.\*\.country | string | 
+action\_result\.data\.\*\.created\_by | string | 
+action\_result\.data\.\*\.created\_ts | string | 
+action\_result\.data\.\*\.expiration\_ts | string | 
+action\_result\.data\.\*\.feed\_id | numeric | 
+action\_result\.data\.\*\.id | numeric |  `threatstream intelligence id` 
+action\_result\.data\.\*\.import\_session\_id | string | 
+action\_result\.data\.\*\.import\_source | string | 
+action\_result\.data\.\*\.ip | string | 
+action\_result\.data\.\*\.is\_anonymous | boolean | 
+action\_result\.data\.\*\.is\_public | boolean | 
+action\_result\.data\.\*\.itype | string | 
+action\_result\.data\.\*\.latitude | string | 
+action\_result\.data\.\*\.longitude | string | 
 action\_result\.data\.\*\.meta\.detail2 | string | 
+action\_result\.data\.\*\.meta\.next | string | 
 action\_result\.data\.\*\.meta\.previous | string | 
 action\_result\.data\.\*\.meta\.severity | string | 
+action\_result\.data\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.org | string | 
+action\_result\.data\.\*\.owner\_organization\_id | numeric | 
 action\_result\.data\.\*\.rdns | string | 
+action\_result\.data\.\*\.remote\_api | boolean | 
+action\_result\.data\.\*\.resource\_uri | string | 
+action\_result\.data\.\*\.retina\_confidence | numeric | 
+action\_result\.data\.\*\.source | string | 
+action\_result\.data\.\*\.source\_created | string | 
+action\_result\.data\.\*\.source\_modified | string | 
+action\_result\.data\.\*\.source\_reported\_confidence | numeric | 
+action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.subtype | string | 
 action\_result\.data\.\*\.tags\.\*\.id | string | 
-action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.tags\.\*\.name | string | 
 action\_result\.data\.\*\.tags\.\*\.org\_id | numeric | 
 action\_result\.data\.\*\.tags\.\*\.remote\_api | numeric | 
-action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
 action\_result\.data\.\*\.tags\.\*\.source\_user | string | 
-action\_result\.data\.\*\.type | string | 
-action\_result\.data\.\*\.uuid | string | 
-action\_result\.data\.\*\.itype | string | 
-action\_result\.data\.\*\.value | string | 
-action\_result\.data\.\*\.source | string | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.data\.\*\.country | string | 
-action\_result\.data\.\*\.feed\_id | numeric | 
-action\_result\.data\.\*\.subtype | string | 
-action\_result\.data\.\*\.latitude | string | 
-action\_result\.data\.\*\.is\_public | boolean | 
-action\_result\.data\.\*\.longitude | string | 
-action\_result\.data\.\*\.update\_id | numeric | 
-action\_result\.data\.\*\.confidence | numeric | 
-action\_result\.data\.\*\.created\_by | string | 
-action\_result\.data\.\*\.created\_ts | string | 
-action\_result\.data\.\*\.remote\_api | boolean | 
-action\_result\.data\.\*\.modified\_ts | string | 
+action\_result\.data\.\*\.tags\.\*\.source\_user\_id | string | 
+action\_result\.data\.\*\.tags\.\*\.tlp | string | 
 action\_result\.data\.\*\.threat\_type | string | 
 action\_result\.data\.\*\.threatscore | numeric | 
-action\_result\.data\.\*\.is\_anonymous | boolean | 
-action\_result\.data\.\*\.resource\_uri | string | 
-action\_result\.data\.\*\.expiration\_ts | string | 
-action\_result\.data\.\*\.import\_source | string | 
-action\_result\.data\.\*\.source\_created | string | 
-action\_result\.data\.\*\.source\_modified | string | 
-action\_result\.data\.\*\.import\_session\_id | string | 
-action\_result\.data\.\*\.retina\_confidence | numeric | 
-action\_result\.data\.\*\.owner\_organization\_id | numeric | 
-action\_result\.data\.\*\.source\_reported\_confidence | numeric |   
+action\_result\.data\.\*\.tlp | string | 
+action\_result\.data\.\*\.type | string | 
+action\_result\.data\.\*\.update\_id | numeric | 
+action\_result\.data\.\*\.uuid | string | 
+action\_result\.data\.\*\.value | string | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'create investigation'
 Create an investigation in ThreatStream
@@ -4709,10 +4715,10 @@ action\_result\.data\.\*\.resource\_uri | string |  `url`
 action\_result\.data\.\*\.source\_type | string | 
 action\_result\.data\.\*\.status | string | 
 action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.tasks | string | 
 action\_result\.data\.\*\.tips | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.workgroups | string | 
+action\_result\.data\.tasks | string | 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -4824,10 +4830,10 @@ action\_result\.data\.\*\.resource\_uri | string |  `url`
 action\_result\.data\.\*\.source\_type | string | 
 action\_result\.data\.\*\.status | string | 
 action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.tasks | string | 
 action\_result\.data\.\*\.tips | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.workgroups | string | 
+action\_result\.data\.tasks | string | 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
@@ -4849,8 +4855,8 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.parameter\.investigation\_id | numeric |  `threatstream investigation id` 
 action\_result\.parameter\.fields | string | 
+action\_result\.parameter\.investigation\_id | numeric |  `threatstream investigation id` 
 action\_result\.data\.\*\.assignee | string | 
 action\_result\.data\.\*\.attachments | string | 
 action\_result\.data\.\*\.candidate\_session | string | 
@@ -4888,10 +4894,10 @@ action\_result\.data\.\*\.resource\_uri | string |  `url`
 action\_result\.data\.\*\.source\_type | string | 
 action\_result\.data\.\*\.status | string | 
 action\_result\.data\.\*\.tags | string | 
-action\_result\.data\.tasks | string | 
 action\_result\.data\.\*\.tips | string | 
 action\_result\.data\.\*\.tlp | string | 
 action\_result\.data\.\*\.workgroups | string | 
+action\_result\.data\.tasks | string | 
 action\_result\.summary | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
