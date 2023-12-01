@@ -306,8 +306,6 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **ingest_only_published_incidents** |  optional  | boolean | Ingest only incidents marked as published
 **is_cloud_instance** |  optional  | boolean | Is the provided instance in hostname parameter cloud?
 **verify_server_cert** |  optional  | boolean | Verify server certificate
-**custom_types_str** |  optional  | string | Specify additional types
-**custom_types** |  optional  | array | Specify additional types
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Test connectivity to ThreatStream by querying the intelligence endpoint  
