@@ -131,7 +131,7 @@ class ThreatstreamConnector(BaseConnector):
         self._is_cloud_instance = None
         self._first_run_limit = None
         self._data_dict = {}  # Blank dict to contain data from all API calls
-    
+
     def _save_action_handler_progress(self):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
