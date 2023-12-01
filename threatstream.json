@@ -18,7 +18,7 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "5.3.3",
+    "min_phantom_version": "5.5.0",
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2023 Splunk Inc.",
     "pip_dependencies": {
@@ -8316,11 +8316,6 @@
                 },
                 "allow_unresolved": {
                     "description": "Unresolved domains will be imported if set to true",
-                    "data_type": "boolean",
-                    "order": 6
-                },
-                "allow_custom_type": {
-                    "description": "Allows upload of custom observable_type",
                     "data_type": "boolean",
                     "order": 6
                 }
