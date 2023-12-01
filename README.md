@@ -6,7 +6,7 @@ Connector Version: 3.5.1
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.3.3  
+Minimum Product Version: 5.5.0  
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 
@@ -1968,7 +1968,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **create_on_cloud** |  optional  | Create on remote (cloud)? (applicable only for hybrid on-prem instances) | boolean | 
 **with_approval** |  optional  | Import the observable with approvals | boolean | 
 **allow_unresolved** |  optional  | Unresolved domains will be imported if set to true | boolean | 
-**allow_custom_type** |  optional  | Allows upload of custom observable_type | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
