@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.5.0",
+    "app_version": "3.5.1",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, 26 September 2022"
@@ -20,7 +20,7 @@
     "python_version": "3",
     "min_phantom_version": "5.3.3",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2022 Splunk Inc.",
+    "license": "Copyright (c) 2016-2023 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {
