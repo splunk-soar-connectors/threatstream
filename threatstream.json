@@ -131,22 +131,6 @@
             "data_type": "boolean",
             "order": 4,
             "description": "Verify server certificate"
-        },
-        "custom_types_str": {
-            "data_type": "string",
-            "order": 0,
-            "description": "Specify additional types"
-        },
-        "custom_types": {
-            "data_type": "array",
-            "order": 0,
-            "items": [
-                {
-                    "data_type": "string",
-                    "description": "type"
-                }
-            ],
-            "description": "Specify additional types"
         }
     },
     "actions": [
