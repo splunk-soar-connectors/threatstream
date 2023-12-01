@@ -131,6 +131,22 @@
             "data_type": "boolean",
             "order": 4,
             "description": "Verify server certificate"
+        },
+        "custom_types_str": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Specify additional types"
+        },
+        "custom_types": {
+            "data_type": "array",
+            "order": 0,
+            "items": [
+                {
+                    "data_type": "string",
+                    "description": "type"
+                }
+            ],
+            "description": "Specify additional types"
         }
     },
     "actions": [
@@ -8251,17 +8267,10 @@
             "read_only": false,
             "parameters": {
                 "observable_type": {
-                    "description": "Type of observable to import",
+                    "description": "Type of observable to import, default types: [ip, domain, url, email, hash]. Custom types can be provided if they are available on ThreatStream instance",
                     "data_type": "string",
                     "order": 0,
-                    "required": true,
-                    "value_list": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "hash"
-                    ]
+                    "required": true
                 },
                 "value": {
                     "description": "Observable value",
@@ -8307,6 +8316,11 @@
                 },
                 "allow_unresolved": {
                     "description": "Unresolved domains will be imported if set to true",
+                    "data_type": "boolean",
+                    "order": 6
+                },
+                "allow_custom_type": {
+                    "description": "Allows upload of custom observable_type",
                     "data_type": "boolean",
                     "order": 6
                 }
