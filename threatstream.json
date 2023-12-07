@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.5.1",
+    "app_version": "3.5.0",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, 26 September 2022"
@@ -8251,7 +8251,7 @@
             "read_only": false,
             "parameters": {
                 "observable_type": {
-                    "description": "Type of observable to import, default types: [ip, domain, url, email, hash]. Custom types can be provided if they are available on ThreatStream instance",
+                    "description": "Type of observable to import, types supported by default: [ip, domain, url, email, hash]. Custom types can also be provided if they are available on ThreatStream instance",
                     "data_type": "string",
                     "order": 0,
                     "required": true

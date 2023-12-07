@@ -133,7 +133,7 @@ class ThreatstreamConnector(BaseConnector):
         self._data_dict = {}  # Blank dict to contain data from all API calls
 
     def _save_action_handler_progress(self):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
 
     def initialize(self):
         config = self.get_config()
