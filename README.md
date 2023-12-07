@@ -2,7 +2,7 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3.5.1  
+Connector Version: 3.5.0  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): ".\*"  
@@ -1959,7 +1959,7 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**observable_type** |  required  | Type of observable to import, default types: [ip, domain, url, email, hash]. Custom types can be provided if they are available on ThreatStream instance | string | 
+**observable_type** |  required  | Type of observable to import, types supported by default: [ip, domain, url, email, hash]. Custom types can also be provided if they are available on ThreatStream instance | string | 
 **value** |  required  | Observable value | string |  `ip`  `domain`  `url`  `email`  `md5`  `sha1`  `hash` 
 **classification** |  required  | Designate classification for observable | string | 
 **fields** |  optional  | JSON formatted string of fields to include with the observable | string | 
