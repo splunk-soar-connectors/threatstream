@@ -1,6 +1,6 @@
 # File: threatstream_consts.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,7 +79,6 @@ THREATSTREAM_TLP = ["white", "green", "amber", "red"]
 THREATSTREAM_BODY_CONTENT_TYPE = ["markdown", "richtext"]
 THREATSTREAM_STATUS = ["Approved", "Ready To Review", "Errors", "Rejected", "Processing"]
 THREATSTREAM_PRIORITY = ["very low", "low", "medium", "high", "very high"]
-THREATSTREAM_OBSERVABLE_TYPE = ["ip", "domain", "url", "email", "hash"]
 
 # Error and status messages
 THREATSTREAM_INVALID_SELECTION = "Invalid '{0}' entered. Must be one of: {1}"
