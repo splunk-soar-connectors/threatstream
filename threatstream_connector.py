@@ -138,7 +138,7 @@ class ThreatstreamConnector(BaseConnector):
     def initialize(self):
         config = self.get_config()
 
-        self._base_url = "https://{0}/api".format(config.get('hostname', 'api.threatstream.com'))
+        self._base_url = f"https://{config.get('hostname', 'api.threatstream.com')}/api"
         self._state = self.load_state()
         if not isinstance(self._state, dict):
             self.debug_print("Resetting the state file with the default format")
@@ -221,7 +221,7 @@ class ThreatstreamConnector(BaseConnector):
                         resp_text = response.text
                     action_result.set_status(
                         phantom.APP_SUCCESS,
-                        "Unable to parse the JSON response. Response Status Code: {}. Response: {}".format(status_code, resp_text)
+                        f"Unable to parse the JSON response. Response Status Code: {status_code}. Response: {resp_text}"
                     )
                     return RetVal(phantom.APP_SUCCESS, {})
 
@@ -243,15 +243,14 @@ class ThreatstreamConnector(BaseConnector):
 
             # Error text can still be an empty string
             if error_text:
-                data_message = " Data from server:\n{0}\n".format(error_text)
+                data_message = f" Data from server:\n{error_text}\n"
 
-        message = "Status Code: {0}. {1}".format(status_code, data_message)
+        message = f"Status Code: {status_code}. {data_message}"
 
         message = message.replace('{', '{{').replace('}', '}}')
 
         if len(message) > 500:
-            message = "Status Code: {0}. Error while connecting to the server. Please check the asset and the action's input parameters" \
-                .format(status_code)
+            message = f"Status Code: {status_code}. Error while connecting to the server. Please check the asset and the action's input parameters" 
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -261,8 +260,7 @@ class ThreatstreamConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
-                                                   .format(self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {self._get_error_message_from_exception(e)}"), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -270,7 +268,7 @@ class ThreatstreamConnector(BaseConnector):
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
         if not r.text:
-            message = "Status Code: {0}. {1}".format(r.status_code, "Empty response and no information in the header")
+            message = "Status Code: {r.status_code}. Empty response and no information in the header."
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {0} Data from server: {1}".format(
@@ -304,8 +302,7 @@ class ThreatstreamConnector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+        message = f"Can't process response from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -315,10 +312,10 @@ class ThreatstreamConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         # Create a URL to connect to
-        url = "{0}{1}".format(self._base_url, endpoint)
+        url = f"{self._base_url}{endpoint}"
 
         if use_json:
             try:
@@ -332,20 +329,19 @@ class ThreatstreamConnector(BaseConnector):
                     timeout=DEFAULT_TIMEOUT)
             except requests.exceptions.InvalidSchema as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
+                err_msg = f"Error connecting to server. No connection adapters were found for {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except requests.exceptions.InvalidURL as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
+                err_msg = f"Error connecting to server. Invalid URL {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except requests.exceptions.ConnectionError as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error details: connection refused from the server {}'.format(url)
+                err_msg = f"Error details: connection refused from the server {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Error making rest call to server. Details: {0}"
-                                                       .format(error_message)), resp_json)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error making rest call to server. Details: {error_message}"), resp_json)
 
         else:
             try:
@@ -359,20 +355,20 @@ class ThreatstreamConnector(BaseConnector):
                     timeout=DEFAULT_TIMEOUT)
             except requests.exceptions.InvalidSchema as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
+                err_msg = f"Error connecting to server. No connection adapters were found for {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except requests.exceptions.InvalidURL as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
+                err_msg = f"Error connecting to server. Invalid URL {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except requests.exceptions.ConnectionError as e:
                 self._get_error_message_from_exception(e)
-                err_msg = 'Error details: connection refused from the server {}'.format(url)
+                err_msg = f"Error details: connection refused from the server {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg))
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(
-                    phantom.APP_ERROR, "Error making rest call to server. Details: {0}".format(error_message)), resp_json)
+                    phantom.APP_ERROR, f"Error making rest call to server. Details: {error_message}"), resp_json)
 
         ret_val, response = self._process_response(r, action_result)
 
@@ -497,7 +493,7 @@ class ThreatstreamConnector(BaseConnector):
                 whois_response = wizard_whois.get_whois(value)
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
-                self.debug_print("Error occurred while handling Japanese domain. {}".format(error_message))
+                self.debug_print(f"Error occurred while handling Japanese domain. {error_message}")
 
         if not whois_response:
             payload = self._generate_payload()
@@ -542,13 +538,10 @@ class ThreatstreamConnector(BaseConnector):
                         THREATSTREAM_SUCCESS_WHOIS_MESSAGE, "Unable to fetch additional info for the given IP"))
         except Exception as e:
             final_response["addtional_info"] = None
-            self.debug_print("Unable to fetch additional info for the given IP. ERROR: {error}"
-                             .format(error=self._get_error_message_from_exception(e)))
+            self.debug_print(f"Unable to fetch additional info for the given IP. ERROR: {self._get_error_message_from_exception(e)}")
 
             action_result.add_data(final_response)
-            return action_result.set_status(phantom.APP_SUCCESS, "{}. {}".format(
-                THREATSTREAM_SUCCESS_WHOIS_MESSAGE,
-                "Unable to fetch additional info for the given IP. ERROR: {error}".format(error=self._get_error_message_from_exception(e))))
+            return action_result.set_status(phantom.APP_SUCCESS, f"{THREATSTREAM_SUCCESS_WHOIS_MESSAGE}. Unable to fetch additional info for the given IP. ERROR: {self._get_error_message_from_exception(e)}")
 
         action_result.add_data(final_response)
 
@@ -564,10 +557,10 @@ class ThreatstreamConnector(BaseConnector):
         if search_exact_value:
             extend_source = False
 
-        self.debug_print('Retrieving ip domain with {0}'.format(param))
+        self.debug_print(f"Retrieving ip domain with {param}")
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
 
@@ -598,7 +591,7 @@ class ThreatstreamConnector(BaseConnector):
         """ Retrieve all the information needed for email or md5 hashes """
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
@@ -711,7 +704,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q="(value={})".format(value), limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
@@ -897,7 +890,7 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-            endpoint = "{}{}/".format(ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), "intelligence")
+            endpoint = f"{ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id)}intelligence/"
 
             response = self._paginator(endpoint, action_result, payload=payload)
 
@@ -930,7 +923,7 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-            endpoint = "{}{}/".format(endpoint, "intelligence")
+            endpoint = f"{endpoint}intelligence/"
 
             response = self._paginator(endpoint, action_result, payload=payload)
 
@@ -1084,10 +1077,7 @@ class ThreatstreamConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     is_error = True
-                    output_message = "{}. {}. Details: {}".format(
-                        output_message,
-                        THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence)),
-                        action_result.get_message())
+                    output_message = f"{output_message}. {THREATSTREAM_ERR_INVALID_REMOTE_INTELLIGENCE.format(', '.join(cloud_intelligence))}. Details: {action_result.get_message()}"
 
                 if response and response.get("ids"):
                     intelligence.extend(response.get("ids"))
@@ -1100,10 +1090,7 @@ class ThreatstreamConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     is_error = True
-                    output_message = "{}. {}. Details: {}".format(
-                        output_message,
-                        THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence)),
-                        action_result.get_message())
+                    output_message = f"{output_message}. {THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(', '.join(local_intelligence))}. Details: {action_result.get_message()}"
 
                 if response and response.get("local_ids"):
                     intelligence.extend(response.get("local_ids"))
@@ -1313,7 +1300,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, output_message)
 
         if message:
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident. {}".format(message))
+            return action_result.set_status(phantom.APP_SUCCESS, f"Successfully updated incident. {message}")
         else:
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
 
@@ -1326,7 +1313,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_message = self._get_error_message_from_exception(e)
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_message))
+                    f"Error building fields dictionary: {error_message}. Please ensure that provided input is in valid JSON format")
                 return None
 
             if not isinstance(fields, dict):
@@ -1405,7 +1392,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_message = self._get_error_message_from_exception(e)
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(error_message))
+                    f"Error building list of intelligence IDs: {error_message}. Please supply as comma separated string of integers")
                 return None
         else:
             try:
@@ -1416,7 +1403,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_message = self._get_error_message_from_exception(e)
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building list of intelligence IDs: {0}. Please supply as comma separated string of integers".format(error_message))
+                    f"Error building list of intelligence IDs: {error_message}. Please supply as comma separated string of integers")
                 return None
         return intel
 
@@ -1434,7 +1421,7 @@ class ThreatstreamConnector(BaseConnector):
             error_message = self._get_error_message_from_exception(e)
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {0}".format(error_message))
+                f"Error occurred while parsing the JSON string provided in the 'query' parameter. Error: {error_message}")
 
         order_by = param.get("order_by")
         if order_by:
@@ -1480,12 +1467,12 @@ class ThreatstreamConnector(BaseConnector):
                 elif len(e.args) == 1:
                     err_message = e.args[0]
         except Exception as e:
-            self.error_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
+            self.error_print(f"Error occurred while fetching exception information. Details: {str(e)}")
 
         if not err_code:
-            error_text = "Error Message: {}".format(err_message)
+            error_text = f"Error Message: {err_message}"
         else:
-            error_text = "Error Code: {}. Error Message: {}".format(err_code, err_message)
+            error_text = f"Error Code: {err_code}. Error Message: {err_message}"
 
         return error_text
 
@@ -1548,7 +1535,7 @@ class ThreatstreamConnector(BaseConnector):
                     error_message = self._get_error_message_from_exception(e)
                     return action_result.set_status(
                         phantom.APP_ERROR,
-                        "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_message))
+                        f"Error building fields dictionary: {error_message}. Please ensure that provided input is in valid JSON format")
 
                 if not isinstance(fields, dict):
                     return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
@@ -1565,12 +1552,12 @@ class ThreatstreamConnector(BaseConnector):
                         data.update(fields)
                 else:
                     return action_result.set_status(phantom.APP_ERROR,
-                                                    "Providing '{key}' in fields parameter is mandatory for importing an observable \
-                                (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
+                                                    f"Providing '{key}' in fields parameter is mandatory for importing an observable \
+                                (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})")
             else:
                 return action_result.set_status(phantom.APP_ERROR,
-                                                "Providing '{key}' in fields parameter is mandatory for importing an observable \
-                            (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})".format(key=key))
+                                                f"Providing '{key}' in fields parameter is mandatory for importing an observable \
+                            (e.g. {{\"itype\": \"<indicator_type>\"}} or {{\"threat_type\": \"<threat_type>\"}})")
 
         else:
             ret_val, confidence = self._validate_integer(action_result, param.get('confidence', 100), THREATSTREAM_INVALID_CONFIDENCE)
@@ -1881,9 +1868,8 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid"), None
 
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, "Error while fetching the vault information of the vault id: '{}'"
-                                            .format(param.get('vault_id')))
-
+            return action_result.set_status(phantom.APP_ERROR, f"Error while fetching the vault information of the vault id: '{param.get('vault_id')}'")
+        
         vault_path = vault_info.get('path')
         if vault_path is None:
             return action_result.set_status(phantom.APP_ERROR, "Could not find a path associated with the provided vault ID")
@@ -1891,7 +1877,7 @@ class ThreatstreamConnector(BaseConnector):
             vault_file = open(vault_path, "rb")
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Unable to open vault file: {}".format(error_message))
+            return action_result.set_status(phantom.APP_ERROR, f"Unable to open vault file: {error_message}")
 
         payload = self._generate_payload()
 
@@ -2053,7 +2039,7 @@ class ThreatstreamConnector(BaseConnector):
 
         # Creating temporary directory and file
         try:
-            temp_dir = Vault.get_vault_tmp_dir() + '/{}'.format(uuid.uuid4())
+            temp_dir = Vault.get_vault_tmp_dir() + f"/{uuid.uuid4()}"
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, filename)
 
@@ -2081,22 +2067,21 @@ class ThreatstreamConnector(BaseConnector):
 
         # Error while adding report to vault
         self.debug_print('Error adding file to vault:', vault_ret_dict)
-        action_result.append_to_message('. {}'.format(vault_ret_dict[1]))
+        action_result.append_to_message(f'. {vault_ret_dict[1]}')
 
         # Set the action_result status to error, the handler function will most probably return as is
         return phantom.APP_ERROR, None
 
     def _check_and_update_container_already_exists(self, incident_id, incident_name, verify=False):
 
-        url = '{0}rest/container?_filter_source_data_identifier="{1}"&_filter_asset={2}' \
-            .format(self.get_phantom_base_url(), incident_id, self.get_asset_id())
+        url = f'{self.get_phantom_base_url()}rest/container?_filter_source_data_identifier="{incident_id}"&_filter_asset={self.get_asset_id()}'
 
         try:
             r = requests.get(url, verify=verify, timeout=DEFAULT_TIMEOUT)
             resp_json = r.json()
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
-            self.debug_print("Unable to query ThreatStream incident container: {}".format(error_message))
+            self.debug_print(f"Unable to query ThreatStream incident container: {error_message}")
             return None
 
         if resp_json.get('count', 0) <= 0:
@@ -2111,21 +2096,20 @@ class ThreatstreamConnector(BaseConnector):
 
         # If the container exists and the name of the incident has been updated,
         # update the name of the container as well to stay in sync with the UI of ThreatStream
-        if container_id and (resp_json.get('data', [])[0]['name'] != '{}-{}'.format(incident_id, incident_name)):
-            url = '{0}rest/container/{1}'.format(self.get_phantom_base_url(), container_id)
+        if container_id and (resp_json.get('data', [])[0]['name'] != f'{incident_id}-{incident_name}'):
+            url = f'{self.get_phantom_base_url()}rest/container/{container_id}'
             try:
-                data = {"name": '{}-{}'.format(incident_id, incident_name)}
+                data = {"name": f'{incident_id}-{incident_name}'}
                 r = requests.post(url, verify=verify, json=data, timeout=DEFAULT_TIMEOUT)
                 resp_json = r.json()
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
-                self.debug_print("Unable to update the name of the ThreatStream incident container: {}".format(error_message))
+                self.debug_print(f"Unable to update the name of the ThreatStream incident container: {error_message}")
                 return container_id
 
             if not resp_json.get('success'):
-                self.debug_print("Container with ID: {0} could not be updated with the current incident_name: {1} of the incident ID: {2}"
-                                 .format(container_id, incident_name, incident_id))
-                self.debug_print("Response of the container updation is: {0}".format(str(resp_json)))
+                self.debug_print(f"Container with ID: {container_id} could not be updated with the current incident_name: {incident_name} of the incident ID: {incident_id}")
+                self.debug_print(f"Response of the container updation is: {str(resp_json)}")
                 return container_id
 
         return container_id
@@ -2150,7 +2134,7 @@ class ThreatstreamConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, "Error occurred while fetching the incident ID of the last ingestion run. Error: {0}".format(error_message))
+                phantom.APP_ERROR, f"Error occurred while fetching the incident ID of the last ingestion run. Error: {error_message}")
 
         try:
             if self.is_poll_now():
@@ -2171,8 +2155,8 @@ class ThreatstreamConnector(BaseConnector):
 
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR,
-                                            "Error occurred while fetching the number of containers to be ingested. Error: {0}"
-                                            .format(self._get_error_message_from_exception(e)))
+                                            f"Error occurred while fetching the number of containers to be ingested. Error: {self._get_error_message_from_exception(e)}"
+                                            )
 
         if start_ingestion_time:
             payload = self._generate_payload(order_by="modified_ts", modified_ts__gte=start_ingestion_time)
@@ -2192,9 +2176,8 @@ class ThreatstreamConnector(BaseConnector):
                     if incident.get("organization_id") == int(org_id):
                         incidents.append(incident)
                     else:
-                        self.debug_print("Skipping incident ID: {0} due to organization ID: {1} \
-                            being different than the configuration parameter organization_id: {2}".format(
-                            incident.get("id"), incident.get("organization_id"), org_id))
+                        self.debug_print(f"Skipping incident ID: {incident.get('id')} due to organization ID: {incident.get('organization_id')} \
+                            being different than the configuration parameter organization_id: {org_id}")
 
                 if not interim_incidents:
                     break
