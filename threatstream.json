@@ -5,12 +5,12 @@
     "publisher": "Splunk",
     "type": "threat intel",
     "main_module": "threatstream_connector.py",
-    "app_version": "3.5.0",
+    "app_version": "3.5.1",
     "latest_tested_versions": [
         "On-premise v4.0 RED",
         "Cloud, 26 September 2022"
     ],
-    "utctime_updated": "2022-01-21T10:26:01.000000Z",
+    "utctime_updated": "2024-01-11T10:17:22.000000Z",
     "package_name": "phantom_threatstream",
     "logo": "logo_anomali.svg",
     "logo_dark": "logo_anomali_dark.svg",
@@ -18,9 +18,9 @@
     "product_name": "ThreatStream",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "5.3.3",
+    "min_phantom_version": "6.1.1",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2022 Splunk Inc.",
+    "license": "Copyright (c) 2016-2024 Splunk Inc.",
     "pip_dependencies": {
         "wheel": [
             {
@@ -8251,17 +8251,10 @@
             "read_only": false,
             "parameters": {
                 "observable_type": {
-                    "description": "Type of observable to import",
+                    "description": "Type of observable to import, types supported by default: [ip, domain, url, email, hash]. Custom types can also be provided if they are available on ThreatStream instance",
                     "data_type": "string",
                     "order": 0,
-                    "required": true,
-                    "value_list": [
-                        "ip",
-                        "domain",
-                        "url",
-                        "email",
-                        "hash"
-                    ]
+                    "required": true
                 },
                 "value": {
                     "description": "Observable value",
