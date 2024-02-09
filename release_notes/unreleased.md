@@ -1,1 +1,3 @@
 **Unreleased**
+
+* Removed certifi package
