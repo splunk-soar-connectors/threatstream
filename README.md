@@ -2063,14 +2063,14 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **use_premium_sandbox** |  optional  | Specify whether the premium sandbox should be used for detonation - true or false. If you want to use the Joe Sandbox service for detonation, set this attribute to true | boolean | 
 **use_vmray_sandbox** |  optional  | Specify whether the vmray sandbox should be used for detonation - true or false. If you want to use the VMRay sandbox service for detonation, set this attribute to true | boolean | 
 **vmray_max_jobs** |  optional  | Specify the number of detonations you want VMRay to perform for the submission | numeric | 
-**fields** |  optional  | JSON formatted string of additional fields to be included in the detonate file action. e.g. {"file_has_password":"true","file_password":"abc123"}. Please check the API doc to find more information on other valid fields | string |  # pragma: allowlist secret
+**fields** |  optional  | JSON formatted string of additional fields to be included in the detonate file action. e.g. {"file_has_password":"true","file_password":"abc123"}. Please check the API doc to find more information on other valid fields | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
 action_result.parameter.classification | string |  |   public 
-action_result.parameter.fields | string |  |   {"file_has_password":"true","file_password":"abc123","import_indicators":"true","report_radio-notes":"Credential-Exposure,compromised_email","trusted_circles":"13"}  # pragma: allowlist secret
+action_result.parameter.fields | string |  |   {"file_has_password":"true","file_password":"abc123","import_indicators":"true","report_radio-notes":"Credential-Exposure,compromised_email","trusted_circles":"13"} 
 action_result.parameter.platform | string |  |   WINDOWS7 
 action_result.parameter.use_premium_sandbox | boolean |  |   True  False 
 action_result.parameter.use_vmray_sandbox | boolean |  |   True  False 
@@ -2492,7 +2492,7 @@ action_result.data.\*.date_modified | string |  |   2020-10-08T11:38:29.563295
 action_result.data.\*.default_comment | string |  |   test comment 
 action_result.data.\*.email | string |  `email`  |   test@test.com 
 action_result.data.\*.expiration_ts | string |  |   2021-01-06T10:41:08.444000 
-action_result.data.\*.fileName | string |  `url`  |   https://test.com/https%3A/test.com?Signature=19pJrM2OyY3wqiKi%2FDwPRThLq%2Bs%3D&Expires=1602227603&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # pragma: allowlist secret
+action_result.data.\*.fileName | string |  `url`  |   https://test.com/https%3A/test.com?Signature=19pJrM2OyY3wqiKi%2FDwPRThLq%2Bs%3D&Expires=1602227603&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
 action_result.data.\*.fileType | string |  |   html 
 action_result.data.\*.file_name_label | string |  |  
 action_result.data.\*.id | numeric |  `threatstream import session id`  |   875 
@@ -3003,7 +3003,7 @@ action_result.data.\*.attachments.\*.remote_api | boolean |  |   True  False
 action_result.data.\*.attachments.\*.s3_thumbnail_url | string |  |  
 action_result.data.\*.attachments.\*.s3_url | string |  |   http://ui-threatstream.s3.test.com/userUploads/2021-03-26/20210326_103145_userId-136_abcd.txt 
 action_result.data.\*.attachments.\*.signed_thumbnail_url | string |  |  
-action_result.data.\*.attachments.\*.signed_url | string |  |   https://test-optic.s3.ui.com/userUploads/2021-03-26/20210326_103145_userId-136_abcd.txt?Signature=p5I5tJOrB242TAOSA39eYxL7dr4%3D&Expires=1616756070&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # pragma: allowlist secret
+action_result.data.\*.attachments.\*.signed_url | string |  |   https://test-optic.s3.ui.com/userUploads/2021-03-26/20210326_103145_userId-136_abcd.txt?Signature=p5I5tJOrB242TAOSA39eYxL7dr4%3D&Expires=1616756070&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
 action_result.data.\*.attachments.\*.tip_report | numeric |  |   10787 
 action_result.data.\*.attachments.\*.user.avatar_s3_url | string |  |  
 action_result.data.\*.attachments.\*.user.can_share_intelligence | boolean |  |   True  False 
@@ -4078,7 +4078,7 @@ action_result.data.\*.attachments.id | numeric |  |   26649
 action_result.data.\*.attachments.r_type | string |  |   A 
 action_result.data.\*.attachments.remote_api | boolean |  |   True  False 
 action_result.data.\*.attachments.resource_uri | string |  |   /api/v1/vulnerabilityexternalreference/26649/?remote_api=true 
-action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_133407_userId-136_69e3a3d6-b499-4ba1-b918-769a4b74463a_PDF_All20valid_invalid.pdf?Signature=uk%2FY5YOrBVwpxv0xs6sKvyXULrg%3D&Expires=1622126047&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # pragma: allowlist secret
+action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_133407_userId-136_69e3a3d6-b499-4ba1-b918-769a4b74463a_PDF_All20valid_invalid.pdf?Signature=uk%2FY5YOrBVwpxv0xs6sKvyXULrg%3D&Expires=1622126047&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
 action_result.data.\*.attachments.title | string |  |   PDF_All%20valid_invalid.pdf 
 action_result.data.\*.attachments.url | string |  |  
 action_result.data.\*.body_content_type | string |  |   markdown 
@@ -4197,7 +4197,7 @@ action_result.data.\*.attachments.id | numeric |  |   26653
 action_result.data.\*.attachments.r_type | string |  |   A 
 action_result.data.\*.attachments.remote_api | boolean |  |   True  False 
 action_result.data.\*.attachments.resource_uri | string |  |   /api/v1/vulnerabilityexternalreference/26653/?remote_api=true 
-action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_133417_userId-136_2b5d20a5-4d12-4ff8-961c-847b5766440c_HTML20-20All20valid_invalid.html?Signature=Ymp0ntZu5HNAuoK9%2FCVPE6x3Dqw%3D&Expires=1622126057&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # pragma: allowlist secret
+action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_133417_userId-136_2b5d20a5-4d12-4ff8-961c-847b5766440c_HTML20-20All20valid_invalid.html?Signature=Ymp0ntZu5HNAuoK9%2FCVPE6x3Dqw%3D&Expires=1622126057&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
 action_result.data.\*.attachments.title | string |  |   HTML%20-%20All%20valid_invalid.html 
 action_result.data.\*.attachments.url | string |  |  
 action_result.data.\*.body_content_type | string |  |   markdown 
@@ -4372,8 +4372,8 @@ action_result.data.\*.attachments.id | numeric |  |   26632
 action_result.data.\*.attachments.r_type | string |  |   A 
 action_result.data.\*.attachments.remote_api | boolean |  |   True  False 
 action_result.data.\*.attachments.resource_uri | string |  |   /api/v1/actorexternalreference/26632/?remote_api=true 
-action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_131543_userId-136_c1946412-e29e-49fa-a0ed-3316c20d76af_HTML20-20All20valid_invalid.html?Signature=Q71zTevIhJsdGfPdhKZuHy4bu14%3D&Expires=1622124943&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # https://github.com/splunk-soar-connectors/phishinginitiative/pull/10  # https://github.com/splunk-soar-connectors/phishinginitiative/pull/10  # pragma: allowlist secret
-action_result.data.\*.attachments.title | string |  |   HTML%20-%20All%20valid_invalid.html  
+action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_131543_userId-136_c1946412-e29e-49fa-a0ed-3316c20d76af_HTML20-20All20valid_invalid.html?Signature=Q71zTevIhJsdGfPdhKZuHy4bu14%3D&Expires=1622124943&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
+action_result.data.\*.attachments.title | string |  |   HTML%20-%20All%20valid_invalid.html 
 action_result.data.\*.attachments.url | string |  |  
 action_result.data.\*.avatar_s3_url | string |  |  
 action_result.data.\*.body_content_type | string |  |   markdown 
@@ -4511,7 +4511,7 @@ action_result.data.\*.attachments.id | numeric |  |   26641
 action_result.data.\*.attachments.r_type | string |  |   A 
 action_result.data.\*.attachments.remote_api | boolean |  |   True  False 
 action_result.data.\*.attachments.resource_uri | string |  |   /api/v1/actorexternalreference/26641/?remote_api=true 
-action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_131611_userId-136_62cde7fc-ce0b-4d74-a159-669769998dc0_unicode.zip?Signature=5e4NsfOOT8GwBc57JeNM9j0a7oU%3D&Expires=1622124971&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH  # pragma: allowlist secret
+action_result.data.\*.attachments.s3_url | string |  |   https://test-optic.s3.user.com/userUploads/2021-05-27/20210527_131611_userId-136_62cde7fc-ce0b-4d74-a159-669769998dc0_unicode.zip?Signature=5e4NsfOOT8GwBc57JeNM9j0a7oU%3D&Expires=1622124971&AWSAccessKeyId=AKIAQYUTUNAKSCAMMFFH 
 action_result.data.\*.attachments.title | string |  |   unicode.zip 
 action_result.data.\*.attachments.url | string |  |  
 action_result.data.\*.avatar_s3_url | string |  |  
