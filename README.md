@@ -2,7 +2,7 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3.5.2  
+Connector Version: 3.5.3  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): ".\*"  
