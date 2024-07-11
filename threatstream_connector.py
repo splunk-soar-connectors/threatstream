@@ -320,7 +320,7 @@ class ThreatstreamConnector(BaseConnector):
         username = config[THREATSTREAM_JSON_USERNAME]
         api_key = config[THREATSTREAM_JSON_API_KEY]
 
-        headers.update({'Authorization': 'apikey {0}:{1}'.format(username, api_key)})
+        headers.update({'Authorization': f'apikey {username}:{api_key}'})
 
         return headers
 
