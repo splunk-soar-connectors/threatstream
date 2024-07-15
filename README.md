@@ -2,11 +2,11 @@
 # ThreatStream
 
 Publisher: Splunk  
-Connector Version: 3.5.3  
+Connector Version: 3.6.0  
 Product Vendor: Anomali  
 Product Name: ThreatStream  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.1  
+Minimum Product Version: 6.2.1  
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
 

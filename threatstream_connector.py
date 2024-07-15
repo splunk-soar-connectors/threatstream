@@ -312,8 +312,21 @@ class ThreatstreamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
+    def _update_header(self, headers=None):
+        if not headers:
+            headers = {}
+
+        config = self.get_config()
+        username = config[THREATSTREAM_JSON_USERNAME]
+        api_key = config[THREATSTREAM_JSON_API_KEY]
+
+        headers.update({'Authorization': f'apikey {username}:{api_key}'})
+
+        return headers
+
     def _make_rest_call(self, action_result, endpoint, payload=None, headers=None, data=None, method="get", files=None, use_json=True):
         resp_json = None
+        config = self.get_config()
 
         try:
             request_func = getattr(requests, method)
@@ -322,6 +335,9 @@ class ThreatstreamConnector(BaseConnector):
 
         # Create a URL to connect to
         url = f"{self._base_url}{endpoint}"
+
+        # updating header
+        headers = self._update_header(headers)
 
         if use_json:
             try:
@@ -382,7 +398,7 @@ class ThreatstreamConnector(BaseConnector):
         current_message = action_result.get_message()
 
         if current_message:
-            current_message = current_message.replace(payload.get('api_key'), '<api_key_value_provided_in_config_params>')
+            current_message = current_message.replace(config[THREATSTREAM_JSON_API_KEY], '<api_key_value_provided_in_config_params>')
 
         if phantom.is_fail(ret_val):
             return RetVal(action_result.set_status(phantom.APP_ERROR, current_message), response)
@@ -410,9 +426,6 @@ class ThreatstreamConnector(BaseConnector):
            Can also add in any further URL parameters
         """
         payload = {}
-        config = self.get_config()
-        payload['username'] = config[THREATSTREAM_JSON_USERNAME]
-        payload['api_key'] = config[THREATSTREAM_JSON_API_KEY]
 
         for k, v in kwargs.items():
             if v:
