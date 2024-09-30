@@ -4172,10 +4172,10 @@ class ThreatstreamConnector(BaseConnector):
     def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):  # noqa
 
         if (
-            not (param.get("local_intelligence") or param.get("cloud_intelligence"))
-            and not param.get("fields")
-            and not param.get("attachment")
-            and not param.get("comment")
+            not (param.get("local_intelligence") or param.get("cloud_intelligence")) and 
+            not param.get("fields") and 
+            not param.get("attachment") and 
+            not param.get("comment")
         ):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_MISSING_PARAMS_UPDATE_THREAT_MODEL.format(entity_type))
 
