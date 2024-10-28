@@ -21,13 +21,13 @@ def _get_ctx_result(result, provides):
     data = result.get_data()
     processed_data = list()
 
-    ctx_result['param'] = param
+    ctx_result["param"] = param
     ctx_result["action_name"] = provides
     if summary:
-        ctx_result['summary'] = summary
+        ctx_result["summary"] = summary
 
     if not data:
-        ctx_result['data'] = {}
+        ctx_result["data"] = {}
         return ctx_result
 
     if provides == "get report":
@@ -82,14 +82,14 @@ def _get_ctx_result(result, provides):
     if processed_data:
         data = processed_data
 
-    ctx_result['data'] = data
+    ctx_result["data"] = data
 
     return ctx_result
 
 
 def display_view(provides, all_app_runs, context):
 
-    context['results'] = results = []
+    context["results"] = results = []
     for _, action_results in all_app_runs:
         for result in action_results:
             ctx_result = _get_ctx_result(result, provides)
@@ -98,34 +98,34 @@ def display_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     if provides == "get incident":
-        ret_val = 'threatstream_get_incident.html'
+        ret_val = "threatstream_get_incident.html"
 
     if provides == "get vulnerability":
-        ret_val = 'threatstream_get_vulnerability.html'
+        ret_val = "threatstream_get_vulnerability.html"
 
     if provides == "update incident":
-        ret_val = 'threatstream_update_incident.html'
+        ret_val = "threatstream_update_incident.html"
 
     if provides == "detonate url" or provides == "detonate file":
-        ret_val = 'threatstream_detonate_url.html'
+        ret_val = "threatstream_detonate_url.html"
 
     if provides == "get observable":
-        ret_val = 'threatstream_get_observable.html'
+        ret_val = "threatstream_get_observable.html"
 
     if provides == "get report":
-        ret_val = 'threatstream_get_report.html'
+        ret_val = "threatstream_get_report.html"
 
     if provides == "update import session":
-        ret_val = 'threatstream_get_import_session.html'
+        ret_val = "threatstream_get_import_session.html"
 
     if provides in ["add association", "remove association"]:
-        ret_val = 'threatstream_display_associations.html'
+        ret_val = "threatstream_display_associations.html"
 
     if provides in ["update rule", "create rule"]:
-        ret_val = 'threatstream_display_rule.html'
+        ret_val = "threatstream_display_rule.html"
 
     if provides == "list associations":
-        ret_val = 'threatstream_list_associations.html'
+        ret_val = "threatstream_list_associations.html"
 
     if provides in ["create actor", "update actor"]:
         ret_val = "threatstream_display_actor.html"
