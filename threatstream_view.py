@@ -1,6 +1,6 @@
 # File: threatstream_view.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 def _get_ctx_result(result, provides):
-
     ctx_result = {}
 
     param = result.get_param()
@@ -31,7 +30,6 @@ def _get_ctx_result(result, provides):
         return ctx_result
 
     if provides == "get report":
-
         data_final = dict()
         info_dict = dict()
         process_list = list()
@@ -88,7 +86,6 @@ def _get_ctx_result(result, provides):
 
 
 def display_view(provides, all_app_runs, context):
-
     context["results"] = results = []
     for _, action_results in all_app_runs:
         for result in action_results:
