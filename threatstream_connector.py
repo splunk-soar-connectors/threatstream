@@ -1,6 +1,6 @@
 # File: threatstream_connector.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ from phantom.vault import Vault
 # Local imports
 from threatstream_consts import *
 
+
 # These are the fields outputted in the widget
 # Check to see if all of these are in the json
 # Note that all of these should be in the "admin" field
@@ -58,7 +59,6 @@ class RetVal(tuple):
 
 
 class ThreatstreamConnector(BaseConnector):
-
     ACTION_ID_WHOIS_IP = "whois_ip"
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_EMAIL_REPUTATION = "email_reputation"
@@ -119,8 +119,7 @@ class ThreatstreamConnector(BaseConnector):
     ACTION_DELETE_INVESTIGATION = "delete_investigation"
 
     def __init__(self):
-
-        super(ThreatstreamConnector, self).__init__()
+        super().__init__()
         self._base_url = None
         self._state = None
         self._verify = None
@@ -173,7 +172,6 @@ class ThreatstreamConnector(BaseConnector):
         return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, response, action_result):
-
         status_code = response.status_code
         action = self.get_action_identifier()
 
@@ -195,13 +193,11 @@ class ThreatstreamConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, THREATSTREAM_EMPTY_RESPONSE.format(status_code)), None)
 
     def _process_html_response(self, response, action_result):
-
         # An html response, treat it like an error
         status_code = response.status_code
         action = self.get_action_identifier()
 
         if 200 <= status_code < 399:
-
             if status_code == 202:
                 return RetVal(phantom.APP_SUCCESS, {})
             elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
@@ -252,7 +248,6 @@ class ThreatstreamConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
-
         # Try a json parse
         try:
             resp_json = r.json()
@@ -275,14 +270,13 @@ class ThreatstreamConnector(BaseConnector):
             message = "Status Code: {r.status_code}. Empty response and no information in the header."
         else:
             # You should process the error returned in the json
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(
+            message = "Error from server. Status Code: {} Data from server: {}".format(
                 r.status_code, r.text.replace("{", "{{").replace("}", "}}")
             )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": r.status_code})
@@ -438,7 +432,6 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved intel details")
 
     def _pdns(self, value, ioc_type, action_result):
-
         # Validate input
         if ioc_type not in ["ip", "domain"]:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
@@ -459,7 +452,6 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _insight(self, value, ioc_type, action_result):
-
         # Validate input
         if ioc_type not in ["ip", "domain", "email", "md5", "sha1", "sha256", "sha512"]:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
@@ -477,7 +469,6 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
 
     def _external_references(self, value, action_result):
-
         payload = self._generate_payload()
         ext_ref = ENDPOINT_REFERENCE.format(ioc_value=value)
 
@@ -782,7 +773,6 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.get_status()
 
     def _paginator(self, endpoint, action_result, payload=None, offset=0, limit=None):
-
         items_list = list()
 
         if payload:
@@ -887,7 +877,6 @@ class ThreatstreamConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _get_incident_support(self, action_result, param=None, payload=None, incident_id=None):
-
         if payload and payload.get("remote_api") is not None:
             del payload["remote_api"]
 
@@ -928,7 +917,6 @@ class ThreatstreamConnector(BaseConnector):
         return phantom.APP_SUCCESS, resp_json
 
     def _get_threat_model_support(self, action_result, endpoint):
-
         payload = self._generate_payload()
 
         if self._is_cloud_instance:
@@ -1153,9 +1141,7 @@ class ThreatstreamConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     is_error = True
-                    output_message = "{}. Error while adding intelligence to the incident. Details: {}".format(
-                        output_message, action_result.get_message()
-                    )
+                    output_message = f"{output_message}. Error while adding intelligence to the incident. Details: {action_result.get_message()}"
 
                 if response and response.get("remote_ids"):
                     intelligence.extend(response.get("remote_ids"))
@@ -1191,7 +1177,7 @@ class ThreatstreamConnector(BaseConnector):
         summary["created_on_cloud"] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_incident(self, param):  # noqa
+    def _handle_update_incident(self, param):
         self._save_action_handler_progress()
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1227,7 +1213,6 @@ class ThreatstreamConnector(BaseConnector):
                 action_result, ENDPOINT_SINGLE_INCIDENT.format(inc_id=incident_id), payload, data=data, method="patch"
             )
         else:
-
             if local_intelligence or cloud_intelligence:
                 intel_data = dict()
                 if local_intelligence:
@@ -1253,10 +1238,10 @@ class ThreatstreamConnector(BaseConnector):
                             is_error = True
                             if output_message:
                                 local_id_error = THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(", ".join(local_intelligence))
-                                output_message = "{}. {}. Details: {}".format(output_message, local_id_error, action_result.get_message())
+                                output_message = f"{output_message}. {local_id_error}. Details: {action_result.get_message()}"
                             else:
                                 local_id_error = THREATSTREAM_ERR_INVALID_LOCAL_INTELLIGENCE.format(", ".join(local_intelligence))
-                                output_message = "{}. Details: {}".format(local_id_error, action_result.get_message())
+                                output_message = f"{local_id_error}. Details: {action_result.get_message()}"
                         del intel_data["local_ids"]
                         if resp_json and resp_json.get("local_ids"):
                             intel_ids_list.extend(resp_json.get("local_ids"))
@@ -1285,7 +1270,7 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. Error while updating the incident. Details: {}".format(output_message, action_result.get_message())
+                        output_message = f"{output_message}. Error while updating the incident. Details: {action_result.get_message()}"
                     else:
                         output_message = "{}. Details: {}".format("Error while updating the incident", action_result.get_message())
 
@@ -1347,7 +1332,6 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated incident")
 
     def _build_data(self, param, data, action_result):
-
         if param.get("fields", None):
             try:
                 fields = ast.literal_eval(param["fields"])
@@ -1380,7 +1364,6 @@ class ThreatstreamConnector(BaseConnector):
         associated_intell = list()
 
         if self.get_action_identifier() == "update_incident":
-
             ret_val, resp_json = self._get_incident_support(action_result, param)
 
             if phantom.is_fail(ret_val):
@@ -1390,7 +1373,6 @@ class ThreatstreamConnector(BaseConnector):
                 associated_intell.append(int(intell.get("id")))
 
         if self.get_action_identifier() in ["update_actor", "update_vulnerability"]:
-
             ret_val, _id = self._validate_integer(action_result, param.get("id"), THREATSTREAM_ID)
 
             if phantom.is_fail(ret_val):
@@ -1518,7 +1500,7 @@ class ThreatstreamConnector(BaseConnector):
                 elif len(e.args) == 1:
                     err_message = e.args[0]
         except Exception as e:
-            self.error_print(f"Error occurred while fetching exception information. Details: {str(e)}")
+            self.error_print(f"Error occurred while fetching exception information. Details: {e!s}")
 
         if not err_code:
             error_text = f"Error Message: {err_message}"
@@ -1527,8 +1509,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return error_text
 
-    def import_support(self, param, action_result):  # noqa
-
+    def import_support(self, param, action_result):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
         create_on_cloud = param.get("create_on_cloud", False)
@@ -1885,7 +1866,7 @@ class ThreatstreamConnector(BaseConnector):
 
         try:
             success, message, vault_info = phrules.vault_info(vault_id=vault_id)
-            vault_info = list(vault_info)[0]
+            vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
         except Exception:
@@ -2088,7 +2069,6 @@ class ThreatstreamConnector(BaseConnector):
         return phantom.APP_ERROR, None
 
     def _check_and_update_container_already_exists(self, incident_id, incident_name, verify=False):
-
         url = f'{self.get_phantom_base_url()}rest/container?_filter_source_data_identifier="{incident_id}"&_filter_asset={self.get_asset_id()}'
 
         try:
@@ -2127,12 +2107,12 @@ class ThreatstreamConnector(BaseConnector):
                     f"Container with ID: {container_id} could not be updated with the current incident_name:\
                     {incident_name} of the incident ID: {incident_id}"
                 )
-                self.debug_print(f"Response of the container updation is: {str(resp_json)}")
+                self.debug_print(f"Response of the container updation is: {resp_json!s}")
                 return container_id
 
         return container_id
 
-    def _handle_on_poll(self, param):  # noqa
+    def _handle_on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         config = self.get_config()
 
@@ -2220,29 +2200,29 @@ class ThreatstreamConnector(BaseConnector):
                     incidents.append(incident)
                 else:
                     self.debug_print(
-                        "Skipping incident ID: {0} due organization ID: {1} \
-                        being different than the configuration parameter organization_id: {2}".format(
+                        "Skipping incident ID: {} due organization ID: {} \
+                        being different than the configuration parameter organization_id: {}".format(
                             incident.get("id"), incident.get("organization_id"), org_id
                         )
                     )
 
-        self.save_progress("Fetched {0} incidents in the oldest first order based on modified_ts time.".format(len(incidents)))
+        self.save_progress(f"Fetched {len(incidents)} incidents in the oldest first order based on modified_ts time.")
         self.save_progress("Started incident and intelligence artifacts creation...")
 
         for i, incident in enumerate(incidents):
-            self.send_progress("Processing incident and corresponding intelligence artifacts - {} %".format(((i + 1) / len(incidents)) * 100))
+            self.send_progress(f"Processing incident and corresponding intelligence artifacts - {((i + 1) / len(incidents)) * 100} %")
             # self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
             # Handle the ingest_only_published_incidents scenario
             if config.get("ingest_only_published_incidents", False):
                 if "published" != incident.get("publication_status"):
                     self.debug_print(
-                        "Skipping incident ID: {0} because ingest_only_published_incidents configuration parameter is marked true".format(
+                        "Skipping incident ID: {} because ingest_only_published_incidents configuration parameter is marked true".format(
                             incident.get("id")
                         )
                     )
                     continue
 
-            self.debug_print("Retrieving details for the incident ID: {0}".format(incident.get("id")))
+            self.debug_print("Retrieving details for the incident ID: {}".format(incident.get("id")))
 
             ret_val, resp_json = self._get_incident_support(action_result, incident_id=incident["id"])
 
@@ -2266,7 +2246,7 @@ class ThreatstreamConnector(BaseConnector):
                     tags = item.get("tags")
 
                     for j, tag in enumerate(tags):
-                        tags_dict["tag_{}".format(j + 1)] = "    ||    ".join("{} : {}".format(key, value) for key, value in tag.items())
+                        tags_dict[f"tag_{j + 1}"] = "    ||    ".join(f"{key} : {value}" for key, value in tag.items())
 
                     item["tags_formatted"] = tags_dict
 
@@ -2292,7 +2272,7 @@ class ThreatstreamConnector(BaseConnector):
                 tags = resp_json.get("tags_v2")
 
                 for j, tag in enumerate(tags):
-                    tags_dict["tag_v2_{}".format(j + 1)] = "    ||    ".join("{} : {}".format(key, value) for key, value in tag.items())
+                    tags_dict[f"tag_v2_{j + 1}"] = "    ||    ".join(f"{key} : {value}" for key, value in tag.items())
 
                 resp_json["tags_v2_formatted"] = tags_dict
 
@@ -2302,7 +2282,7 @@ class ThreatstreamConnector(BaseConnector):
 
             existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
 
-            self.debug_print("Saving container and adding artifacts for the incident ID: {0}".format(resp_json.get("id")))
+            self.debug_print("Saving container and adding artifacts for the incident ID: {}".format(resp_json.get("id")))
 
             if not existing_container_id:
                 container = dict()
@@ -2314,7 +2294,7 @@ class ThreatstreamConnector(BaseConnector):
                 ret_val, message, container_id = self.save_container(container)
 
                 if phantom.is_fail(ret_val):
-                    message = "Failed to add container error msg: {0}".format(message)
+                    message = f"Failed to add container error msg: {message}"
                     self.debug_print(message)
                     return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
 
@@ -2333,10 +2313,10 @@ class ThreatstreamConnector(BaseConnector):
             ret_val, message, _ = self.save_artifacts(artifacts_list)
 
             if not ret_val:
-                self.debug_print("Error while saving the artifact for the incident ID: {0}".format(resp_json.get("id")), message)
+                self.debug_print("Error while saving the artifact for the incident ID: {}".format(resp_json.get("id")), message)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error occurred while saving the artifact for the incident ID: {0}. Error message: {1}".format(resp_json.get("id"), message),
+                    "Error occurred while saving the artifact for the incident ID: {}. Error message: {}".format(resp_json.get("id"), message),
                 )
 
         if not self.is_poll_now() and incidents:
@@ -2386,7 +2366,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _handle_import_session_update(self, param):  # noqa
+    def _handle_import_session_update(self, param):
         self._save_action_handler_progress()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2486,7 +2466,7 @@ class ThreatstreamConnector(BaseConnector):
 
                 threat_model_msg = "Request for association sent successfully. "
 
-            endpoint = "{}{}/".format(ENDPOINT_IMPORT_SESSION, item_id)
+            endpoint = f"{ENDPOINT_IMPORT_SESSION}{item_id}/"
 
             ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method="patch")
             if phantom.is_fail(ret_val) and "Status Code: 404" in action_result.get_message() and payload.get("remote_api") != "true":
@@ -2499,7 +2479,7 @@ class ThreatstreamConnector(BaseConnector):
                 messages.append(msg)
             else:
                 updated = True
-                messages.append("{}{}".format(threat_model_msg, "Successfully updated {}".format(param_list) if param_list else ""))
+                messages.append("{}{}".format(threat_model_msg, f"Successfully updated {param_list}" if param_list else ""))
 
         if tags:
             data = {}
@@ -2535,7 +2515,7 @@ class ThreatstreamConnector(BaseConnector):
                     method="post",
                 )
             if phantom.is_fail(ret_val):
-                messages.append("Unable to update the tags. Error: {}".format(action_result.get_message()))
+                messages.append(f"Unable to update the tags. Error: {action_result.get_message()}")
             else:
                 updated = True
                 messages.append("Successfully updated tags")
@@ -2552,7 +2532,7 @@ class ThreatstreamConnector(BaseConnector):
                     action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id), payload=payload, method="patch"
                 )
             if phantom.is_fail(ret_val):
-                messages.append("Unable to update the comment. Error: {}".format(action_result.get_message()))
+                messages.append(f"Unable to update the comment. Error: {action_result.get_message()}")
             else:
                 updated = True
                 messages.append("Successfully updated comment")
@@ -2560,7 +2540,7 @@ class ThreatstreamConnector(BaseConnector):
         if not updated:
             return action_result.set_status(phantom.APP_ERROR, ". ".join(messages))
 
-        endpoint = ENDPOINT_IMPORT_SESSION + "{}/".format(item_id)
+        endpoint = ENDPOINT_IMPORT_SESSION + f"{item_id}/"
 
         ret_val, resp_json = self._make_rest_call(action_result, endpoint=endpoint, payload=payload)
         if phantom.is_fail(ret_val):
@@ -2663,7 +2643,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return data
 
-    def _handle_create_threat_bulletin(self, param):  # noqa
+    def _handle_create_threat_bulletin(self, param):
         self._save_action_handler_progress()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2807,8 +2787,8 @@ class ThreatstreamConnector(BaseConnector):
 
                 if phantom.is_fail(ret_val):
                     is_error = True
-                    output_message = "{}. Error while adding intelligence to the threat bulletin. Details: {}".format(
-                        output_message, action_result.get_message()
+                    output_message = (
+                        f"{output_message}. Error while adding intelligence to the threat bulletin. Details: {action_result.get_message()}"
                     )
 
                 if response and response.get("remote_ids"):
@@ -2841,8 +2821,8 @@ class ThreatstreamConnector(BaseConnector):
             ret_val, resp_json = self._add_threat_bulletin_attachment(action_result, attachments, threat_bulletin_id, payload, resp_json)
             if phantom.is_fail(ret_val):
                 is_error = True
-                output_message = "{}. Error while adding attachments to the threat bulletin. Details: {}".format(
-                    output_message, action_result.get_message()
+                output_message = (
+                    f"{output_message}. Error while adding attachments to the threat bulletin. Details: {action_result.get_message()}"
                 )
 
         if import_sessions:
@@ -2850,17 +2830,15 @@ class ThreatstreamConnector(BaseConnector):
 
             if phantom.is_fail(ret_val):
                 is_error = True
-                output_message = "{}. Error while adding import sessions to the threat bulletin. Details: {}".format(
-                    output_message, action_result.get_message()
+                output_message = (
+                    f"{output_message}. Error while adding import sessions to the threat bulletin. Details: {action_result.get_message()}"
                 )
 
         if comments:
             ret_val, response = self.add_comment(action_result, comments, "tipreport", threat_bulletin_id, payload)
             if phantom.is_fail(ret_val):
                 is_error = True
-                output_message = "{}. Error while adding comments to the threat bulletin. Details: {}".format(
-                    output_message, action_result.get_message()
-                )
+                output_message = f"{output_message}. Error while adding comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
                 if resp_json["comments"]:
@@ -2876,7 +2854,7 @@ class ThreatstreamConnector(BaseConnector):
         summary["created_on_cloud"] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _handle_update_threat_bulletin(self, param):  # noqa
+    def _handle_update_threat_bulletin(self, param):
         self._save_action_handler_progress()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2945,7 +2923,6 @@ class ThreatstreamConnector(BaseConnector):
                 action_result, ENDPOINT_UPDATE_THREAT_BULLETIN.format(id=threat_bulletin_id), payload, data=data, method="patch"
             )
         else:
-
             if local_intelligence or cloud_intelligence:
                 intel_data = dict()
                 if local_intelligence:
@@ -3020,11 +2997,9 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. Error while updating the threat bulletin. Details: {}".format(
-                            output_message, action_result.get_message()
-                        )
+                        output_message = f"{output_message}. Error while updating the threat bulletin. Details: {action_result.get_message()}"
                     else:
-                        output_message = "Error while updating the threat bulletin. Details: {}".format(action_result.get_message())
+                        output_message = f"Error while updating the threat bulletin. Details: {action_result.get_message()}"
 
                 if resp_json and resp_json.get("ids"):
                     intel_ids_list.extend(resp_json.get("ids"))
@@ -3078,11 +3053,11 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 is_error = True
                 if output_message:
-                    output_message = "{}. Error while updating attachments to the threat bulletin. Details: {}".format(
-                        output_message, action_result.get_message()
+                    output_message = (
+                        f"{output_message}. Error while updating attachments to the threat bulletin. Details: {action_result.get_message()}"
                     )
                 else:
-                    output_message = "Error while updating attachments to the threat bulletin. Details: {}".format(action_result.get_message())
+                    output_message = f"Error while updating attachments to the threat bulletin. Details: {action_result.get_message()}"
 
         if import_sessions:
             ret_val, resp_json = self._add_threat_bulletin_sessions(action_result, import_sessions, threat_bulletin_id, payload, resp_json)
@@ -3090,24 +3065,22 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 is_error = True
                 if output_message:
-                    output_message = "{}. Error while updating import sessions to the threat bulletin. Details: {}".format(
-                        output_message, action_result.get_message()
+                    output_message = (
+                        f"{output_message}. Error while updating import sessions to the threat bulletin. Details: {action_result.get_message()}"
                     )
                 else:
-                    output_message = "Error while updating import sessions to the threat bulletin. Details: {}".format(
-                        action_result.get_message()
-                    )
+                    output_message = f"Error while updating import sessions to the threat bulletin. Details: {action_result.get_message()}"
 
         if comments:
             ret_val, response = self.add_comment(action_result, comments, "tipreport", threat_bulletin_id, payload)
             if phantom.is_fail(ret_val):
                 is_error = True
                 if output_message:
-                    output_message = "{}. Error while updating comments to the threat bulletin. Details: {}".format(
-                        output_message, action_result.get_message()
+                    output_message = (
+                        f"{output_message}. Error while updating comments to the threat bulletin. Details: {action_result.get_message()}"
                     )
                 else:
-                    output_message = "Error while updating comments to the threat bulletin. Details: {}".format(action_result.get_message())
+                    output_message = f"Error while updating comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
                 if resp_json["comments"]:
@@ -3120,7 +3093,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, output_message)
 
         if message:
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated threat bulletin. {}".format(message))
+            return action_result.set_status(phantom.APP_SUCCESS, f"Successfully updated threat bulletin. {message}")
         else:
             return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated threat bulletin")
 
@@ -3258,8 +3231,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_association(self, param, endpoint):  # noqa
-
+    def _handle_association(self, param, endpoint):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         entity_type = param["entity_type"]
@@ -3306,7 +3278,6 @@ class ThreatstreamConnector(BaseConnector):
                 if resp_json.get("ids"):
                     intel_ids_list.extend(resp_json.get("ids"))
         else:
-
             if local_ids or remote_ids:
                 intel_data = dict()
                 if local_ids:
@@ -3393,12 +3364,12 @@ class ThreatstreamConnector(BaseConnector):
 
         if message == "None of the entities got modified, please provide valid entities":
             return action_result.set_status(
-                phantom.APP_SUCCESS, "{}. Please check for the non-modified ids as they would be already associated or invalid".format(message)
+                phantom.APP_SUCCESS, f"{message}. Please check for the non-modified ids as they would be already associated or invalid"
             )
         elif message:
             succ_msg = (
-                "Successfully updated associations. {}. "
-                "Please check for the non-modified ids as they would be already associated or invalid".format(message)
+                f"Successfully updated associations. {message}. "
+                "Please check for the non-modified ids as they would be already associated or invalid"
             )
             return action_result.set_status(phantom.APP_SUCCESS, succ_msg)
         else:
@@ -3488,7 +3459,6 @@ class ThreatstreamConnector(BaseConnector):
         return data
 
     def _get_rule_support(self, action_result, param=None, payload=None, rule_id=None):
-
         if payload and payload.get("remote_api") is not None:
             del payload["remote_api"]
 
@@ -3795,12 +3765,12 @@ class ThreatstreamConnector(BaseConnector):
     def add_attachment(self, action_result, attachment, entity_type, entity_id, payload, resp_json):
         try:
             _, _, file_info = phrules.vault_info(vault_id=attachment)
-            file_info = list(file_info)[0]
+            file_info = next(iter(file_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), resp_json
         except Exception as e:
             return (
-                action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))),
+                action_result.set_status(phantom.APP_ERROR, f"Vault ID not valid: {self._get_error_message_from_exception(e)}"),
                 resp_json,
             )
 
@@ -3868,12 +3838,12 @@ class ThreatstreamConnector(BaseConnector):
     def _add_threat_bulletin_attachment(self, action_result, attachments, threat_bulletin_id, payload, resp_json):
         try:
             _, _, file_info = phrules.vault_info(vault_id=attachments)
-            file_info = list(file_info)[0]
+            file_info = next(iter(file_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), resp_json
         except Exception as e:
             return (
-                action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))),
+                action_result.set_status(phantom.APP_ERROR, f"Vault ID not valid: {self._get_error_message_from_exception(e)}"),
                 resp_json,
             )
 
@@ -3985,7 +3955,7 @@ class ThreatstreamConnector(BaseConnector):
 
         return ret_val, resp_json, entity_id
 
-    def _create_threat_model(self, action_result, param, endpoint, entity_type):  # noqa
+    def _create_threat_model(self, action_result, param, endpoint, entity_type):
         create_on_cloud = param.get("create_on_cloud", False)
 
         data = {"name": param["name"], "is_public": param.get("is_public", False), "publication_status": "new"}
@@ -4030,7 +4000,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
             if not entity_id:
                 return action_result.set_status(
-                    phantom.APP_ERROR, "Error while fetching the {key} ID of the created {key} on the cloud".format(key=entity_type)
+                    phantom.APP_ERROR, f"Error while fetching the {entity_type} ID of the created {entity_type} on the cloud"
                 )
 
             output_message = THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE.format(entity_type, entity_id)
@@ -4094,7 +4064,7 @@ class ThreatstreamConnector(BaseConnector):
                 return action_result.get_status()
             if not entity_id:
                 return action_result.set_status(
-                    phantom.APP_ERROR, "Error while fetching the {key} ID of the created {key} on the on-prem".format(key=entity_type)
+                    phantom.APP_ERROR, f"Error while fetching the {entity_type} ID of the created {entity_type} on the on-prem"
                 )
 
             output_message = THREATSTREAM_SUCCESS_THREATMODEL_MESSAGE.format(entity_type, entity_id)
@@ -4118,9 +4088,9 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. Error while adding intelligence. Details: {}".format(output_message, action_result.get_message())
+                        output_message = f"{output_message}. Error while adding intelligence. Details: {action_result.get_message()}"
                     else:
-                        output_message = "Error while adding intelligence. Details: {}".format(action_result.get_message())
+                        output_message = f"Error while adding intelligence. Details: {action_result.get_message()}"
 
                 if response and response.get("remote_ids"):
                     intelligence.extend(response.get("remote_ids"))
@@ -4143,21 +4113,21 @@ class ThreatstreamConnector(BaseConnector):
             message = "{} created successfully. Associated intelligence : {}".format(entity_type.capitalize(), ", ".join(msg_intel))
 
         elif (local_intelligence or cloud_intelligence) and not intelligence:
-            message = "{} created successfully. {}".format(entity_type.capitalize(), THREATSTREAM_ERR_INVALID_INTELLIGENCE)
+            message = f"{entity_type.capitalize()} created successfully. {THREATSTREAM_ERR_INVALID_INTELLIGENCE}"
         else:
-            message = "{} created successfully".format(entity_type.capitalize())
+            message = f"{entity_type.capitalize()} created successfully"
 
         if attachment:
             ret_val, resp_json = self.add_attachment(action_result, attachment, entity_type, entity_id, payload, resp_json)
             if phantom.is_fail(ret_val):
                 is_error = True
-                output_message = "{}. Error while adding attachments. Details: {}".format(output_message, action_result.get_message())
+                output_message = f"{output_message}. Error while adding attachments. Details: {action_result.get_message()}"
 
         if comment:
             ret_val, resp_json_comment = self.add_comment(action_result, comment.encode("utf-8"), entity_type, entity_id, payload)
             if phantom.is_fail(ret_val):
                 is_error = True
-                output_message = "{}. Error while adding comments. Details: {}".format(output_message, action_result.get_message())
+                output_message = f"{output_message}. Error while adding comments. Details: {action_result.get_message()}"
             else:
                 resp_json["comment"] = resp_json_comment
 
@@ -4169,8 +4139,7 @@ class ThreatstreamConnector(BaseConnector):
         summary["created_on_cloud"] = create_on_cloud or self._is_cloud_instance
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
-    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):  # noqa
-
+    def _update_threat_model(self, action_result, param, endpoint, entity_type, entity_id):
         if (
             not (param.get("local_intelligence") or param.get("cloud_intelligence"))
             and not param.get("fields")
@@ -4282,9 +4251,9 @@ class ThreatstreamConnector(BaseConnector):
                 if phantom.is_fail(ret_val):
                     is_error = True
                     if output_message:
-                        output_message = "{}. Error while updating intelligence. Details: {}".format(output_message, action_result.get_message())
+                        output_message = f"{output_message}. Error while updating intelligence. Details: {action_result.get_message()}"
                     else:
-                        output_message = "Error while updating intelligence. Details: {}".format(action_result.get_message())
+                        output_message = f"Error while updating intelligence. Details: {action_result.get_message()}"
 
                 if resp_json and resp_json.get("ids"):
                     intel_ids_list.extend(resp_json.get("ids"))
@@ -4334,27 +4303,27 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             is_error = True
             if output_message:
-                output_message = "{}. Error while getting threat model. Details: {}".format(output_message, action_result.get_message())
+                output_message = f"{output_message}. Error while getting threat model. Details: {action_result.get_message()}"
             else:
-                output_message = "Error while getting threat model. Details: {}".format(action_result.get_message())
+                output_message = f"Error while getting threat model. Details: {action_result.get_message()}"
 
         if attachment:
             ret_val, resp_json = self.add_attachment(action_result, attachment, entity_type, entity_id, payload, resp_json)
             if phantom.is_fail(ret_val):
                 is_error = True
                 if output_message:
-                    output_message = "{}. Error while adding attachments. Details: {}".format(output_message, action_result.get_message())
+                    output_message = f"{output_message}. Error while adding attachments. Details: {action_result.get_message()}"
                 else:
-                    output_message = "Error while adding attachments. Details: {}".format(action_result.get_message())
+                    output_message = f"Error while adding attachments. Details: {action_result.get_message()}"
 
         if comment:
             ret_val, response = self.add_comment(action_result, comment, entity_type, entity_id, payload)
             if phantom.is_fail(ret_val):
                 is_error = True
                 if output_message:
-                    output_message = "{}. Error while adding comments. Details: {}".format(output_message, action_result.get_message())
+                    output_message = f"{output_message}. Error while adding comments. Details: {action_result.get_message()}"
                 else:
-                    output_message = "Error while adding comments. Details: {}".format(action_result.get_message())
+                    output_message = f"Error while adding comments. Details: {action_result.get_message()}"
             else:
                 resp_json.update({"comments": response})
 
@@ -4364,9 +4333,9 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, output_message)
 
         if message:
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated {}. {}".format(entity_type, message))
+            return action_result.set_status(phantom.APP_SUCCESS, f"Successfully updated {entity_type}. {message}")
         else:
-            return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated {}".format(entity_type))
+            return action_result.set_status(phantom.APP_SUCCESS, f"Successfully updated {entity_type}")
 
     def _handle_create_vulnerability(self, param):
         self._save_action_handler_progress()
@@ -4472,7 +4441,7 @@ class ThreatstreamConnector(BaseConnector):
                 error_message = self._get_error_message_from_exception(e)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error building fields dictionary: {0}. Please ensure that provided input is in valid JSON format".format(error_message),
+                    f"Error building fields dictionary: {error_message}. Please ensure that provided input is in valid JSON format",
                 )
 
             if not isinstance(fields, dict):
@@ -4683,8 +4652,7 @@ class ThreatstreamConnector(BaseConnector):
         action_result.add_data(resp_json)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted investigation")
 
-    def handle_action(self, param):  # noqa
-
+    def handle_action(self, param):
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
 
@@ -4811,7 +4779,6 @@ class ThreatstreamConnector(BaseConnector):
 
 
 if __name__ == "__main__":
-
     # Imports
     import pudb
 
@@ -4820,7 +4787,6 @@ if __name__ == "__main__":
 
     # The first param is the input json file
     with open(sys.argv[1]) as f:
-
         # Load the input json file
         in_json = f.read()
         in_json = json.loads(in_json)

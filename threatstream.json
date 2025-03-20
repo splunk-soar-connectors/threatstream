@@ -20,7 +20,7 @@
     "python_version": "3",
     "min_phantom_version": "6.3.0",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2024 Splunk Inc.",
+    "license": "Copyright (c) 2016-2025 Splunk Inc.",
     "configuration": {
         "hostname": {
             "data_type": "string",
@@ -12336,6 +12336,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ph",
+                    "data_type": "ph"
                 }
             ],
             "versions": "EQ(*)"
@@ -19838,6 +19842,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ph",
+                    "data_type": "ph"
                 }
             ],
             "render": {
@@ -20036,6 +20044,10 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.ph",
+                    "data_type": "ph"
                 }
             ],
             "render": {
