@@ -94,6 +94,8 @@ def display_view(provides, all_app_runs, context):
                 continue
             results.append(ctx_result)
 
+    ret_val = None
+
     if provides == "get incident":
         ret_val = "threatstream_get_incident.html"
 
