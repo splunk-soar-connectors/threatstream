@@ -234,9 +234,9 @@ default ports used by Splunk SOAR.
 This app uses the ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019
 Philip Hane.
 
-## wizard-whois
+## pythonwhois-alt
 
-This app uses the wizard-whois module, which is licensed under the MIT License, Copyright (c)
+This app uses the pythonwhois-alt module, which is licensed under the MIT License, Copyright (c)
 Michael Ramsey.
 
 ## dnspython

@@ -1,9 +1,9 @@
 # ThreatStream
 
-Publisher: Splunk \
-Connector Version: 3.6.1 \
-Product Vendor: Anomali \
-Product Name: ThreatStream \
+Publisher: Splunk <br>
+Connector Version: 3.6.1 <br>
+Product Vendor: Anomali <br>
+Product Name: ThreatStream <br>
 Minimum Product Version: 6.3.0
 
 Integrates a variety of generic, reputation, and investigative actions from the Anomali ThreatStream threat intelligence platform
@@ -244,9 +244,9 @@ default ports used by Splunk SOAR.
 This app uses the ipwhois module, which is licensed under the BSD License, Copyright (c) 2013-2019
 Philip Hane.
 
-## wizard-whois
+## pythonwhois-alt
 
-This app uses the wizard-whois module, which is licensed under the MIT License, Copyright (c)
+This app uses the pythonwhois-alt module, which is licensed under the MIT License, Copyright (c)
 Michael Ramsey.
 
 ## dnspython
@@ -271,71 +271,71 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Test connectivity to ThreatStream by querying the intelligence endpoint \
-[file reputation](#action-file-reputation) - Get information about a file \
-[domain reputation](#action-domain-reputation) - Get information about a given domain \
-[ip reputation](#action-ip-reputation) - Get information about a given IP \
-[email reputation](#action-email-reputation) - Get information about a given email \
-[url reputation](#action-url-reputation) - Get information about a URL \
-[whois ip](#action-whois-ip) - Execute a whois lookup on the given IP \
-[whois domain](#action-whois-domain) - Execute a whois lookup on the given domain \
-[get observable](#action-get-observable) - Get observable present in ThreatStream by ID number \
-[list observables](#action-list-observables) - List observables present in ThreatStream \
-[get vulnerability](#action-get-vulnerability) - Get vulnerability present in ThreatStream by ID number \
-[list vulnerabilities](#action-list-vulnerabilities) - List vulnerabilities present in ThreatStream \
-[list incidents](#action-list-incidents) - List incidents present in ThreatStream \
-[delete incident](#action-delete-incident) - Delete incident in ThreatStream by ID number \
-[get incident](#action-get-incident) - Get incident in ThreatStream by ID number \
-[create incident](#action-create-incident) - Create an incident in ThreatStream \
-[update incident](#action-update-incident) - Update an incident in ThreatStream by ID number \
-[import domain observable](#action-import-domain-observable) - Import domain observable into ThreatStream \
-[import url observable](#action-import-url-observable) - Import URL observable into ThreatStream \
-[import ip observable](#action-import-ip-observable) - Import IP observable into ThreatStream \
-[import file observable](#action-import-file-observable) - Import file observable into ThreatStream \
-[import email observable](#action-import-email-observable) - Import email observable into ThreatStream \
-[import observables](#action-import-observables) - Import observables into ThreatStream \
-[tag observable](#action-tag-observable) - Add a tag to the observable \
-[get pcap](#action-get-pcap) - Download pcap file of a sample submitted to the sandbox and add it to vault \
-[detonate file](#action-detonate-file) - Detonate file in ThreatStream \
-[detonate url](#action-detonate-url) - Detonate URL in ThreatStream \
-[get status](#action-get-status) - Retrieve detonation status present in Threatstream \
-[get report](#action-get-report) - Retrieve detonation report present in Threatstream \
-[on poll](#action-on-poll) - Callback action for the on_poll ingest functionality \
-[run query](#action-run-query) - Run observables query in ThreatStream \
-[list import sessions](#action-list-import-sessions) - List all the import sessions \
-[update import session](#action-update-import-session) - This action updates the fields of the provided item id \
-[list threat models](#action-list-threat-models) - List all the threat models \
-[create threat bulletin](#action-create-threat-bulletin) - Create a threat bulletin in ThreatStream \
-[update threat bulletin](#action-update-threat-bulletin) - Update a threat bulletin in ThreatStream \
-[list threat bulletins](#action-list-threat-bulletins) - List threat bulletins present in ThreatStream \
-[list associations](#action-list-associations) - List associations of an entity present in ThreatStream \
-[create rule](#action-create-rule) - Creates a new rule in Threatstream \
-[update rule](#action-update-rule) - Update a rule in ThreatStream by ID number \
-[list rules](#action-list-rules) - List rules present in ThreatStream \
-[delete rule](#action-delete-rule) - Delete rule in ThreatStream by ID number \
-[add association](#action-add-association) - Create associations between threat model entities on the ThreatStream platform \
-[remove association](#action-remove-association) - Remove associations between threat model entities on the ThreatStream platform \
-[list actors](#action-list-actors) - List actors present in ThreatStream \
-[list imports](#action-list-imports) - List imports present in ThreatStream \
-[create vulnerability](#action-create-vulnerability) - Create a vulnerability in ThreatStream \
-[update vulnerability](#action-update-vulnerability) - Update the vulnerability in ThreatStream \
-[create actor](#action-create-actor) - Create an actor in ThreatStream \
-[update actor](#action-update-actor) - Update an actor in ThreatStream \
-[delete threat bulletin](#action-delete-threat-bulletin) - Delete threat bulletin in ThreatStream by ID \
-[delete vulnerability](#action-delete-vulnerability) - Delete vulnerability in ThreatStream by ID \
-[delete actor](#action-delete-actor) - Delete actor in ThreatStream by ID number \
-[update observable](#action-update-observable) - Update an observable in ThreatStream \
-[create investigation](#action-create-investigation) - Create an investigation in ThreatStream \
-[list investigations](#action-list-investigations) - List investigations present in ThreatStream \
-[get investigation](#action-get-investigation) - Retrieve investigation present in Threatstream by ID \
-[update investigation](#action-update-investigation) - Update an investigation in ThreatStream \
+[test connectivity](#action-test-connectivity) - Test connectivity to ThreatStream by querying the intelligence endpoint <br>
+[file reputation](#action-file-reputation) - Get information about a file <br>
+[domain reputation](#action-domain-reputation) - Get information about a given domain <br>
+[ip reputation](#action-ip-reputation) - Get information about a given IP <br>
+[email reputation](#action-email-reputation) - Get information about a given email <br>
+[url reputation](#action-url-reputation) - Get information about a URL <br>
+[whois ip](#action-whois-ip) - Execute a whois lookup on the given IP <br>
+[whois domain](#action-whois-domain) - Execute a whois lookup on the given domain <br>
+[get observable](#action-get-observable) - Get observable present in ThreatStream by ID number <br>
+[list observables](#action-list-observables) - List observables present in ThreatStream <br>
+[get vulnerability](#action-get-vulnerability) - Get vulnerability present in ThreatStream by ID number <br>
+[list vulnerabilities](#action-list-vulnerabilities) - List vulnerabilities present in ThreatStream <br>
+[list incidents](#action-list-incidents) - List incidents present in ThreatStream <br>
+[delete incident](#action-delete-incident) - Delete incident in ThreatStream by ID number <br>
+[get incident](#action-get-incident) - Get incident in ThreatStream by ID number <br>
+[create incident](#action-create-incident) - Create an incident in ThreatStream <br>
+[update incident](#action-update-incident) - Update an incident in ThreatStream by ID number <br>
+[import domain observable](#action-import-domain-observable) - Import domain observable into ThreatStream <br>
+[import url observable](#action-import-url-observable) - Import URL observable into ThreatStream <br>
+[import ip observable](#action-import-ip-observable) - Import IP observable into ThreatStream <br>
+[import file observable](#action-import-file-observable) - Import file observable into ThreatStream <br>
+[import email observable](#action-import-email-observable) - Import email observable into ThreatStream <br>
+[import observables](#action-import-observables) - Import observables into ThreatStream <br>
+[tag observable](#action-tag-observable) - Add a tag to the observable <br>
+[get pcap](#action-get-pcap) - Download pcap file of a sample submitted to the sandbox and add it to vault <br>
+[detonate file](#action-detonate-file) - Detonate file in ThreatStream <br>
+[detonate url](#action-detonate-url) - Detonate URL in ThreatStream <br>
+[get status](#action-get-status) - Retrieve detonation status present in Threatstream <br>
+[get report](#action-get-report) - Retrieve detonation report present in Threatstream <br>
+[on poll](#action-on-poll) - Callback action for the on_poll ingest functionality <br>
+[run query](#action-run-query) - Run observables query in ThreatStream <br>
+[list import sessions](#action-list-import-sessions) - List all the import sessions <br>
+[update import session](#action-update-import-session) - This action updates the fields of the provided item id <br>
+[list threat models](#action-list-threat-models) - List all the threat models <br>
+[create threat bulletin](#action-create-threat-bulletin) - Create a threat bulletin in ThreatStream <br>
+[update threat bulletin](#action-update-threat-bulletin) - Update a threat bulletin in ThreatStream <br>
+[list threat bulletins](#action-list-threat-bulletins) - List threat bulletins present in ThreatStream <br>
+[list associations](#action-list-associations) - List associations of an entity present in ThreatStream <br>
+[create rule](#action-create-rule) - Creates a new rule in Threatstream <br>
+[update rule](#action-update-rule) - Update a rule in ThreatStream by ID number <br>
+[list rules](#action-list-rules) - List rules present in ThreatStream <br>
+[delete rule](#action-delete-rule) - Delete rule in ThreatStream by ID number <br>
+[add association](#action-add-association) - Create associations between threat model entities on the ThreatStream platform <br>
+[remove association](#action-remove-association) - Remove associations between threat model entities on the ThreatStream platform <br>
+[list actors](#action-list-actors) - List actors present in ThreatStream <br>
+[list imports](#action-list-imports) - List imports present in ThreatStream <br>
+[create vulnerability](#action-create-vulnerability) - Create a vulnerability in ThreatStream <br>
+[update vulnerability](#action-update-vulnerability) - Update the vulnerability in ThreatStream <br>
+[create actor](#action-create-actor) - Create an actor in ThreatStream <br>
+[update actor](#action-update-actor) - Update an actor in ThreatStream <br>
+[delete threat bulletin](#action-delete-threat-bulletin) - Delete threat bulletin in ThreatStream by ID <br>
+[delete vulnerability](#action-delete-vulnerability) - Delete vulnerability in ThreatStream by ID <br>
+[delete actor](#action-delete-actor) - Delete actor in ThreatStream by ID number <br>
+[update observable](#action-update-observable) - Update an observable in ThreatStream <br>
+[create investigation](#action-create-investigation) - Create an investigation in ThreatStream <br>
+[list investigations](#action-list-investigations) - List investigations present in ThreatStream <br>
+[get investigation](#action-get-investigation) - Retrieve investigation present in Threatstream by ID <br>
+[update investigation](#action-update-investigation) - Update an investigation in ThreatStream <br>
 [delete investigation](#action-delete-investigation) - Delete investigation in ThreatStream by ID number
 
 ## action: 'test connectivity'
 
 Test connectivity to ThreatStream by querying the intelligence endpoint
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -350,7 +350,7 @@ No Output
 
 Get information about a file
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If nothing is found, this is because ThreatStream has no information on that file. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.
@@ -424,7 +424,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a given domain
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If nothing is found, this may be due to the format of the domain. Try excluding any subdomains (namely www). If there is still no information found, then it is because ThreatStream has no information on that domain. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data. The <b>search_exact_value</b> parameter searches for the exact domain on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.
@@ -508,7 +508,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a given IP
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If nothing is found, then it is because ThreatStream has no information on that IP. ThreatStream, however, may still have Passive DNS (PDNS) information on it, which can be found in extra data. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.<br>Extra data includes PDNS, insights, and external resources. By default, extra data is not included in the response. You can update the flag params to include the extra data.
@@ -602,7 +602,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a given email
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter. The <b>search_exact_value</b> parameter searches for the exact email on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.
@@ -678,7 +678,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a URL
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If nothing is found, this is because ThreatStream has no information on that URL. If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter. The <b>search_exact_value</b> parameter searches for the exact url on ThreatStream server. If this parameter is kept <b>true</b>, then the <b>extend_source</b> parameter will be ignored and no extra information will be available.
@@ -760,7 +760,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Execute a whois lookup on the given IP
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.
@@ -820,7 +820,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Execute a whois lookup on the given domain
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 ThreatStream returns whois info as a raw string (present in the raw field) which the app will then attempt to parse into the output. Depending on the contents of the raw string, it may not be able to parse all or any of the required fields.
@@ -896,7 +896,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get observable present in ThreatStream by ID number
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -968,7 +968,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List observables present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The observables will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -1054,7 +1054,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get vulnerability present in ThreatStream by ID number
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1119,7 +1119,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List vulnerabilities present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The vulnerabilities will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -1182,7 +1182,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List incidents present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The incidents will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -1254,7 +1254,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete incident in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1279,7 +1279,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get incident in ThreatStream by ID number
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1413,7 +1413,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create an incident in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1495,7 +1495,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an incident in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1571,7 +1571,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import domain observable into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing domain observables without approval, the user must provide indicator type in the field parameter (e.g - "mal_domain") whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - "malware").</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li></ul>
@@ -1618,7 +1618,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import URL observable into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing URL observables without approval, the user must provide indicator type in the indicator_type parameter (e.g - "phish_url") whereas, for importing observables with approval, the user must provide threat type in the indicator_type parameter (e.g - "phish").</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li></ul>
@@ -1661,7 +1661,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import IP observable into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing IP observables without approval, the user must provide indicator type in the indicator_type parameter (e.g - "apt_ip") whereas, for importing observables with approval, the user must provide threat type in the indicator_type parameter (e.g - "apt").</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li></ul>
@@ -1702,7 +1702,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import file observable into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing file observables without approval, the user must provide indicator type in the field parameter (e.g - "crypto_hash") whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - "crypto").</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li></ul>
@@ -1748,7 +1748,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import email observable into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing email observables without approval, the user must provide indicator type in the indicator_type parameter (e.g - "spam_email") whereas, for importing observables with approval, the user must provide threat type in the indicator_type parameter (e.g - "spam").</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li></ul>
@@ -1794,7 +1794,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import observables into ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>For importing observables without approval, the user must provide indicator type in the field parameter (e.g - {"itype": "&lt;indicator_type&gt;"}) whereas, for importing observables with approval, the user must provide threat type in the field parameter (e.g - {"threat_type": "&lt;threat_type&gt;"}).</li><li>The "allow_unresolved" parameter will be passed in the API call if the "value" parameter is set to "domain" or "url" and "with_approval" parameter is set to "False".</li><li>The possible values of indicator type (itype) and threat_type are listed at the starting of the documentation. If the input contains any indicator type (itype) or threat_type value except the ones listed, the action will behave according to the API behavior.</li><li>For importing observables of type 'URL', 'IP' and 'Domain', Threatstream itself detects the confidence value whereas, for importing observables of type 'Email', 'File', the user must provide confidence value in the field parameter (e.g - {"itype": "&lt;indicator_type&gt;", "confidence": &lt;confidence_value&gt;}).</li><li>If both the "itype" and "threat_type" values are passed in the "fields" parameter when "with_approval" is set to "True", the action will behave according to the API behavior.</li></ul>
@@ -1837,7 +1837,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a tag to the observable
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -1875,7 +1875,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Download pcap file of a sample submitted to the sandbox and add it to vault
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -1901,7 +1901,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Detonate file in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.
@@ -1967,7 +1967,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Detonate URL in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If classification or platform parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.
@@ -2013,7 +2013,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve detonation status present in Threatstream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2075,7 +2075,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve detonation report present in Threatstream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2210,7 +2210,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Callback action for the on_poll ingest functionality
 
-Type: **ingest** \
+Type: **ingest** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2231,7 +2231,7 @@ No Output
 
 Run observables query in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 For providing the <b>query</b> parameter, please form a valid search string using the Anomali filter language (as seen on the advanced search page) and then convert it into a valid JSON string as shown in the example here. e.g. Anomali filter language-based search string = modifed_ts\_\_gt=2018-01-10&status=active has to be provided in the <b>query</b> parameter as { "modifed_ts\_\_gt": "2018-01-10", "status": "active" }<br> If offset is provided in the 'query' parameter, it will be overwritten by the offset value provided in the 'offset' parameter.
@@ -2321,7 +2321,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List all the import sessions
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>For a Hybrid instance, this action will return both remote and local data based on the input parameters.</li><li>The user can use the <b>list imports</b> action to fetch only remote or local data in the response.</li></ul>
@@ -2426,7 +2426,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 This action updates the fields of the provided item id
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If "null" is provided in the expire time parameter, then expiration time will be set to "9999-12-31T00:00:00".</li></ul>
@@ -2564,7 +2564,7 @@ action_result.parameter.ph | ph | | |
 
 List all the threat models
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -2636,7 +2636,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create a threat bulletin in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>Circles parameter will only be applicable when a threat bulletin will be created on the cloud.</li><li>If the body_content_type parameter is not provided, then the default value (markdown) will be considered as the value of the body_content_type parameter. Once created, body_content_type cannot be modified.</li></ul>
@@ -2814,7 +2814,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update a threat bulletin in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Circles parameter will only be applicable when a cloud threat bulletin will be updated.
@@ -3056,7 +3056,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List threat bulletins present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>This action will list the threat bulletins in oldest first format.</li><li>is_public parameter will only be applicable as filter when its value will be set to "true" or "false". It wont be applied as a filter and will list all the threat bulletins when the value of is_public parameter is set to "all".</li></ul>
@@ -3277,7 +3277,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List associations of an entity present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -3458,7 +3458,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Creates a new rule in Threatstream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <li> In the field param, tags, actors, malware, campaigns, incidents, signature, tips, ttps, vulnerabilities accepts list of IDs as an example: {“incidents”: [1000000001], “actors”: [1000000001], “vulnerabilities”: [1000000001, 1000000002], “campaigns”: [1000000001], “signatures”: [1000000001], “tags”: [{“name”:“test_tag”,“tlp”:“white”}], “match_impacts”: [ “actor_ip”, “actor_ipv6” ]} </li> <li> In field param, at least one Match Within parameter (match_observables, match_reportedfiles, match_signatures, match_tips, or match_vulnerabilities) should be true. Otherwise, the action will pass and a rule will be created but it will throw an error while updating it from the UI. </li> <li>Do not specify values for both match_impacts and exclude_impacts in the same request. Indicator types specified in match_impacts are filtered out if also specified in exclude_impacts.</li>
@@ -3554,7 +3554,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update a rule in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3656,7 +3656,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List rules present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The rules will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -3735,7 +3735,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete rule in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3760,7 +3760,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create associations between threat model entities on the ThreatStream platform
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3794,7 +3794,7 @@ action_result.parameter.ph | ph | | |
 
 Remove associations between threat model entities on the ThreatStream platform
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -3828,7 +3828,7 @@ action_result.parameter.ph | ph | | |
 
 List actors present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The actors will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -3900,7 +3900,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List imports present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>The imports will be listed in the latest first order on the basis of created_ts.</li><li>If the limit parameter is not provided, then the default value (1000) will be considered as the value of the limit parameter.</li></ul>
@@ -3959,7 +3959,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create a vulnerability in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <ul><li>The "is_public" parameter can not be set as "true" if the "create_on_cloud" parameter is "false" for hybride on-prem instances.</li></ul>
@@ -4087,7 +4087,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update the vulnerability in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4259,7 +4259,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create an actor in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4405,7 +4405,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an actor in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4626,7 +4626,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete threat bulletin in ThreatStream by ID
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4651,7 +4651,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete vulnerability in ThreatStream by ID
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4676,7 +4676,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete actor in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4701,7 +4701,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an observable in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If any of the indicator_type, confidence, tlp, severity, status, or expiration_date parameter is added and is also mentioned in the fields parameter, the value given in the individual parameters is considered.
@@ -4788,7 +4788,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create an investigation in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -4859,7 +4859,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List investigations present in ThreatStream
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4915,7 +4915,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Retrieve investigation present in Threatstream by ID
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -4980,7 +4980,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update an investigation in ThreatStream
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -5047,7 +5047,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Delete investigation in ThreatStream by ID number
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
