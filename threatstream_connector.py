@@ -26,10 +26,10 @@ from urllib.parse import urlsplit
 import dateutil.parser
 import phantom.app as phantom
 import phantom.rules as phrules
-import pythonwhois_alt
 import pytz
 import requests
 import simplejson as json
+import wizard_whois as pythonwhois_alt
 from bs4 import BeautifulSoup, UnicodeDammit
 from ipwhois import IPWhois
 from phantom.action_result import ActionResult
