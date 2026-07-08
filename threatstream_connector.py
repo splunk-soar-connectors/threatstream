@@ -1,6 +1,6 @@
 # File: threatstream_connector.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -631,7 +631,7 @@ class ThreatstreamConnector(BaseConnector):
 
         self.save_progress("Starting connectivity test")
         payload = self._generate_payload(limit="1")
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
+        ret_val, _resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
 
         if phantom.is_fail(ret_val):
             self.save_progress("Connectivity test failed")
@@ -1865,7 +1865,7 @@ class ThreatstreamConnector(BaseConnector):
         vault_id = param.get("vault_id")
 
         try:
-            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            _success, _message, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
