@@ -143,7 +143,7 @@ class ThreatstreamConnector(BaseConnector):
             self.debug_print("Resetting the state file with the default format")
             self._state = {"app_version": self.get_app_json().get("app_version")}
 
-        self._verify = config.get("verify_server_cert", False)
+        self._verify = config.get("verify_server_cert", True)
         self._is_cloud_instance = config.get("is_cloud_instance", False)
         self._first_run_limit = config.get("first_run_containers")
 
