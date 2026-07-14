@@ -785,6 +785,8 @@ class ThreatstreamConnector(BaseConnector):
             payload = self._generate_payload(limit=DEFAULT_MAX_RESULTS)
 
         payload["offset"] = offset
+        max_pages = (limit + DEFAULT_MAX_RESULTS - 1) // DEFAULT_MAX_RESULTS if limit else DEFAULT_MAX_PAGES
+        pages_fetched = 0
 
         while True:
             ret_val, items = self._make_rest_call(action_result, endpoint, payload)
@@ -792,6 +794,7 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return None
 
+            pages_fetched += 1
             items_list.extend(items.get("objects", []))
 
             if limit and len(items_list) >= limit:
@@ -799,6 +802,13 @@ class ThreatstreamConnector(BaseConnector):
 
             if len(items.get("objects", [])) < DEFAULT_MAX_RESULTS:
                 break
+
+            if pages_fetched >= max_pages:
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Server kept returning full result pages; aborted pagination after {pages_fetched} pages",
+                )
+                return None
 
             offset = offset + DEFAULT_MAX_RESULTS
             payload["offset"] = offset
