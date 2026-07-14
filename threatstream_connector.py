@@ -2046,10 +2046,23 @@ class ThreatstreamConnector(BaseConnector):
 
         # download file
         try:
-            pcap_file = requests.get(pcap, timeout=DEFAULT_TIMEOUT).content
+            pcap_response = requests.get(pcap, timeout=DEFAULT_TIMEOUT)
         except Exception as e:
             self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file"), None
+
+        if not pcap_response.ok:
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Could not download PCAP file. Server returned status code: {pcap_response.status_code}",
+                ),
+                None,
+            )
+
+        pcap_file = pcap_response.content
+        if not pcap_file:
+            return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file. Server returned an empty response"), None
 
         # Creating temporary directory and file
         try:
