@@ -2884,7 +2884,11 @@ class ThreatstreamConnector(BaseConnector):
             if cloud_intelligence is None:
                 return cloud_intelligence
 
-        data = {"is_public": param.get("is_public", False), "is_anonymous": param.get("is_anonymous", False)}
+        data = {}
+        if param.get("is_public") is not None:
+            data["is_public"] = param.get("is_public")
+        if param.get("is_anonymous") is not None:
+            data["is_anonymous"] = param.get("is_anonymous")
 
         data = self._build_threatbulletin_data(param, data)
 
