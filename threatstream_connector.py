@@ -1,6 +1,6 @@
 # File: threatstream_connector.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,6 +59,10 @@ class RetVal(tuple):
 
 
 class ThreatstreamConnector(BaseConnector):
+    _SUBMIT_STATUS_ENDPOINT_RE = re.compile(r"^/?(?:api/)?v1/submit/([1-9][0-9]*)/?$")
+    _SUBMIT_REPORT_ENDPOINT_RE = re.compile(r"^/?(?:api/)?v1/submit/([1-9][0-9]*)/report/?$")
+    _API_PATH_SEGMENT_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
+
     ACTION_ID_WHOIS_IP = "whois_ip"
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_EMAIL_REPUTATION = "email_reputation"
@@ -139,7 +143,7 @@ class ThreatstreamConnector(BaseConnector):
             self.debug_print("Resetting the state file with the default format")
             self._state = {"app_version": self.get_app_json().get("app_version")}
 
-        self._verify = config.get("verify_server_cert", False)
+        self._verify = config.get("verify_server_cert", True)
         self._is_cloud_instance = config.get("is_cloud_instance", False)
         self._first_run_limit = config.get("first_run_containers")
 
@@ -631,7 +635,7 @@ class ThreatstreamConnector(BaseConnector):
 
         self.save_progress("Starting connectivity test")
         payload = self._generate_payload(limit="1")
-        ret_val, resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
+        ret_val, _resp_json = self._make_rest_call(action_result, ENDPOINT_INTELLIGENCE, payload)
 
         if phantom.is_fail(ret_val):
             self.save_progress("Connectivity test failed")
@@ -781,6 +785,8 @@ class ThreatstreamConnector(BaseConnector):
             payload = self._generate_payload(limit=DEFAULT_MAX_RESULTS)
 
         payload["offset"] = offset
+        max_pages = (limit + DEFAULT_MAX_RESULTS - 1) // DEFAULT_MAX_RESULTS if limit else DEFAULT_MAX_PAGES
+        pages_fetched = 0
 
         while True:
             ret_val, items = self._make_rest_call(action_result, endpoint, payload)
@@ -788,6 +794,7 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return None
 
+            pages_fetched += 1
             items_list.extend(items.get("objects", []))
 
             if limit and len(items_list) >= limit:
@@ -795,6 +802,13 @@ class ThreatstreamConnector(BaseConnector):
 
             if len(items.get("objects", [])) < DEFAULT_MAX_RESULTS:
                 break
+
+            if pages_fetched >= max_pages:
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Server kept returning full result pages; aborted pagination after {pages_fetched} pages",
+                )
+                return None
 
             offset = offset + DEFAULT_MAX_RESULTS
             payload["offset"] = offset
@@ -1811,8 +1825,10 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
-        endpoint = param.get("endpoint")
-        endpoint = endpoint.replace("/api/", "/")
+        ret_val, endpoint = self._normalize_submit_endpoint(action_result, param.get("endpoint"), report=False)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
 
         if phantom.is_fail(ret_val):
@@ -1825,11 +1841,10 @@ class ThreatstreamConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         payload = self._generate_payload()
-        endpoint = param.get("endpoint")
-        if "report" not in endpoint:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide correct report endpoint")
+        ret_val, endpoint = self._normalize_submit_endpoint(action_result, param.get("endpoint"), report=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        endpoint = endpoint.replace("/api/", "/")
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload, method="get")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1865,7 +1880,7 @@ class ThreatstreamConnector(BaseConnector):
         vault_id = param.get("vault_id")
 
         try:
-            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            _success, _message, vault_info = phrules.vault_info(vault_id=vault_id)
             vault_info = next(iter(vault_info))
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None
@@ -2031,10 +2046,23 @@ class ThreatstreamConnector(BaseConnector):
 
         # download file
         try:
-            pcap_file = requests.get(pcap, timeout=DEFAULT_TIMEOUT).content
+            pcap_response = requests.get(pcap, timeout=DEFAULT_TIMEOUT)
         except Exception as e:
             self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file"), None
+
+        if not pcap_response.ok:
+            return (
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Could not download PCAP file. Server returned status code: {pcap_response.status_code}",
+                ),
+                None,
+            )
+
+        pcap_file = pcap_response.content
+        if not pcap_file:
+            return action_result.set_status(phantom.APP_ERROR, "Could not download PCAP file. Server returned an empty response"), None
 
         # Creating temporary directory and file
         try:
@@ -2879,7 +2907,11 @@ class ThreatstreamConnector(BaseConnector):
             if cloud_intelligence is None:
                 return cloud_intelligence
 
-        data = {"is_public": param.get("is_public", False), "is_anonymous": param.get("is_anonymous", False)}
+        data = {}
+        if param.get("is_public") is not None:
+            data["is_public"] = param.get("is_public")
+        if param.get("is_anonymous") is not None:
+            data["is_anonymous"] = param.get("is_anonymous")
 
         data = self._build_threatbulletin_data(param, data)
 
@@ -3176,32 +3208,62 @@ class ThreatstreamConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _normalize_submit_endpoint(self, action_result, endpoint, report=False):
+        endpoint = str(endpoint or "")
+        parsed_endpoint = urlsplit(endpoint)
+        regex = self._SUBMIT_REPORT_ENDPOINT_RE if report else self._SUBMIT_STATUS_ENDPOINT_RE
+        example_endpoint = "/api/v1/submit/<id>/report/" if report else "/api/v1/submit/<id>/"
+
+        if parsed_endpoint.scheme or parsed_endpoint.netloc or parsed_endpoint.query or parsed_endpoint.fragment:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide a {example_endpoint} endpoint"), None
+
+        match = regex.fullmatch(parsed_endpoint.path)
+        if not match:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide a {example_endpoint} endpoint"), None
+
+        report_id = match.group(1)
+        if report:
+            return phantom.APP_SUCCESS, ENDPOINT_GET_REPORT.format(report_id=report_id)
+        return phantom.APP_SUCCESS, f"/v1/submit/{report_id}/"
+
+    def _validate_association_path_params(self, action_result, param):
+        for key in ("entity_type", "associated_entity_type"):
+            if not self._API_PATH_SEGMENT_RE.fullmatch(str(param.get(key) or "")):
+                return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_API_INVALID_VALUE), None
+
+        ret_val, entity_id = self._validate_integer(action_result, param.get("entity_id"), "entity_id")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        return phantom.APP_SUCCESS, entity_id
+
     def _handle_list_associations(self, param):
         self._save_action_handler_progress()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val, entity_id = self._validate_association_path_params(action_result, param)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         ret_val, limit = self._validate_integer(action_result, param.get("limit", 1000), THREATSTREAM_LIMIT)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         payload = self._generate_payload()
+        entity_type = param.get("entity_type")
+        associated_entity_type = param.get("associated_entity_type")
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
             associations = self._paginator(
-                ENDPOINT_FETCH_ENTITIES.format(
-                    entity_type=param.get("entity_type"), id=param.get("entity_id"), associated_entity_type=param.get("associated_entity_type")
-                ),
+                ENDPOINT_FETCH_ENTITIES.format(entity_type=entity_type, id=entity_id, associated_entity_type=associated_entity_type),
                 action_result,
                 payload=payload,
                 limit=limit,
             )
         else:
             associations = self._paginator(
-                ENDPOINT_FETCH_ENTITIES.format(
-                    entity_type=param.get("entity_type"), id=param.get("entity_id"), associated_entity_type=param.get("associated_entity_type")
-                ),
+                ENDPOINT_FETCH_ENTITIES.format(entity_type=entity_type, id=entity_id, associated_entity_type=associated_entity_type),
                 action_result,
                 payload=payload,
                 limit=limit,
@@ -3211,9 +3273,9 @@ class ThreatstreamConnector(BaseConnector):
                 payload["remote_api"] = "true"
                 associations = self._paginator(
                     ENDPOINT_FETCH_ENTITIES.format(
-                        entity_type=param.get("entity_type"),
-                        id=param.get("entity_id"),
-                        associated_entity_type=param.get("associated_entity_type"),
+                        entity_type=entity_type,
+                        id=entity_id,
+                        associated_entity_type=associated_entity_type,
                     ),
                     action_result,
                     payload=payload,

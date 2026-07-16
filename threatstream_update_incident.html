@@ -11,7 +11,7 @@
 {% block widget_content %}
   <!-- Main Start Block -->
   <!-- File: threatstream_update_incident.html
-  Copyright (c) 2016-2025 Splunk Inc.
+  Copyright (c) 2016-2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ and limitations under the License.
             <td>Incident ID</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['threatstream incident id'], 'value':'{{ result.param.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['threatstream incident id'], 'value':'{{ result.param.incident_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.incident_id }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -139,7 +139,7 @@ and limitations under the License.
                   <td>{{ data.name }}</td>
                   <td>
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['threatstream organization id'], 'value':'{{ data.organization_id }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['threatstream organization id'], 'value':'{{ data.organization_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ data.organization_id }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -166,7 +166,7 @@ and limitations under the License.
                     <tr>
                       <td>
                         <a href="javascript:;"
-                           onclick="context_menu(this, [{'contains': ['threatstream intelligence id'], 'value':'{{ intelligence.id }}' }], 0, {{ container.id }}, null, false);">
+                           onclick="context_menu(this, [{'contains': ['threatstream intelligence id'], 'value':'{{ intelligence.id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                           {{ intelligence.id }}
                           &nbsp;
                           <span class="fa fa-caret-down" style="font-size: smaller;"></span>

@@ -1,6 +1,6 @@
 # File: threatstream_consts.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #
 # Default values
 DEFAULT_MAX_RESULTS = 1000
+DEFAULT_MAX_PAGES = 100
 DEFAULT_TIMEOUT = 120
 
 # JSON keys
