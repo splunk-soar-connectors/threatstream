@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import sys
+import unicodedata
 import uuid
 from urllib.parse import urlsplit
 
@@ -51,6 +52,17 @@ def _json_fallback(obj):
         return obj.isoformat()
     else:
         return obj
+
+
+def _strip_unicode_format_controls(value):
+    """Remove Unicode format controls from upstream incident data before ingesting it."""
+    if isinstance(value, str):
+        return "".join(character for character in value if unicodedata.category(character) != "Cf")
+    if isinstance(value, dict):
+        return {key: _strip_unicode_format_controls(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_strip_unicode_format_controls(item) for item in value]
+    return value
 
 
 class RetVal(tuple):
@@ -1603,7 +1615,7 @@ class ThreatstreamConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_CONFIDENCE)
             indicator_type = param["indicator_type"]
-            classification = param.get("classification")
+            classification = param.get("classification", "private")
             severity = param.get("severity")
             tags = param.get("tags")
             source = param.get("source")
@@ -1655,8 +1667,7 @@ class ThreatstreamConnector(BaseConnector):
                 if severity:
                     object_dict.update({"severity": severity})
 
-                if classification:
-                    object_dict.update({"classification": classification})
+                object_dict.update({"classification": classification})
 
                 if source:
                     object_dict.update({"source": source})
@@ -1915,7 +1926,7 @@ class ThreatstreamConnector(BaseConnector):
             {
                 "report_radio-platform": param.get("platform", "WINDOWS7"),
                 "report_radio-file": vault_path,
-                "report_radio-classification": param.get("classification"),
+                "report_radio-classification": param.get("classification", "private"),
             }
         )
         if param.get("use_premium_sandbox", None) and param.get("use_vmray_sandbox", None):
@@ -1971,7 +1982,7 @@ class ThreatstreamConnector(BaseConnector):
             {
                 "report_radio-platform": param.get("platform", "WINDOWS7"),
                 "report_radio-url": param.get("url"),
-                "report_radio-classification": param.get("classification"),
+                "report_radio-classification": param.get("classification", "private"),
             }
         )
 
@@ -2259,7 +2270,8 @@ class ThreatstreamConnector(BaseConnector):
 
             # Create the list of artifacts to be created
             artifacts_list = []
-            intelligence = resp_json.pop("intelligence", [])
+            intelligence = _strip_unicode_format_controls(resp_json.pop("intelligence", []))
+            resp_json = _strip_unicode_format_controls(resp_json)
 
             for item in intelligence:
                 artifact = {

@@ -1,3 +1,5 @@
 **Unreleased**
 
-* Refresh development validation tooling. [PSAAS-32948]
+* Limited ThreatStream pagination when upstream continuously returns full pages. [PSAAS-32948]
+* Stripped Unicode format controls from incident data before ingestion.
+* Defaulted imported observables to private classification when automation omits the parameter.
