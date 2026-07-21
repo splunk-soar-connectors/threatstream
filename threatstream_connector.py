@@ -432,15 +432,24 @@ class ThreatstreamConnector(BaseConnector):
 
         return payload
 
-    def _intel_details(self, action_result, q=None, value=None, limit=None, extend_source=False):
+    def _intel_details(self, action_result, q=None, value=None, exact_value=None, limit=None, extend_source=False):
         """Use the intelligence endpoint to get general details"""
 
-        payload = self._generate_payload(extend_source=extend_source, order_by="-created_ts", q=q, value=value, limit=limit)
+        payload = self._generate_payload(
+            extend_source=extend_source,
+            order_by="-created_ts",
+            q=q,
+            value=exact_value if exact_value is not None else value,
+            limit=limit,
+        )
 
         intel_details = self._paginator(ENDPOINT_INTELLIGENCE, action_result, payload=payload, limit=limit)
 
         if intel_details is None:
             return action_result.get_status()
+
+        if exact_value is not None:
+            intel_details = [detail for detail in intel_details if detail.get("value") == exact_value]
 
         for detail in intel_details:
             action_result.add_data(detail)
@@ -462,7 +471,7 @@ class ThreatstreamConnector(BaseConnector):
         # action_result.add_data({'pdns': resp_json['results']})
         # self._data_dict['pdns'] = resp_json['results']
         if action_result.get_data():
-            action_result.add_data(action_result.get_data()[0].update({"pdns": resp_json["results"]}))
+            action_result.get_data()[0].update({"pdns": resp_json["results"]})
         else:
             action_result.add_data({"pdns": resp_json["results"]})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
@@ -479,7 +488,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error retrieving insights")
 
         if action_result.get_data():
-            action_result.add_data(action_result.get_data()[0].update({"insights": resp_json["insights"]}))
+            action_result.get_data()[0].update({"insights": resp_json["insights"]})
         else:
             action_result.add_data({"insights": resp_json["insights"]})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
@@ -491,10 +500,10 @@ class ThreatstreamConnector(BaseConnector):
         ret_val, resp_json = self._make_rest_call(action_result, ext_ref, payload)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_SUCCESS, "Error retrieving external references")
+            return action_result.set_status(phantom.APP_ERROR, "Error retrieving external references")
 
         if action_result.get_data():
-            action_result.add_data(action_result.get_data()[0].update({"external_references": resp_json}))
+            action_result.get_data()[0].update({"external_references": resp_json})
         else:
             action_result.add_data({"external_references": resp_json})
         return action_result.set_status(phantom.APP_SUCCESS, "Retrieved")
@@ -588,7 +597,7 @@ class ThreatstreamConnector(BaseConnector):
         self.debug_print(f"Retrieving ip domain with {param}")
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, exact_value=value, limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
 
@@ -619,7 +628,7 @@ class ThreatstreamConnector(BaseConnector):
         """Retrieve all the information needed for email or md5 hashes"""
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, exact_value=value, limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
@@ -734,7 +743,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.get_status()
 
         if search_exact_value:
-            ret_val = self._intel_details(action_result, q=f"(value={value})", limit=limit, extend_source=extend_source)
+            ret_val = self._intel_details(action_result, exact_value=value, limit=limit, extend_source=extend_source)
         else:
             ret_val = self._intel_details(action_result, value=value, limit=limit, extend_source=extend_source)
         if not ret_val:
@@ -2109,6 +2118,8 @@ class ThreatstreamConnector(BaseConnector):
 
     def _check_and_update_container_already_exists(self, incident_id, incident_name, verify=False):
         url = f'{self.get_phantom_base_url()}rest/container?_filter_source_data_identifier="{incident_id}"&_filter_asset={self.get_asset_id()}'
+        tracked_containers = self._state.setdefault("incident_container_ids", {})
+        tracked_container_id = tracked_containers.get(str(incident_id))
 
         try:
             r = requests.get(url, verify=verify, timeout=DEFAULT_TIMEOUT)
@@ -2116,21 +2127,32 @@ class ThreatstreamConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             self.debug_print(f"Unable to query ThreatStream incident container: {error_message}")
-            return None
+            return phantom.APP_ERROR, None
 
         if resp_json.get("count", 0) <= 0:
+            if tracked_container_id is not None:
+                self.debug_print(f"Tracked container {tracked_container_id} for incident {incident_id} no longer exists")
+                return phantom.APP_ERROR, None
             self.debug_print("No container matched")
-            return None
+            return phantom.APP_SUCCESS, None
 
-        try:
-            container_id = resp_json.get("data", [])[0]["id"]
-        except Exception as e:
-            self.debug_print("Container results are not proper: ", e)
-            return None
+        matching_containers = resp_json.get("data", [])
+        container = next(
+            (item for item in matching_containers if str(item.get("id")) == str(tracked_container_id)),
+            None,
+        )
+        if tracked_container_id is None or container is None:
+            self.debug_print(
+                f"Refusing untracked container match for ThreatStream incident {incident_id}; "
+                "the source data identifier and asset fields do not prove connector ownership"
+            )
+            return phantom.APP_ERROR, None
+
+        container_id = container["id"]
 
         # If the container exists and the name of the incident has been updated,
         # update the name of the container as well to stay in sync with the UI of ThreatStream
-        if container_id and (resp_json.get("data", [])[0]["name"] != f"{incident_id}-{incident_name}"):
+        if container_id and (container.get("name") != f"{incident_id}-{incident_name}"):
             url = f"{self.get_phantom_base_url()}rest/container/{container_id}"
             try:
                 data = {"name": f"{incident_id}-{incident_name}"}
@@ -2139,7 +2161,7 @@ class ThreatstreamConnector(BaseConnector):
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
                 self.debug_print(f"Unable to update the name of the ThreatStream incident container: {error_message}")
-                return container_id
+                return phantom.APP_SUCCESS, container_id
 
             if not resp_json.get("success"):
                 self.debug_print(
@@ -2147,9 +2169,9 @@ class ThreatstreamConnector(BaseConnector):
                     {incident_name} of the incident ID: {incident_id}"
                 )
                 self.debug_print(f"Response of the container updation is: {resp_json!s}")
-                return container_id
+                return phantom.APP_SUCCESS, container_id
 
-        return container_id
+        return phantom.APP_SUCCESS, container_id
 
     def _handle_on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2320,7 +2342,13 @@ class ThreatstreamConnector(BaseConnector):
             artifact["cef_types"] = {"id": ["threatstream incident id"], "organization_id": ["threatstream organization id"]}
             artifacts_list.append(artifact)
 
-            existing_container_id = self._check_and_update_container_already_exists(resp_json.get("id"), resp_json.get("name"))
+            incident_id = resp_json.get("id")
+            ret_val, existing_container_id = self._check_and_update_container_already_exists(incident_id, resp_json.get("name"))
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Refusing to ingest ThreatStream incident {incident_id} into an untracked container",
+                )
 
             self.debug_print("Saving container and adding artifacts for the incident ID: {}".format(resp_json.get("id")))
 
@@ -2343,7 +2371,15 @@ class ThreatstreamConnector(BaseConnector):
                     self.debug_print(message)
                     return action_result.set_status(phantom.APP_ERROR, "Failed creating container")
 
+                if "duplicate" in str(message).lower():
+                    self.debug_print(f"Refusing duplicate container returned for ThreatStream incident {incident_id}: {message}")
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Refusing to ingest ThreatStream incident {incident_id} into an untracked duplicate container",
+                    )
+
                 existing_container_id = container_id
+                self._state.setdefault("incident_container_ids", {})[str(incident_id)] = container_id
 
             # Add the artifacts_list to either the created or
             # the existing container with ID in existing_container_id
