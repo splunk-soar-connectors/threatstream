@@ -2312,6 +2312,9 @@ class ThreatstreamConnector(BaseConnector):
         self.save_progress(f"Fetched {len(incidents)} incidents in the oldest first order based on modified_ts time.")
         self.save_progress("Started incident and intelligence artifacts creation...")
 
+        failed_incident_ids = []
+        checkpoint_time = None
+
         for i, incident in enumerate(incidents):
             self.send_progress(f"Processing incident and corresponding intelligence artifacts - {((i + 1) / len(incidents)) * 100} %")
             # self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
@@ -2323,6 +2326,8 @@ class ThreatstreamConnector(BaseConnector):
                             incident.get("id")
                         )
                     )
+                    if not failed_incident_ids:
+                        checkpoint_time = incident.get("modified_ts")
                     continue
 
             self.debug_print("Retrieving details for the incident ID: {}".format(incident.get("id")))
@@ -2330,7 +2335,13 @@ class ThreatstreamConnector(BaseConnector):
             ret_val, resp_json = self._get_incident_support(action_result, incident_id=incident["id"])
 
             if not ret_val:
-                return action_result.get_status()
+                self.debug_print(
+                    "Failed to retrieve details for the incident ID: {}, skipping it. Error: {}".format(
+                        incident.get("id"), action_result.get_message()
+                    )
+                )
+                failed_incident_ids.append(incident.get("id"))
+                continue
 
             # Create the list of artifacts to be created
             artifacts_list = []
@@ -2437,10 +2448,18 @@ class ThreatstreamConnector(BaseConnector):
                     "Error occurred while saving the artifact for the incident ID: {}. Error message: {}".format(resp_json.get("id"), message),
                 )
 
-        if not self.is_poll_now() and incidents:
+            if not failed_incident_ids:
+                checkpoint_time = incident.get("modified_ts")
+
+        if failed_incident_ids:
+            self.save_progress(
+                f"Could not retrieve details of {len(failed_incident_ids)} incident(s), skipped: {failed_incident_ids}. They will be retried on the next poll."
+            )
+
+        if not self.is_poll_now() and checkpoint_time:
             # 2019-08-14T11:37:01.113736 to 2019-08-14T11:37:01 conversion
             # The incidents are sorted in the ascending order
-            last_incident_time = incidents[-1].get("modified_ts")
+            last_incident_time = checkpoint_time
             if last_incident_time:
                 try:
                     parsed_time = dateutil.parser.parse(last_incident_time)

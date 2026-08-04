@@ -6,3 +6,4 @@
 * Import-session update now reports an action error when any requested sub-operation fails.
 * Form-backed import and detonation actions now serialize structured field values before request encoding.
 * Scheduled polling now prevents malformed or future incident timestamps from advancing its saved checkpoint.
+* Polling now skips isolated incident-detail failures without advancing the retry checkpoint past them.
