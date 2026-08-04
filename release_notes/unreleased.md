@@ -8,3 +8,4 @@
 * Scheduled polling now prevents malformed or future incident timestamps from advancing its saved checkpoint.
 * Polling now skips isolated incident-detail failures without advancing the retry checkpoint past them.
 * Scheduled polling now consumes first-run state only after the bounded initial run completes successfully.
+* The get-observable widget now escapes the intelligence identifier before embedding it in JavaScript.
