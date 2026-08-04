@@ -211,26 +211,11 @@ class ThreatstreamConnector(BaseConnector):
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
         status_code = response.status_code
-        action = self.get_action_identifier()
 
-        if 200 <= status_code < 399:
-            if status_code == 202:
-                return RetVal(phantom.APP_SUCCESS, {})
-            elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
-            else:
-                try:
-                    resp = response.json()
-                    return RetVal(phantom.APP_SUCCESS, resp)
-                except Exception:
-                    if not response.text:
-                        resp_text = "Unknown response from the server"
-                    else:
-                        resp_text = response.text
-                    action_result.set_status(
-                        phantom.APP_SUCCESS, f"Unable to parse the JSON response. Response Status Code: {status_code}. Response: {resp_text}"
-                    )
-                    return RetVal(phantom.APP_SUCCESS, {})
+        if status_code == 202:
+            return RetVal(phantom.APP_SUCCESS, {})
+        if status_code == 204:
+            return self._process_empty_response(response, action_result)
 
         data_message = ""
         if not response.text:
@@ -277,13 +262,19 @@ class ThreatstreamConnector(BaseConnector):
                 None,
             )
 
-        # Please specify the status codes here
-        if 200 <= r.status_code < 399:
-            if resp_json.get("error", None) is None:
+        # ThreatStream success responses are JSON objects. Requests can decode
+        # any JSON value, so reject non-object bodies before using object keys.
+        if 200 <= r.status_code < 300:
+            if (
+                isinstance(resp_json, dict)
+                and resp_json.get("error") is None
+                and resp_json.get("errors") is None
+                and resp_json.get("success", True) is not False
+            ):
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
         if not r.text:
-            message = "Status Code: {r.status_code}. Empty response and no information in the header."
+            message = f"Status Code: {r.status_code}. Empty response and no information in the header."
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {} Data from server: {}".format(
