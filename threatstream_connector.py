@@ -1544,6 +1544,33 @@ class ThreatstreamConnector(BaseConnector):
 
         return error_text
 
+    def _validate_expiration_date(self, action_result, value, parameter_name):
+        regex = (
+            r"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T|\s{1})(2[0-3]|[01][0-9]):"
+            r"([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9])(:)?[0-5][0-9])?$"
+        )
+
+        try:
+            if re.fullmatch(regex, value) is None:
+                raise ValueError
+
+            expiration = dateutil.parser.parse(value)
+            if expiration.tzinfo is None:
+                expiration = pytz.utc.localize(expiration)
+
+            if expiration.astimezone(pytz.utc).date() < datetime.datetime.now(pytz.utc).date():
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Invalid '{parameter_name}'. Please provide a date that is greater than or equal to the current date",
+                )
+        except (TypeError, ValueError, OverflowError):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Invalid '{parameter_name}'. Expected format: YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]",
+            )
+
+        return phantom.APP_SUCCESS
+
     def import_support(self, param, action_result):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
@@ -2495,30 +2522,9 @@ class ThreatstreamConnector(BaseConnector):
                 if expire_time == "null":
                     expire_time = None
                 else:
-                    try:
-                        regex = (
-                            r"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T|\s{1})(2[0-3]|[01][0-9]):"
-                            r"([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9])(:)?[0-5][0-9])?$"
-                        )
-
-                        match_iso8601 = re.compile(regex).match
-
-                        if match_iso8601(expire_time) is None:
-                            raise Exception
-
-                        expire_time_date_obj = dateutil.parser.parse(expire_time)
-                        expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
-                        expire_time_utc_date = expire_time_utc_date_obj.date()
-
-                        current_time_utc_date_obj = datetime.datetime.utcnow().replace(tzinfo=dateutil.tz.tzutc())
-                        current_time_utc_date = current_time_utc_date_obj.date()
-
-                        if expire_time_utc_date < current_time_utc_date:
-                            return action_result.set_status(
-                                phantom.APP_ERROR, "Invalid date. Please provide a date that is greater than or equal to the current date"
-                            )
-                    except Exception:
-                        self.debug_print("Error while parsing expire time")
+                    ret_val = self._validate_expiration_date(action_result, expire_time, "expire_time")
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
                 data["expiration_ts"] = expire_time
                 param_list.append("expire_time")
             if threat_model_type and threat_model_to_associate:
@@ -4584,6 +4590,9 @@ class ThreatstreamConnector(BaseConnector):
             data.update({"confidence": confidence})
 
         if expiration_date:
+            ret_val = self._validate_expiration_date(action_result, expiration_date, "expiration_date")
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             data.update({"expiration_ts": expiration_date})
 
         ret_val, resp_json = self._make_rest_call(
