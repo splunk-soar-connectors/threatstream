@@ -1571,6 +1571,18 @@ class ThreatstreamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
+    @staticmethod
+    def _serialize_form_fields(fields):
+        serialized = {}
+        for key, value in fields.items():
+            if isinstance(value, bool):
+                serialized[key] = str(value).lower()
+            elif isinstance(value, (dict, list)):
+                serialized[key] = json.dumps(value)
+            else:
+                serialized[key] = value
+        return serialized
+
     def import_support(self, param, action_result):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
@@ -1757,6 +1769,9 @@ class ThreatstreamConnector(BaseConnector):
                         tags_to_insert.append(temp_tag)
                     data.update({"tags": json.dumps(tags_to_insert)})
 
+        if with_approval:
+            data = self._serialize_form_fields(data)
+
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload=payload, data=data, method=method, use_json=use_json)
 
         if phantom.is_fail(ret_val):
@@ -1916,7 +1931,7 @@ class ThreatstreamConnector(BaseConnector):
             if not isinstance(fields, dict):
                 action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
                 return None
-            data.update(fields)
+            data.update(self._serialize_form_fields(fields))
         return data
 
     def _handle_detonate_file(self, param):
