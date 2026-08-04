@@ -2490,6 +2490,7 @@ class ThreatstreamConnector(BaseConnector):
         messages = []
 
         updated = False
+        any_failed = False
 
         if tlp and tlp not in THREATSTREAM_TLP:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP)))
@@ -2557,6 +2558,7 @@ class ThreatstreamConnector(BaseConnector):
                     action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method="patch"
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 msg = "{}Error: {}".format("Unable to update {}. ".format(param_list if param_list else ""), action_result.get_message())
                 messages.append(msg)
             else:
@@ -2597,6 +2599,7 @@ class ThreatstreamConnector(BaseConnector):
                     method="post",
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 messages.append(f"Unable to update the tags. Error: {action_result.get_message()}")
             else:
                 updated = True
@@ -2614,12 +2617,13 @@ class ThreatstreamConnector(BaseConnector):
                     action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id), payload=payload, method="patch"
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 messages.append(f"Unable to update the comment. Error: {action_result.get_message()}")
             else:
                 updated = True
                 messages.append("Successfully updated comment")
 
-        if not updated:
+        if not updated or any_failed:
             return action_result.set_status(phantom.APP_ERROR, ". ".join(messages))
 
         endpoint = ENDPOINT_IMPORT_SESSION + f"{item_id}/"
