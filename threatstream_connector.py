@@ -22,7 +22,7 @@ import shutil
 import sys
 import unicodedata
 import uuid
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import dateutil.parser
 import phantom.app as phantom
@@ -462,7 +462,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
 
         payload = self._generate_payload(order_by="-last_seen")
-        pdns = ENDPOINT_PDNS.format(ioc_type=ioc_type, ioc_value=value)
+        pdns = ENDPOINT_PDNS.format(ioc_type=ioc_type, ioc_value=quote(str(value), safe=""))
 
         ret_val, resp_json = self._make_rest_call(action_result, pdns, payload)
         if phantom.is_fail(ret_val) or not resp_json["success"]:
@@ -495,7 +495,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _external_references(self, value, action_result):
         payload = self._generate_payload()
-        ext_ref = ENDPOINT_REFERENCE.format(ioc_value=value)
+        ext_ref = ENDPOINT_REFERENCE.format(ioc_value=quote(str(value), safe=""))
 
         ret_val, resp_json = self._make_rest_call(action_result, ext_ref, payload)
 
@@ -522,7 +522,7 @@ class ThreatstreamConnector(BaseConnector):
 
         if not whois_response:
             payload = self._generate_payload()
-            whois = ENDPOINT_WHOIS.format(ioc_value=value)
+            whois = ENDPOINT_WHOIS.format(ioc_value=quote(str(value), safe=""))
 
             ret_val, resp_json = self._make_rest_call(action_result, whois, payload)
             if phantom.is_fail(ret_val):
