@@ -7,3 +7,4 @@
 * Form-backed import and detonation actions now serialize structured field values before request encoding.
 * Scheduled polling now prevents malformed or future incident timestamps from advancing its saved checkpoint.
 * Polling now skips isolated incident-detail failures without advancing the retry checkpoint past them.
+* Scheduled polling now consumes first-run state only after the bounded initial run completes successfully.

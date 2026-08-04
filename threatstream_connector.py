@@ -2245,7 +2245,6 @@ class ThreatstreamConnector(BaseConnector):
             elif self._state.get("first_run", True):
                 # Scheduled polling first run
                 limit = self._first_run_limit
-                self._state["first_run"] = False
             else:
                 # Poll every new update in the subsequent polls
                 # of the scheduled_polling
@@ -2472,6 +2471,9 @@ class ThreatstreamConnector(BaseConnector):
                     self._state["last_incident_time"] = last_incident_time
                 except (ValueError, OverflowError, TypeError) as e:
                     self.debug_print(f"Ignoring unparseable upstream modified_ts '{last_incident_time}' for the poll checkpoint: {e}")
+
+        if not self.is_poll_now():
+            self._state["first_run"] = False
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 
