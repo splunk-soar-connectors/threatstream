@@ -920,7 +920,7 @@ class ThreatstreamConnector(BaseConnector):
         if param and param.get("incident_id"):
             ret_val, incident_id = self._validate_integer(action_result, param["incident_id"], THREATSTREAM_INCIDENT_ID)
             if phantom.is_fail(ret_val):
-                return action_result.get_status()
+                return action_result.get_status(), None
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
@@ -3580,7 +3580,7 @@ class ThreatstreamConnector(BaseConnector):
 
         ret_val, rule_id = self._validate_integer(action_result, rule_id, THREATSTREAM_RULE_ID)
         if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            return action_result.get_status(), None
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
