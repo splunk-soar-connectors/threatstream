@@ -1812,7 +1812,7 @@ class ThreatstreamConnector(BaseConnector):
 
         data = {THREATSTREAM_JSON_TAGS: []}
 
-        tlp = param.get("tlp")
+        tlp = param.get("tlp", "red")
         if tlp and tlp not in THREATSTREAM_TLP:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP)))
 
