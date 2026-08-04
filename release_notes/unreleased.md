@@ -10,3 +10,4 @@
 * Scheduled polling now consumes first-run state only after the bounded initial run completes successfully.
 * The get-observable widget now escapes the intelligence identifier before embedding it in JavaScript.
 * Response handling now rejects unexpected HTML, non-object JSON, and JSON bodies that explicitly report failure.
+* Threat-bulletin mutations now handle responses that omit optional comment or import-session acknowledgement fields.

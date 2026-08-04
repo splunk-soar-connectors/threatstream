@@ -2964,7 +2964,7 @@ class ThreatstreamConnector(BaseConnector):
                 output_message = f"{output_message}. Error while adding comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
-                if resp_json["comments"]:
+                if resp_json.get("comments"):
                     resp_json["comments"].append(response)
                 else:
                     resp_json.update({"comments": response})
@@ -3210,7 +3210,7 @@ class ThreatstreamConnector(BaseConnector):
                     output_message = f"Error while updating comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
-                if resp_json["comments"]:
+                if resp_json.get("comments"):
                     resp_json["comments"].append(response)
                 else:
                     resp_json.update({"comments": response})
@@ -3988,7 +3988,10 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status(), resp_json
 
-        resp_json.update({"import_sessions": response["ids"]})
+        if isinstance(response, dict) and response.get("ids") is not None:
+            resp_json.update({"import_sessions": response["ids"]})
+        else:
+            resp_json.update({"import_sessions": import_sessions})
 
         return action_result.set_status(phantom.APP_SUCCESS, "Import sessions attached successfully"), resp_json
 
