@@ -2442,7 +2442,17 @@ class ThreatstreamConnector(BaseConnector):
             # The incidents are sorted in the ascending order
             last_incident_time = incidents[-1].get("modified_ts")
             if last_incident_time:
-                self._state["last_incident_time"] = last_incident_time
+                try:
+                    parsed_time = dateutil.parser.parse(last_incident_time)
+                    now = datetime.datetime.now(parsed_time.tzinfo) if parsed_time.tzinfo else datetime.datetime.now()
+                    if parsed_time > now:
+                        self.debug_print(
+                            f"Upstream modified_ts '{last_incident_time}' is in the future; clamping poll checkpoint to the current time"
+                        )
+                        last_incident_time = now.strftime("%Y-%m-%dT%H:%M:%S.%f")
+                    self._state["last_incident_time"] = last_incident_time
+                except (ValueError, OverflowError, TypeError) as e:
+                    self.debug_print(f"Ignoring unparseable upstream modified_ts '{last_incident_time}' for the poll checkpoint: {e}")
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 

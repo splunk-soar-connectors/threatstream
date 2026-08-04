@@ -5,3 +5,4 @@
 * Import-session and observable updates now reject malformed or past expiration timestamps before sending requests.
 * Import-session update now reports an action error when any requested sub-operation fails.
 * Form-backed import and detonation actions now serialize structured field values before request encoding.
+* Scheduled polling now prevents malformed or future incident timestamps from advancing its saved checkpoint.
