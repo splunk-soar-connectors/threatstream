@@ -22,7 +22,7 @@ import shutil
 import sys
 import unicodedata
 import uuid
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 import dateutil.parser
 import phantom.app as phantom
@@ -211,26 +211,11 @@ class ThreatstreamConnector(BaseConnector):
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
         status_code = response.status_code
-        action = self.get_action_identifier()
 
-        if 200 <= status_code < 399:
-            if status_code == 202:
-                return RetVal(phantom.APP_SUCCESS, {})
-            elif status_code == 204 and action == self.ACTION_ID_DELETE_INCIDENT:
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted incident"), {})
-            else:
-                try:
-                    resp = response.json()
-                    return RetVal(phantom.APP_SUCCESS, resp)
-                except Exception:
-                    if not response.text:
-                        resp_text = "Unknown response from the server"
-                    else:
-                        resp_text = response.text
-                    action_result.set_status(
-                        phantom.APP_SUCCESS, f"Unable to parse the JSON response. Response Status Code: {status_code}. Response: {resp_text}"
-                    )
-                    return RetVal(phantom.APP_SUCCESS, {})
+        if status_code == 202:
+            return RetVal(phantom.APP_SUCCESS, {})
+        if status_code == 204:
+            return self._process_empty_response(response, action_result)
 
         data_message = ""
         if not response.text:
@@ -277,13 +262,19 @@ class ThreatstreamConnector(BaseConnector):
                 None,
             )
 
-        # Please specify the status codes here
-        if 200 <= r.status_code < 399:
-            if resp_json.get("error", None) is None:
+        # ThreatStream success responses are JSON objects. Requests can decode
+        # any JSON value, so reject non-object bodies before using object keys.
+        if 200 <= r.status_code < 300:
+            if (
+                isinstance(resp_json, dict)
+                and resp_json.get("error") is None
+                and resp_json.get("errors") is None
+                and resp_json.get("success", True) is not False
+            ):
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
         if not r.text:
-            message = "Status Code: {r.status_code}. Empty response and no information in the header."
+            message = f"Status Code: {r.status_code}. Empty response and no information in the header."
         else:
             # You should process the error returned in the json
             message = "Error from server. Status Code: {} Data from server: {}".format(
@@ -462,7 +453,7 @@ class ThreatstreamConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_TYPE)
 
         payload = self._generate_payload(order_by="-last_seen")
-        pdns = ENDPOINT_PDNS.format(ioc_type=ioc_type, ioc_value=value)
+        pdns = ENDPOINT_PDNS.format(ioc_type=ioc_type, ioc_value=quote(str(value), safe=""))
 
         ret_val, resp_json = self._make_rest_call(action_result, pdns, payload)
         if phantom.is_fail(ret_val) or not resp_json["success"]:
@@ -495,7 +486,7 @@ class ThreatstreamConnector(BaseConnector):
 
     def _external_references(self, value, action_result):
         payload = self._generate_payload()
-        ext_ref = ENDPOINT_REFERENCE.format(ioc_value=value)
+        ext_ref = ENDPOINT_REFERENCE.format(ioc_value=quote(str(value), safe=""))
 
         ret_val, resp_json = self._make_rest_call(action_result, ext_ref, payload)
 
@@ -522,7 +513,7 @@ class ThreatstreamConnector(BaseConnector):
 
         if not whois_response:
             payload = self._generate_payload()
-            whois = ENDPOINT_WHOIS.format(ioc_value=value)
+            whois = ENDPOINT_WHOIS.format(ioc_value=quote(str(value), safe=""))
 
             ret_val, resp_json = self._make_rest_call(action_result, whois, payload)
             if phantom.is_fail(ret_val):
@@ -920,7 +911,7 @@ class ThreatstreamConnector(BaseConnector):
         if param and param.get("incident_id"):
             ret_val, incident_id = self._validate_integer(action_result, param["incident_id"], THREATSTREAM_INCIDENT_ID)
             if phantom.is_fail(ret_val):
-                return action_result.get_status()
+                return action_result.get_status(), None
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
@@ -1544,6 +1535,45 @@ class ThreatstreamConnector(BaseConnector):
 
         return error_text
 
+    def _validate_expiration_date(self, action_result, value, parameter_name):
+        regex = (
+            r"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T|\s{1})(2[0-3]|[01][0-9]):"
+            r"([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9])(:)?[0-5][0-9])?$"
+        )
+
+        try:
+            if re.fullmatch(regex, value) is None:
+                raise ValueError
+
+            expiration = dateutil.parser.parse(value)
+            if expiration.tzinfo is None:
+                expiration = pytz.utc.localize(expiration)
+
+            if expiration.astimezone(pytz.utc).date() < datetime.datetime.now(pytz.utc).date():
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Invalid '{parameter_name}'. Please provide a date that is greater than or equal to the current date",
+                )
+        except (TypeError, ValueError, OverflowError):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Invalid '{parameter_name}'. Expected format: YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ]",
+            )
+
+        return phantom.APP_SUCCESS
+
+    @staticmethod
+    def _serialize_form_fields(fields):
+        serialized = {}
+        for key, value in fields.items():
+            if isinstance(value, bool):
+                serialized[key] = str(value).lower()
+            elif isinstance(value, (dict, list)):
+                serialized[key] = json.dumps(value)
+            else:
+                serialized[key] = value
+        return serialized
+
     def import_support(self, param, action_result):
         payload = self._generate_payload()
         action_name = self.get_action_identifier()
@@ -1730,6 +1760,9 @@ class ThreatstreamConnector(BaseConnector):
                         tags_to_insert.append(temp_tag)
                     data.update({"tags": json.dumps(tags_to_insert)})
 
+        if with_approval:
+            data = self._serialize_form_fields(data)
+
         ret_val, resp_json = self._make_rest_call(action_result, endpoint, payload=payload, data=data, method=method, use_json=use_json)
 
         if phantom.is_fail(ret_val):
@@ -1812,7 +1845,7 @@ class ThreatstreamConnector(BaseConnector):
 
         data = {THREATSTREAM_JSON_TAGS: []}
 
-        tlp = param.get("tlp")
+        tlp = param.get("tlp", "red")
         if tlp and tlp not in THREATSTREAM_TLP:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP)))
 
@@ -1889,7 +1922,7 @@ class ThreatstreamConnector(BaseConnector):
             if not isinstance(fields, dict):
                 action_result.set_status(phantom.APP_ERROR, THREATSTREAM_ERR_INVALID_JSON)
                 return None
-            data.update(fields)
+            data.update(self._serialize_form_fields(fields))
         return data
 
     def _handle_detonate_file(self, param):
@@ -2203,7 +2236,6 @@ class ThreatstreamConnector(BaseConnector):
             elif self._state.get("first_run", True):
                 # Scheduled polling first run
                 limit = self._first_run_limit
-                self._state["first_run"] = False
             else:
                 # Poll every new update in the subsequent polls
                 # of the scheduled_polling
@@ -2270,6 +2302,9 @@ class ThreatstreamConnector(BaseConnector):
         self.save_progress(f"Fetched {len(incidents)} incidents in the oldest first order based on modified_ts time.")
         self.save_progress("Started incident and intelligence artifacts creation...")
 
+        failed_incident_ids = []
+        checkpoint_time = None
+
         for i, incident in enumerate(incidents):
             self.send_progress(f"Processing incident and corresponding intelligence artifacts - {((i + 1) / len(incidents)) * 100} %")
             # self.send_progress("Processing containers and artifacts creation for the incident ID: {0}".format(incident.get("id")))
@@ -2281,6 +2316,8 @@ class ThreatstreamConnector(BaseConnector):
                             incident.get("id")
                         )
                     )
+                    if not failed_incident_ids:
+                        checkpoint_time = incident.get("modified_ts")
                     continue
 
             self.debug_print("Retrieving details for the incident ID: {}".format(incident.get("id")))
@@ -2288,7 +2325,13 @@ class ThreatstreamConnector(BaseConnector):
             ret_val, resp_json = self._get_incident_support(action_result, incident_id=incident["id"])
 
             if not ret_val:
-                return action_result.get_status()
+                self.debug_print(
+                    "Failed to retrieve details for the incident ID: {}, skipping it. Error: {}".format(
+                        incident.get("id"), action_result.get_message()
+                    )
+                )
+                failed_incident_ids.append(incident.get("id"))
+                continue
 
             # Create the list of artifacts to be created
             artifacts_list = []
@@ -2395,12 +2438,33 @@ class ThreatstreamConnector(BaseConnector):
                     "Error occurred while saving the artifact for the incident ID: {}. Error message: {}".format(resp_json.get("id"), message),
                 )
 
-        if not self.is_poll_now() and incidents:
+            if not failed_incident_ids:
+                checkpoint_time = incident.get("modified_ts")
+
+        if failed_incident_ids:
+            self.save_progress(
+                f"Could not retrieve details of {len(failed_incident_ids)} incident(s), skipped: {failed_incident_ids}. They will be retried on the next poll."
+            )
+
+        if not self.is_poll_now() and checkpoint_time:
             # 2019-08-14T11:37:01.113736 to 2019-08-14T11:37:01 conversion
             # The incidents are sorted in the ascending order
-            last_incident_time = incidents[-1].get("modified_ts")
+            last_incident_time = checkpoint_time
             if last_incident_time:
-                self._state["last_incident_time"] = last_incident_time
+                try:
+                    parsed_time = dateutil.parser.parse(last_incident_time)
+                    now = datetime.datetime.now(parsed_time.tzinfo) if parsed_time.tzinfo else datetime.datetime.now()
+                    if parsed_time > now:
+                        self.debug_print(
+                            f"Upstream modified_ts '{last_incident_time}' is in the future; clamping poll checkpoint to the current time"
+                        )
+                        last_incident_time = now.strftime("%Y-%m-%dT%H:%M:%S.%f")
+                    self._state["last_incident_time"] = last_incident_time
+                except (ValueError, OverflowError, TypeError) as e:
+                    self.debug_print(f"Ignoring unparseable upstream modified_ts '{last_incident_time}' for the poll checkpoint: {e}")
+
+        if not self.is_poll_now():
+            self._state["first_run"] = False
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved and ingested the list of incidents")
 
@@ -2463,6 +2527,7 @@ class ThreatstreamConnector(BaseConnector):
         messages = []
 
         updated = False
+        any_failed = False
 
         if tlp and tlp not in THREATSTREAM_TLP:
             return action_result.set_status(phantom.APP_ERROR, THREATSTREAM_INVALID_SELECTION.format("tlp", ", ".join(THREATSTREAM_TLP)))
@@ -2495,30 +2560,9 @@ class ThreatstreamConnector(BaseConnector):
                 if expire_time == "null":
                     expire_time = None
                 else:
-                    try:
-                        regex = (
-                            r"^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])(T|\s{1})(2[0-3]|[01][0-9]):"
-                            r"([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?(Z|[+-](?:2[0-3]|[01][0-9])(:)?[0-5][0-9])?$"
-                        )
-
-                        match_iso8601 = re.compile(regex).match
-
-                        if match_iso8601(expire_time) is None:
-                            raise Exception
-
-                        expire_time_date_obj = dateutil.parser.parse(expire_time)
-                        expire_time_utc_date_obj = expire_time_date_obj.astimezone(pytz.utc)
-                        expire_time_utc_date = expire_time_utc_date_obj.date()
-
-                        current_time_utc_date_obj = datetime.datetime.utcnow().replace(tzinfo=dateutil.tz.tzutc())
-                        current_time_utc_date = current_time_utc_date_obj.date()
-
-                        if expire_time_utc_date < current_time_utc_date:
-                            return action_result.set_status(
-                                phantom.APP_ERROR, "Invalid date. Please provide a date that is greater than or equal to the current date"
-                            )
-                    except Exception:
-                        self.debug_print("Error while parsing expire time")
+                    ret_val = self._validate_expiration_date(action_result, expire_time, "expire_time")
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
                 data["expiration_ts"] = expire_time
                 param_list.append("expire_time")
             if threat_model_type and threat_model_to_associate:
@@ -2551,6 +2595,7 @@ class ThreatstreamConnector(BaseConnector):
                     action_result, endpoint=endpoint, payload=payload, headers=None, data=data, method="patch"
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 msg = "{}Error: {}".format("Unable to update {}. ".format(param_list if param_list else ""), action_result.get_message())
                 messages.append(msg)
             else:
@@ -2591,6 +2636,7 @@ class ThreatstreamConnector(BaseConnector):
                     method="post",
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 messages.append(f"Unable to update the tags. Error: {action_result.get_message()}")
             else:
                 updated = True
@@ -2608,12 +2654,13 @@ class ThreatstreamConnector(BaseConnector):
                     action_result, endpoint=ENDPOINT_COMMENT_IMPORT_SESSION.format(session_id=item_id), payload=payload, method="patch"
                 )
             if phantom.is_fail(ret_val):
+                any_failed = True
                 messages.append(f"Unable to update the comment. Error: {action_result.get_message()}")
             else:
                 updated = True
                 messages.append("Successfully updated comment")
 
-        if not updated:
+        if not updated or any_failed:
             return action_result.set_status(phantom.APP_ERROR, ". ".join(messages))
 
         endpoint = ENDPOINT_IMPORT_SESSION + f"{item_id}/"
@@ -2917,7 +2964,7 @@ class ThreatstreamConnector(BaseConnector):
                 output_message = f"{output_message}. Error while adding comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
-                if resp_json["comments"]:
+                if resp_json.get("comments"):
                     resp_json["comments"].append(response)
                 else:
                     resp_json.update({"comments": response})
@@ -3163,7 +3210,7 @@ class ThreatstreamConnector(BaseConnector):
                     output_message = f"Error while updating comments to the threat bulletin. Details: {action_result.get_message()}"
 
             if not phantom.is_fail(ret_val):
-                if resp_json["comments"]:
+                if resp_json.get("comments"):
                     resp_json["comments"].append(response)
                 else:
                     resp_json.update({"comments": response})
@@ -3580,7 +3627,7 @@ class ThreatstreamConnector(BaseConnector):
 
         ret_val, rule_id = self._validate_integer(action_result, rule_id, THREATSTREAM_RULE_ID)
         if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            return action_result.get_status(), None
 
         if self._is_cloud_instance:
             payload["remote_api"] = "true"
@@ -3941,7 +3988,10 @@ class ThreatstreamConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status(), resp_json
 
-        resp_json.update({"import_sessions": response["ids"]})
+        if isinstance(response, dict) and response.get("ids") is not None:
+            resp_json.update({"import_sessions": response["ids"]})
+        else:
+            resp_json.update({"import_sessions": import_sessions})
 
         return action_result.set_status(phantom.APP_SUCCESS, "Import sessions attached successfully"), resp_json
 
@@ -4584,6 +4634,9 @@ class ThreatstreamConnector(BaseConnector):
             data.update({"confidence": confidence})
 
         if expiration_date:
+            ret_val = self._validate_expiration_date(action_result, expiration_date, "expiration_date")
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             data.update({"expiration_ts": expiration_date})
 
         ret_val, resp_json = self._make_rest_call(

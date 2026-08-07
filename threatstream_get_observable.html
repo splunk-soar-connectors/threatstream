@@ -108,7 +108,7 @@ and limitations under the License.
             <td>Intelligence ID</td>
             <td>
               <a href="javascript:;"
-                 onclick="context_menu(this, [{'contains': ['threatstream intelligence id'], 'value':'{{ result.param.intelligence_id }}' }], 0, {{ container.id }}, null, false);">
+                 onclick="context_menu(this, [{'contains': ['threatstream intelligence id'], 'value':'{{ result.param.intelligence_id|escapejs }}' }], 0, {{ container.id }}, null, false);">
                 {{ result.param.intelligence_id }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
